@@ -1,0 +1,61 @@
+vnote_backup_file_826537664 E:/笔记/前端/js常用的的日期处理.md
+# js常用的的日期处理
+## 库函数
+### 创建日期
+可以使用 newDate() 来创建日期，传入的参数通常有4种常用的方式：使用日期字符串参数
+使用一系列的参数
+时间戳参数
+不带参数
+```
+new Date('1988-03-21')//自定义日期
+new Date()//当前日期
+```
+toString：格式化成 "Wed Jan 23 2019 17:23:42 GMT+0800 (中国标准时间)"
+toDateString: 格式化成 "Wed Jan 23 2019"
+toLocaleString：格式化成 "2019/1/23 下午5:23:42"
+toLocaleDateString：格式化成 "2019/1/23"
+toGMTString：格式化成 "Wed, 23 Jan 2019 09:23:42 GMT"
+toUTCString：格式化成 "Wed, 23 Jan 2019 09:23:42 GMT"
+toISOString ：格式化成 "2019-01-23T09:23:42.000Z"
+getFullYear：获取当地时间4位数的年份
+getMonth：获取当时时间的月份，注意从 0 开始
+getDate：获取当地时间月中的某一天（1-31）
+getDay：获取当地时间的星期几（0-6），星期日（0）开始，到星期六（6）结束。
+
+从另一个日期获取日期
+有两种可能的情况，希望从另一个日期获得一个日期。
+
+设置另一个日期特定的日期/时间值
+从另一个日期添加/减去增量
+设置另一个日期特定的日期/时间值
+可以使用以下方法设置另一个日期的日期/时间:
+setFullYear: 设置年份
+setMonth：设置月份
+setDate：设置每月的某一天
+setHours：设置时
+setNubytes：设置分
+setSeconds：设置秒
+setMilliseconds：设置毫秒
+
+自动日期校正
+如果为 Date提供一个超出其可接受范围的值，JS 将自动重新计算日期。
+
+如下所示，假设我们把日期定在2019年3月33日，日历上没有33日，JS 会自动将 3月33日调整为 4月2日。
+
+1、获取当前时间，结果格式：YYYY-mm-DD HH:MM
+```
+function getYMDHM(){
+	var d = new Date();
+	var year = d.getFullYear();
+	var month = d.getMonth() + 1; // 记得当前月是要+1的
+	month = month < 10 ? ("0" + month) : month;
+	var dt = d.getDate();
+	dt = dt < 10 ? ("0" + dt) : dt;
+	var hour = d.getHours();
+	hour = hour < 10 ? ("0" + hour) : hour;
+	var minu = d.getMinutes();
+	minu = minu < 10 ? ("0" + minu) : minu;
+	var now = year + "-" + month + "-" + dt + " " + hour + ":" + minu;
+	return now;
+}
+```

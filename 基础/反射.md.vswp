@@ -1,0 +1,84 @@
+vnote_backup_file_826537664 E:/笔记/基础/反射.md
+# 反射
+新建一个实体类
+```
+package com.wpp;
+
+public class User{
+    private Integer id;
+    private String name;
+
+    public User() {
+    }
+
+    public User(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
+}
+
+```
+```
+        //获取Class的对象 Class.forName("类路径")
+        Class<?> user = Class.forName("com.wpp.User");
+        System.out.println(user);
+        //再加载一个会发现两个class是一个
+        Class<?> user1 = Class.forName("com.wpp.User");
+        System.out.println(user.hashCode());
+        System.out.println(user1.hashCode());
+        //但是new出来的不是一个
+        User user2 = new User(1,"wpp");
+        System.out.println(user2.hashCode());
+        //通过new出来的对象getClass()实际上也是一个
+        System.out.println(user2.getClass());
+        System.out.println(user2.getClass().hashCode());
+
+```
+几种方式对比
+```
+//获取Class实例：通过类的Class属性
+ //1、getClass
+ System.out.println(user2.getClass().hashCode());
+//2、Class.forName
+ System.out.println(Class.forName("com.wpp.User").hashCode());
+ //3、 .class
+System.out.println(User.class.hashCode());
+//4、 .Type（内置基本属性）
+System.out.println(Integer.TYPE);
+//5、利用ClassLoader
+```
+输出为
+460141958
+460141958
+460141958
+460141958
+int
+  
+![](_v_images/20230806185911145_5252.png =1340x)
+![](_v_images/20230806185937628_20925.png =1143x)
+![](_v_images/20230806191010462_21815.png =990x)
+![](_v_images/20230806191232968_25526.png =989x)

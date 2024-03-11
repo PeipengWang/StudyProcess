@@ -1,0 +1,7 @@
+vnote_backup_file_826537664 E:/笔记/前端/self==top.md
+# self==top
+if(self!=top){
+       top.location=self.location;
+   }
+意思是本网页不允许被框架。目的是防止你的网页被引用在别人的页面中！
+top指向最顶层框架的window对象，self指向当前框架的window对象。如果网页中没有iframe，则top和self是同一个值，所以这段代码可以防止自己的网页被别人用iframe的方式嵌入到其它网页中去。
