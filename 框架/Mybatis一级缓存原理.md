@@ -1,5 +1,7 @@
 # Mybatis一级缓存原理
-![](_v_images/20230714214647389_21509.png)
+<div align="center">
+	<img src="_v_images/20230714214647389_21509.png" alt="Editor" width="500">
+</div>
 ![](_v_images/20230714215342300_2168.png)
 
 ![](_v_images/20230714215400080_30121.png)
