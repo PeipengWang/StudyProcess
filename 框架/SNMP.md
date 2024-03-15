@@ -1,24 +1,22 @@
 # SNMP
 下载
 http://sourceforge.net/projects/net-snmp/files/net-snmp/5.7.1/  
-
-
-./configure --prefix=/usr/local/snmp --with-mib-modules='ucd-snmp/diskio ip-mib/ipv4InterfaceTable'
-make  &&  make install
-mkdir /usr/local/snmp/etc
-cp EXAMPLE.conf /usr/local/snmp/etc/snmpd.conf
-https://cloud.tencent.com/developer/article/1366176
-ps aux | grep snmp | grep -v grep |awk '{print $2}'| xargs kill
-netstat -an |grep 161
-/usr/local/snmp/sbin/snmpd -c /usr/local/snmp/etc/snmpd.conf
-snmpget -v 2c -c public localhost sysName.0"或者"snmpget -v 2c -c public 本机的ip地址 sysName.0
-snmpget -v 2c -c public 本机的ip地址 .1.3.6.1.2.1.1.5.0
-　snmpget -v 2c -c public localhost sysName.0
-　　　　snmpget -v 2c -c public 127.0.0.1 sysName.0
-　　　　snmpget -v 2c -c public 192.168.1.229 sysName.0
-　　　　snmpget -v 2c -c public localhost .1.3.6.1.2.1.1.5.0
-　　　　snmpget -v 2c -c public 127.0.0.1 .1.3.6.1.2.1.1.5.0
-　　　　snmpget -v 2c -c public 192.168.1.229 .1.3.6.1.2.1.1.5.0
+./configure --prefix=/usr/local/snmp --with-mib-modules='ucd-snmp/diskio ip-mib/ipv4InterfaceTable'  
+make  &&  make install  
+mkdir /usr/local/snmp/etc  
+cp EXAMPLE.conf /usr/local/snmp/etc/snmpd.conf  
+https://cloud.tencent.com/developer/article/1366176  
+ps aux | grep snmp | grep -v grep |awk '{print $2}'| xargs kill  
+netstat -an |grep 161  
+/usr/local/snmp/sbin/snmpd -c /usr/local/snmp/etc/snmpd.conf  
+snmpget -v 2c -c public localhost sysName.0"或者"snmpget -v 2c -c public 本机的ip地址 sysName.0  
+snmpget -v 2c -c public 本机的ip地址 .1.3.6.1.2.1.1.5.0  
+　snmpget -v 2c -c public localhost sysName.0  
+　　　　snmpget -v 2c -c public 127.0.0.1 sysName.0  
+　　　　snmpget -v 2c -c public 192.168.1.229 sysName.0  
+　　　　snmpget -v 2c -c public localhost .1.3.6.1.2.1.1.5.0  
+　　　　snmpget -v 2c -c public 127.0.0.1 .1.3.6.1.2.1.1.5.0  
+　　　　snmpget -v 2c -c public 192.168.1.229 .1.3.6.1.2.1.1.5.0  
 　　　　iptables –L –n
 iptables -I INPUT -p udp --dport 161 -j ACCEPT
 iptables save
