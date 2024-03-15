@@ -2,7 +2,7 @@
 ![](_v_images/20230714214647389_21509.png)
 ![](_v_images/20230714215342300_2168.png)
 
-![](_v_images/20230714215400080_30121.png =600x)
+![](_v_images/20230714215400080_30121.png)
 ## 一级缓存特点
 自动启用
 通过在setting中设置localCacheScope= STATEMENT（默认为SESSION）全局禁用一级缓存
@@ -25,4 +25,4 @@
 在一个session内，不过期、不更新、不限制；
 与spring整合时，如果开启了事务，事务内，Spring通过ThreadLocal始终使用同一个sqlSession，一级缓存生效； 如果没有开启事务，每次查询前会创建一个sqlSession，查询结束后会关闭sqlSession,所以一级缓存无效； 
 ## Spring集成
-![](_v_images/20230714215752214_555.png =650x)
+![](_v_images/20230714215752214_555.png)
