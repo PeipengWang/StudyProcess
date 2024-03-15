@@ -23,13 +23,8 @@ iptables save
 Snmputil.exe
 snmputil get 192.168.1.229 public .1.3.6.1.2.1.1.5.0
 如果安装后想卸载SNMP，可以执行"make uninstall"命令，卸载步骤如下：
-
 　　1、使用"netstat -an |grep 161"查看snmp服务是否启动
-
 　　2、如果已经启动就使用命令"ps aux | grep snmp | grep -v grep |awk '{print $2}'| xargs kill"关闭snmp的相关服务
-
 　　3、进入SNMP源码目录(net-snmp-5.7.1)
-
 　　4、执行"make uninstall"命令卸载SNMP
-
 　　5、删除/usr/local下的snmp目录以及snmp目录里面的所有文件，usr/local/snmp是SNMP的安装路径
