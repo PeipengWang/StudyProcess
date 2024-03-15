@@ -1,3 +1,4 @@
+<pre>
 # SpringBean
 ## Bean的生命周期
 1、首先需要明确bean对象与普通对象的区别:  
@@ -34,3 +35,4 @@
   容器初始化--》bean初始化--》bean实例化  
   [bean的初始化与实例化](https://blog.csdn.net/qq_15037231/article/details/105938673)  
   实例化
+</pre>
