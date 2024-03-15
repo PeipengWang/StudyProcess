@@ -1,9 +1,9 @@
 # Mybatis一级缓存原理
 <div>
-	<img src="_v_images/20230714214647389_21509.png" alt="Editor">
+	<img src="_v_images/20230714214647389_21509.png" alt="Editor"/>
+<img src="_v_images/20230714215342300_2168.png">
 	
 </div>
-![](_v_images/20230714215342300_2168.png)
 
 ![](_v_images/20230714215400080_30121.png)
 ## 一级缓存特点
