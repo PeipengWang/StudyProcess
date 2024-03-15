@@ -36,7 +36,7 @@ firewall-cmd --reload
 2、--permanent：表示设置为持久；  
 3、--add-port：标识添加的端口；  
 演示
-'''
+```
 upstream lb{  
     server 127.0.0.1:8080 weight=1;  
     server 127.0.0.1:8081 weight=1;  
@@ -44,6 +44,6 @@ upstream lb{
 location / {
     proxy_pass http://lb;
 }
-'''
+```
 正向代理代理的是客户端  
 反向代理代理的是客户端  
