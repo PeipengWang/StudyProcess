@@ -1,6 +1,8 @@
 # SNMP
 下载
-http://sourceforge.net/projects/net-snmp/files/net-snmp/5.7.1/
+http://sourceforge.net/projects/net-snmp/files/net-snmp/5.7.1/  
+
+
 ./configure --prefix=/usr/local/snmp --with-mib-modules='ucd-snmp/diskio ip-mib/ipv4InterfaceTable'
 make  &&  make install
 mkdir /usr/local/snmp/etc
