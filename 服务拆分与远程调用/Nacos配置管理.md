@@ -149,7 +149,8 @@ public class UserController {
 ![](_v_images/20211219214944173_3885.png)
 
 ## 搭建Nacos集群
-![](_v_images/20211219215150930_1432.png =643x)
+<img src="_v_images/20211219215150930_1432.png" alt="" width="643">
+
 ### 搭建集群的基本步骤：
 搭建数据库，初始化数据库表结构
 下载nacos安装包
