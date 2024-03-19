@@ -49,7 +49,7 @@ Exception in thread "Thread-1766" java.lang.NumberFormatException: For input str
 	at shujujiegou.testThreadLocal.lambda$main$0(testThreadLocal.java:16)
 	at java.lang.Thread.run(Thread.java:748)
 ```
-现在已经知道ThreadLocal是本地变量的意思，相当于把共享变量与本地进行了隔离，每个线程复制一份，因此在操作过程中互不干扰
+现在已经知道ThreadLocal是本地变量的意思，相当于把共享变量与本地进行了隔离，每个线程复制一份，因此在操作过程中互不干扰  
 写法如下：
 ```
 private static ThreadLocal<SimpleDateFormat> threadLocal = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
@@ -74,16 +74,16 @@ public static void main(String[] args) {
 }
  
 ```
-ThreadLocal数据结构
-1、它是一个数组结构。
-3、Entry，这里没用再打开，其实它是一个弱引用实现，static class Entry extends WeakReference<ThreadLocal<?>>。这说明只要没用强引用存在，发生GC时就会被垃圾回收。
-3、数据元素采用哈希散列方式进行存储，不过这里的散列使用的是 斐波那契（Fibonacci）散列法，后面会具体分析。
-4、另外由于这里不同于HashMap的数据结构，发生哈希碰撞不会存成链表或红黑树，而是使用开放寻址进行存储。也就是同一个下标位置发生冲突时，则+1向后寻址，直到找到空位置或垃圾回收位置进行存储。
-6、大于2/3就会扩容
-7、探测式清理，其实这也是非常耗时。为此我们在使用 ThreadLocal 一定要记得 new ThreadLocal<>().remove(); 操作。避免弱引用发生GC后，导致内存泄漏的问题。
-底层数据结构
-它的底层数据结构通常是一个 Map，其中线程是键，线程局部变量是值。Java 中的 ThreadLocal 类通过使用线程作为键，可以为每个线程存储一个独立的变量副本，从而实现线程隔离。
-在 ThreadLocal 的内部实现中，一般会使用一个 ThreadLocalMap 类型的实例来存储线程局部变量。ThreadLocalMap 是一个自定义的哈希表，它的键是 ThreadLocal 实例，值是线程局部变量的值。由于每个线程都有自己的 ThreadLocalMap 实例，所以每个线程都可以独立存取其对应的线程局部变量。
-总的来说，ThreadLocal 底层的数据结构就是一个 Map，它将线程作为键与线程局部变量的值进行关联，从而实现了线程隔离的效果。
-底层结构看这篇
-https://blog.csdn.net/qq_38599840/article/details/113850849
+ThreadLocal数据结构  
+1、它是一个数组结构。  
+3、Entry，这里没用再打开，其实它是一个弱引用实现，static class Entry extends WeakReference<ThreadLocal<?>>。这说明只要没用强引用存在，发生GC时就会被垃圾回收。  
+3、数据元素采用哈希散列方式进行存储，不过这里的散列使用的是 斐波那契（Fibonacci）散列法，后面会具体分析。  
+4、另外由于这里不同于HashMap的数据结构，发生哈希碰撞不会存成链表或红黑树，而是使用开放寻址进行存储。也就是同一个下标位置发生冲突时，则+1向后寻址，直到找到空位置或垃圾回收位置进行存储。  
+6、大于2/3就会扩容  
+7、探测式清理，其实这也是非常耗时。为此我们在使用 ThreadLocal 一定要记得 new ThreadLocal<>().remove(); 操作。避免弱引用发生GC后，导致内存泄漏的问题。  
+底层数据结构  
+它的底层数据结构通常是一个 Map，其中线程是键，线程局部变量是值。Java 中的 ThreadLocal 类通过使用线程作为键，可以为每个线程存储一个独立的变量副本，从而实现线程隔离。  
+在 ThreadLocal 的内部实现中，一般会使用一个 ThreadLocalMap 类型的实例来存储线程局部变量。ThreadLocalMap 是一个自定义的哈希表，它的键是 ThreadLocal 实例，值是线程局部变量的值。由于每个线程都有自己的 ThreadLocalMap 实例，所以每个线程都可以独立存取其对应的线程局部变量。  
+总的来说，ThreadLocal 底层的数据结构就是一个 Map，它将线程作为键与线程局部变量的值进行关联，从而实现了线程隔离的效果。  
+底层结构看这篇  
+https://blog.csdn.net/qq_38599840/article/details/113850849  
