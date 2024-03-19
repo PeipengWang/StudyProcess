@@ -1,3 +1,4 @@
+vnote_backup_file_826537664 E:/笔记/StudyProcess/数据库/Mysql/Mysql数据库按照加锁范围划分.md
 # Mysql数据库按照加锁范围划分
 根据加锁的范围，MySQL 里面的锁大致可以分成全局锁、表级锁和行锁三类
 ## 全局锁
