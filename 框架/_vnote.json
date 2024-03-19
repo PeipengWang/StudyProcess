@@ -133,6 +133,15 @@
         }
     ],
     "sub_directories": [
+        {
+            "name": "Struts"
+        },
+        {
+            "name": "Spring"
+        },
+        {
+            "name": "Mybatis"
+        }
     ],
     "version": "1"
 }
