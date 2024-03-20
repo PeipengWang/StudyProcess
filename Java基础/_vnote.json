@@ -53,6 +53,9 @@
         }
     ],
     "sub_directories": [
+        {
+            "name": "JVM"
+        }
     ],
     "version": "1"
 }
