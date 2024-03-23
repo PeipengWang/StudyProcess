@@ -1,0 +1,3 @@
+jsessionid是标明session的id的，它是存在于cookie中的，一般情况下不会出现在url中，服务器会从客户端的cookie中取出来，但是如果客户端禁用了cookie的话，就要重写url了，显式的将jsessionid重写到Url中，方便服务器来通过这个找到session的id。
+
+如果客户端请求的cookie中不包含JSESSIONID，服务端调用request.getSession()时就会生成并传递给客户端，此次响应头会包含设置cookie的信息
