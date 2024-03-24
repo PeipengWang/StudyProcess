@@ -10,9 +10,102 @@
             "name": "Tcpdump抓包.md",
             "tags": [
             ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T13:58:28Z",
+            "modified_time": "2024-03-24T13:58:40Z",
+            "name": "rpm与yum.md",
+            "tags": [
+            ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T13:59:01Z",
+            "modified_time": "2024-03-24T13:59:04Z",
+            "name": "Linux对于软件的管理.md",
+            "tags": [
+            ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T14:00:55Z",
+            "modified_time": "2024-03-24T14:00:58Z",
+            "name": "Linux获取CPU信息.md",
+            "tags": [
+            ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T14:03:31Z",
+            "modified_time": "2024-03-24T14:03:31Z",
+            "name": "检查网络连通性的几种方法.md",
+            "tags": [
+            ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T14:04:05Z",
+            "modified_time": "2024-03-24T14:04:09Z",
+            "name": "linux新建一个服务.md",
+            "tags": [
+            ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T14:04:38Z",
+            "modified_time": "2024-03-24T14:04:41Z",
+            "name": "设置两个文件权限完全相同的方法.md",
+            "tags": [
+            ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T14:05:10Z",
+            "modified_time": "2024-03-24T14:05:13Z",
+            "name": "Linux查看进程.md",
+            "tags": [
+            ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T14:06:50Z",
+            "modified_time": "2024-03-24T14:06:53Z",
+            "name": "SNMP的配置.md",
+            "tags": [
+            ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T14:07:11Z",
+            "modified_time": "2024-03-24T14:07:15Z",
+            "name": "Linux环境变量执行顺序.md",
+            "tags": [
+            ]
         }
     ],
     "sub_directories": [
+        {
+            "name": "shell"
+        }
     ],
     "version": "1"
 }

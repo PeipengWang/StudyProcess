@@ -1,0 +1,3 @@
+vnote_backup_file_826537664 E:/笔记/StudyProcess/Linux/Linux环境变量执行顺序.md
+# 环境变量执行顺序
+etc/profile → /etc/profile.d/*.sh → ~/.bash_profile → ~/.bashrc → [/etc/bashrc]

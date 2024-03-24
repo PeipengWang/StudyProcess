@@ -1,0 +1,79 @@
+vnote_backup_file_826537664 E:/笔记/StudyProcess/C与C++/qq.md
+setsid()：是一个UNIX系统调用，用于创建一个新的会话（session）并将当前进程设置为该会话的领头进程（session leader）。通常情况下，setsid() 函数用于创建守护进程（daemon），以确保它与任何终端分离，从而可以在后台独立运行，而不受终端的影响。
+
+1、它创建一个新的会话。
+
+2、将调用进程设置为新会话的领头进程（session leader）。
+
+3、如果调用进程之前是进程组的组长（group leader），那么它会放弃组长地位，以避免接收来自控制终端的信号。
+
+实际就是脱离父进程，自由自在的活着
+
+fork()：是一个UNIX和类UNIX系统中的系统调用，用于创建一个新的进程，新进程是调用进程的子进程。fork() 函数的作用是创建一个几乎完全相同的子进程，包括进程的代码、数据和上下文，但子进程拥有自己独立的进程ID（PID）
+
+1、创建新进程： fork() 用于创建一个新的进程，新进程是原进程的副本。这两个进程在调用fork() 之前是完全相同的，但后续它们可以独立运行，执行不同的代码。
+
+2、并发执行： 通常，父进程和子进程会并发运行，即它们可以同时执行不同的代码。这允许在多进程编程中执行并行任务。
+
+3、分支执行： fork() 的典型用例是将一个进程分成两个分支，其中一个分支（子进程）可以执行不同的操作，而另一个分支（父进程）可以执行其他操作。
+
+4、多任务处理： fork() 可用于创建多个进程来处理不同的任务，例如服务器程序可以使用多个进程来同时处理客户端请求。
+
+5、后台任务： 通过fork() 可以创建后台进程，它们在后台独立运行，不受终端会话的影响。
+
+需要注意的是，父进程和子进程之间并不共享内存，它们有各自的内存空间，因此在进程间通信时需要使用专门的IPC（进程间通信）机制，如管道、消息队列、共享内存等。
+
+
+
+实例：
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    pid_t pid;
+
+    // Create a child process
+    pid = fork();
+
+    // Check for errors
+    if (pid < 0) {
+        perror("Fork error");
+        exit(1);
+    }
+
+    // If we are in the parent process, exit
+    if (pid > 0) {
+        printf("Parent process exiting.\n");
+        exit(0);
+    }
+
+    // We are now in the child process
+    printf("Child process (daemon) started.\n");
+
+    // Create a new session and become the session leader
+    if (setsid() < 0) {
+        perror("Setsid error");
+        exit(1);
+    }
+
+    // Change the current working directory to root
+    if (chdir("/") < 0) {
+        perror("Chdir error");
+        exit(1);
+    }
+
+    // Close standard file descriptors (stdin, stdout, stderr)
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+
+    // Run as a background daemon
+    while (1) {
+        // Your daemon code goes here
+        sleep(1); // For demonstration, sleep for 1 second
+    }
+
+    return 0;
+}
