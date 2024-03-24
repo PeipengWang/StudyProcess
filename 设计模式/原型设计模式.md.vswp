@@ -1,0 +1,107 @@
+vnote_backup_file_826537664 E:/笔记/StudyProcess/设计模式/原型设计模式.md
+# 原型设计模式
+原型（Prototype）模式的定义如下：用一个已经创建的实例作为原型，通过复制该原型对象来创建一个和原型相同或相似的新对象。在这里，原型实例指定了要创建的对象的种类。用这种方式创建对象非常高效，根本无须知道对象创建的细节。
+## 原型模式的优点：
+Java 自带的原型模式基于内存二进制流的复制，在性能上比直接 new 一个对象更加优良。
+可以使用深克隆方式保存对象的状态，使用原型模式将对象复制一份，并将其状态保存起来，简化了创建对象的过程，以便在需要的时候使用（例如恢复到历史某一状态），可辅助实现撤销操作。
+## 原型模式的缺点：
+需要为每一个类都配置一个 clone 方法
+clone 方法位于类的内部，当对已有类进行改造的时候，需要修改代码，违背了开闭原则。
+当实现深克隆时，需要编写较为复杂的代码，而且当对象之间存在多重嵌套引用时，为了实现深克隆，每一层对象对应的类都必须支持深克隆，实现起来会比较麻烦。因此，深克隆、浅克隆需要运用得当。
+## 模式的结构
+原型模式包含以下主要角色。
+抽象原型类：规定了具体原型对象必须实现的接口。
+具体原型类：实现抽象原型类的 clone() 方法，它是可被复制的对象。
+访问类：使用具体原型类中的 clone() 方法来复制新的对象。
+![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/69e07b273c154c79bf468783a77656d6.png)
+
+## 原型模式的克隆分为浅克隆和深克隆。
+浅克隆：创建一个新对象，新对象的属性和原来对象完全相同，对于非基本类型属性，仍指向原有属性所指向的对象的内存地址（基本类型各自的，引用类型公共的）。
+深克隆：创建一个新对象，属性中引用的其他对象也会被克隆，不再指向原有对象地址。
+### 浅克隆实现
+下面是浅克隆的实现步骤，深克隆需要重写Clone()
+对象的类实现Cloneable接口；
+覆盖Object类的clone()方法（覆盖clone()方法，访问修饰符设为public，默认是protected,但是如果所有类都在同一个包下protected是可以访问的）；
+实例：
+定义Clone接口
+```
+public abstract class Prototype implements Cloneable{
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+}
+
+```
+真实类
+```
+public class RealizeType extends Prototype{
+    private String name;
+    private String value;
+
+    public RealizeType(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    @Override
+    public String toString() {
+        return "RealizeType{" +
+                "name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
+}
+
+```
+测试
+```
+public class PrototypeTest {
+    public static void main(String[] args) throws CloneNotSupportedException {
+        Prototype prototype = new RealizeType("Jhon", "16");
+        RealizeType clone = (RealizeType) prototype.clone();
+        clone.setName("Mary");
+        System.out.println(prototype);
+        System.out.println(clone);
+    }
+}
+
+```
+输出为：
+```
+RealizeType{name='Jhon', value='16'}
+RealizeType{name='Mary', value='16'}
+```
+能够克隆出不同的对象
+### 深克隆实现
+深拷贝实现的是对所有可变(没有被final修饰的引用变量)引用类型的成员变量都开辟内存空间所以一般深拷贝对于浅拷贝来说是比较耗费时间和内存开销的。
+方法一：重写Clone()方法
+在clone()方法中对应用类型重新new
+方法二：序列化实现
+通过重写Object的clone方法去实现深克隆十分麻烦，特别是嵌套比较多和有数组的情况下，重写Clone()很复杂。所以我们可以通过序列化实现深克隆。
+在Java里深克隆一个对象，常常可以先使对象实现Serializable接口，然后把对象（实际上只是对象的一个拷贝）写到一个流里，再从流里读出来，便可以重建对象。
+
+不推荐大家用Cloneable接口，实现比较麻烦，现在借助Apache Commons或者
+springframework可以直接实现：
+浅克隆：BeanUtils.cloneBean(Object obj);BeanUtils.copyProperties(S,T);
+深克隆：SerializationUtils.clone(T object);
+BeanUtils是利用反射原理获得所有类可见的属性和方法，然后复制到target类。
+SerializationUtils.clone()就是使用我们的前面讲的序列化实现深克隆，当然你要把要克隆的类实现Serialization接口。
+## 原型模式的应用场景
+对象之间相同或相似，即只是个别的几个属性不同的时候。
+创建对象成本较大，例如初始化时间长，占用CPU太多，或者占用网络资源太多等，需要优化资源。
+创建一个对象需要繁琐的数据准备或访问权限等，需要提高性能或者提高安全性。
+系统中大量使用该类对象，且各个调用者都需要给它的属性重新赋值。
+在 Spring 中，原型模式应用的非常广泛，例如 scope='prototype'、JSON.parseObject() 等都是原型模式的具体应用。
+## Spring5中的原型设计模式
+原型模式可扩展为带原型管理器的原型模式，它在原型模式的基础上增加了一个原型管理器 PrototypeManager 类。该类用 HashMap 保存多个复制的原型，Client 类可以通过管理器的 get(String id) 方法从中获取复制的原型
+
+在 Spring 中，原型模式应用得非常广泛，例如 scope=“prototype” ，我们经常用的 JSON.parseObject() 也是一种原型模式。分为浅克隆和深克隆两种。
+SpringFramework 的 IOC 容器中放了很多很多的 Bean ，默认情况下，Bean 的作用域（ Scope ）是 singleton ，就是单实例的；如果显式声明作用域为 prototype ，那 Bean 的作用域就会变为每次获取都是一个新的，即原型 Bean 
+pring中，如果一个类被标记为”prototype”,每一次请求（将其注入到另一个bean中，或者以程序的方式调用容器的getBean()方法）都会产生一个新的bean实例。
+Spring不能对一个prototype Bean的整个生命周期负责，容器在初始化、配置、装饰或者是装配完一个prototype实例后，将它交给客户端，随后就对该prototype实例不闻不问了。不管何种作用域，容器都会调用所有对象的初始化生命周期回调方法，而对prototype而言，任何配置好的析构生命周期回调方法都将不会被调用。清除prototype作用域的对象并释放任何prototype bean所持有的昂贵资源，都是客户端代码的职责。
+
+

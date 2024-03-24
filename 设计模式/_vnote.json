@@ -1,0 +1,48 @@
+{
+    "created_time": "2024-03-24T13:44:33Z",
+    "files": [
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T13:44:45Z",
+            "modified_time": "2024-03-24T13:44:48Z",
+            "name": "手写动态代理.md",
+            "tags": [
+            ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T13:46:35Z",
+            "modified_time": "2024-03-24T13:46:38Z",
+            "name": "原型设计模式.md",
+            "tags": [
+            ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T13:52:46Z",
+            "modified_time": "2024-03-24T13:52:48Z",
+            "name": "模板方法设计模式.md",
+            "tags": [
+            ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-03-24T13:53:14Z",
+            "modified_time": "2024-03-24T13:53:16Z",
+            "name": "静态代理与动态代理设计模式.md",
+            "tags": [
+            ]
+        }
+    ],
+    "sub_directories": [
+    ],
+    "version": "1"
+}
