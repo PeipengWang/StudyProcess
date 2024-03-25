@@ -1,24 +1,24 @@
 # pthread
-1、新建一个demoC
-CMakeLists.txt加入依赖
-target_link_libraries(demoC -pthread)
-2、依赖
-#include <pthread.h>
-#include <stdio.h>
-3、定义头文件
-pthread_test.h
- 头文件中定义函数
-```
-#include <pthread.h>
-#include <stdio.h>
-void *thread_function(void *arg);
+1、新建一个demoC  
+CMakeLists.txt加入依赖  
+target_link_libraries(demoC -pthread)  
+2、依赖  
+#include <pthread.h>  
+#include <stdio.h>  
+3、定义头文件  
+pthread_test.h  
+ 头文件中定义函数  
+```  
+#include <pthread.h>  
+#include <stdio.h>  
+void *thread_function(void *arg);  
 /**
  * 创建新的线程
  * @return
  */
 int create_new_thread(void);
 ```
- 4、实现头文件中定义的函数
+ 4、实现头文件中定义的函数  
  pthread_test.c
 ```
 #include "pthread_test.h"
@@ -27,7 +27,7 @@ void *thread_function(void *arg) {
     return NULL;
 }
 /**
- * 测试创建一个线程
+ * 测试创建一个线程  
  * @return
  */
 int create_new_thread(void){
@@ -44,9 +44,9 @@ int create_new_thread(void){
 }
 
 ```
-5、运行
-引入自定义头文件
-实现main
+5、运行  
+引入自定义头文件  
+实现main  
 ```
 #include "pthread_test.h"
 int main() {
