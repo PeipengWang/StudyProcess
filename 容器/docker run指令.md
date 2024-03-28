@@ -3,6 +3,7 @@
 ## Docker容器运行语法
  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 ## docker run常用选项
+```
 d, --detach=false 指定容器运行于前台还是后台，默认为 false。
 -i, --interactive=false 打开 STDIN，用于控制台交互。
 -t, --tty=false  分配 tty 设备，该可以支持终端登录，默认为 false。
@@ -47,3 +48,4 @@ d, --detach=false 指定容器运行于前台还是后台，默认为 false。
 docker run -i -t centos /bin/bash
 我们使用 docker run -i -t 命令以交互式方式运行 Docker。
 docker run -d centos /bin/bash -c "while true; do echo hello world; sleep 3; done"
+```
