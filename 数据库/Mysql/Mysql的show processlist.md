@@ -1,5 +1,5 @@
-# show full processlist状态详解
-···
+# show full processlist状态详解  
+```
 Id: 连接或线程的标识符，是一个唯一的数字。
 User: 连接使用的用户名。
 Host: 连接来自的主机名或 IP 地址。
@@ -13,9 +13,9 @@ Rows_sent: 已经发送到客户端的行数。
 Rows_examined: 已经扫描的行数。
 Rows_affected: 已经修改或删除的行数。
 Timestamp: 当前时间戳。
-···
+```
 status详解：
-···
+```
 init: 表示当前连接正在初始化或准备执行操作。
 Waiting for table metadata lock: 表示当前连接正在等待元数据锁，通常发生在 ALTER TABLE 或 DROP TABLE 等语句执行时。
 Creating sort index: 表示当前连接正在创建排序索引。
@@ -39,4 +39,4 @@ Analyzing and statistics：线程正在收集存储引擎的统计信息，并�
 Copying to tmp table [on disk]: 线程正在执行查询，并且将结果集都复制到另一个临时表中，这种状态一般是要么在做group by 操作，要么是文件排序或者是union操作。如果后面跟着一个on disk标记，那表示Mysql在将内存临时表放到磁盘上
 Sorting result：线程在对结果集进行排序
 Sending data：在多个状态传送数据
-···
+```
