@@ -60,6 +60,16 @@
             "name": "Java的监听器与观察者模式.md",
             "tags": [
             ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2024-04-11T15:35:38Z",
+            "modified_time": "2024-04-11T15:35:43Z",
+            "name": "单例模式--饿汉与懒汉.md",
+            "tags": [
+            ]
         }
     ],
     "sub_directories": [

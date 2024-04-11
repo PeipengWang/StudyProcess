@@ -1,0 +1,12 @@
+B-Tree的特点
+1，叶节点具有相同的深度
+2，所有的索引元素不能重复
+3，叶节点的数据从左往右递增
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200406141422657.png)
+B+树的特点
+1，非叶子节点不能存储数据
+2，所有的索引元素不能重复
+3，所有的叶子节点用指针连接，提高区间访问性能
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200406141318629.png)
+如果是用到范围查找，B+树是一个非常好的查找方式。
+[数据结构仿真](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html)
