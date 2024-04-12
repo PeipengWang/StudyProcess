@@ -645,29 +645,9 @@ PriorityQueue&lt;ScheduledFutureTask&lt;?&gt;&gt; scheduledTaskQueue() {
 ##### Q：
 > 1 可以理解为线程池套线程池，只是里面的线程池只有1个线程，在group创建中会生成对应的eventloop，channel在boss生成包装成Niosocketchannel后，采用基于长度不同的两种策略方案丢到work的一个eventloop，也就是一个线程，必然可以保证线程安全。不过从另一个角度看也不能绝对的保证业务的线程安全，多个业务线程拿到channel后乱搞数据也说不定嘞2 不是解决，是规避，在约定的时间内，空转次数超标，就认为可能出现该bug，那就重新搞一个select，把之前的selectkey注册到新的select，废弃老的那个3 一个线程，死循环一般从自己关联的taskqueue获取任务执行，而且taskqueue添加任务保证了线程安全，那就不需要锁了，来一个处理一个，类似于最简单的生产消费模型
 
- ###### &nbsp;&nbsp;&nbsp; 讲师回复：
-> &nbsp;&nbsp;&nbsp; 回答的很棒，有自己的理解。
 
 ##### **亮：
 > NioEventLoop是一个异步工作任务轮巡线程池，里面核心点就是任务处理，分为普通任务和定时任务。任务是由IO事件处理而来。处理IO事件的连接事件，可读，可写事件。这些IO事件是通过轮巡而来。轮巡又特别处理了epollo的空轮巡的问题，通过特定阈值来确定是否重建select。
-
-##### *雄：
-> 有收获，谢谢老师
-
-##### **5134：
-> 真好，点赞
-
-##### **新：
-> 老师，可以问下配图是使用什么软件画的吗，好精致漂亮，希望老师回复下😁
-
- ###### &nbsp;&nbsp;&nbsp; 编辑回复：
-> &nbsp;&nbsp;&nbsp; Sketch
-
-##### 无：
-> 2020-12-21 打卡，文章很不错，需要反复阅读理解消化。
-
- ###### &nbsp;&nbsp;&nbsp; 编辑回复：
-> &nbsp;&nbsp;&nbsp; 加油学习~
 
 ##### **丁：
 > 老师为什么 Netty 能够保证 Channel 的操作都是线程安全的呢。这句话我不是很明白，不是每个channel都会分配到一个EventGroupLoop下的其中一个NioEventLoop去执行的吗？这不就是相当于线程安全的吗
