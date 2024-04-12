@@ -349,20 +349,8 @@ io.netty.handler.codec.TooLongFrameException: frame length exceeds 10: 13 - disc
  ###### &nbsp;&nbsp;&nbsp; 讲师回复：
 > &nbsp;&nbsp;&nbsp; 应该描述更准确些，如果同时制定\n和\r\n，其实会退化成LineBasedFrameDecoder，就会截取出ABC 和 DEF。如果只是选取\r\n作为特定分隔符，只会截取出ABC\nDEF
 
-##### **帆：
-> 2020.11.12 偏向固定长度，即 前14字节固定。
-
-##### **航：
-> 2020.11.12打卡
-
-##### 无：
-> 2020-11-12 打卡
-
 ##### Q：
 > 感觉length字段设置为整个请求的长度好一些吧整个结构可以认为是 前缀+长度+请求业务数据lengthFieldOffset = 10，需要跳过前面的10 字节，才是 Length 的起始位置。lengthFieldLength = 4，协议设计的固定长度lengthAdjustment = -4，因为length的长度是整个长度，需要通过-4知道前缀+业务数据的长度initialBytesToStrip = 0，不需要跳过，为什么不跳过呢，因为前缀中包含了魔术、版本号等数据，需要通过解析该值进行数据的合法性校验操作
-
-##### **升：
-> 打卡，但是我看大家都是读取固定字节长度的数据，没读到就退出下次再读
 
 ##### *磊：
 > 老师，可以将协议头的魔数作为特殊分隔符来进行解码吗？
