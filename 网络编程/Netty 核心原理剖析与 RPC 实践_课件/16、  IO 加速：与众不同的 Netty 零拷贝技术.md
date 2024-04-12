@@ -201,24 +201,5 @@ ByteBuf body = httpBuf.slice(<span class="hljs-number">6</span>, <span class="hl
 
 ### 精选评论
 
-##### 无：
-> 2020-12-10 打卡，这章写得不错，通俗易懂。
-
 ##### **亮：
 > 零拷贝是不是就是说明当前的一个用户发起的操作，举例通过浏览器打开一个网络图片。正常应该是用户通过网络发起读取请求。第一次系统dma拷贝：读取图片，系统磁盘到系统内核缓冲，第二次cpu拷贝：系统内核缓冲拷贝到用户缓冲，第三次cpu拷贝：用户执行读取并发送，用户缓冲拷贝到系统socket缓冲，第四次系统dma拷贝：cpu拷贝系统通过socket发送，socket缓冲拷贝到网卡。这里面的cpu拷贝可以省略掉，也就是直接使用系统的DMA(直接内存访问，网卡设备可以直接访问内存)拷贝访问磁盘到内核缓冲，DMA拷贝socket缓冲到网卡设备。不再进行cpu拷贝(内核空间和用户空间的切换)。这就是零拷贝的原理吧。
-
-##### **用户0488：
-> 真香，目前看过最通俗最深入最全面的Netty技术资料
-
-##### **浩：
-> 深入浅出，nice
-
-##### **3997：
-> 老师，能说一下这几种分配ByteBuf的应用场景吗？最佳实践是怎样的？是不是默认用最后一种就可以了？ByteBuf buffer1 = Unpooled.buffer();ByteBuf buffer2 = PooledByteBufAllocator.DEFAULT.buffer();ByteBuf buffer3 = ByteBufAllocator.DEFAULT.buffer();
-
- ###### &nbsp;&nbsp;&nbsp; 讲师回复：
-> &nbsp;&nbsp;&nbsp; 可以看下 11 课 ByteBuf 的分类，还是需要根据实际情况进行选择。
-
-##### **5134：
-> 真好
-
