@@ -220,9 +220,3 @@ buffer.release();
 ##### **晶：
 > 即使使用了readBytes移动了readIndex的位置，get操作还是可以从头开始读取，刚开始以为get只能从readIndex当前位置开始读取，读取的时候不移动指针；其实是readIndex指针的移动并不影响get对数据的读取。
 
-##### *剑：
-> 棒棒哒
-
-##### **升：
-> 打卡
-
