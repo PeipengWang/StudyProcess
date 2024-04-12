@@ -224,12 +224,6 @@
 ##### **家：
 > 如果你的ChannelHandler逻辑非常复杂而且是阻塞的，那么请用ChannelPipeline addFirst(EventExecutorGroup group, String name, ChannelHandler handler);ChannelPipeline addLast(EventExecutorGroup group, String name, ChannelHandler handler);如果你的项目无需考虑ChannelHandler的执行顺序，可以用UnorderedThreadPoolEventExecutor这个线程组以达到最高的并发度
 
- ###### &nbsp;&nbsp;&nbsp; 讲师回复：
-> &nbsp;&nbsp;&nbsp; 赞，UnorderedThreadPoolEventExecutor 是个很好的知识点补充。
-
-##### peng：
-> 打开，以前版本是一个布尔值来标记是inBound还是outBound，现在是每个Context都用一个掩码来做标记。
-
 ##### **8561：
 > 既然是要用统一的异常handler处理，那么SampleInBoundHandler 中的exceptionCaught方法设计的目的是什么呢？如果我在SampleInBoundHandler的exceptionCaught 中处理掉异常会有什么问题吗？
 
