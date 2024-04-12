@@ -356,8 +356,6 @@ tradeOrder info：id=<span class="hljs-number">0</span>, status=已支付
 
 ### 精选评论
 
-##### **红：
-> InternalThreadLocalMap 中初始化数组中第0个元素的set作用是?
 
  ###### &nbsp;&nbsp;&nbsp; 讲师回复：
 > &nbsp;&nbsp;&nbsp; Set 集合是为了保存 FastThreadLocal对象，我认为 Set 集合设计的好处有几点：1. 删除 FastThreadLocal 留扩展接口。2. 提高 removeAll 的删除效率，不需要去遍历膨胀的数组。3. 可以更好地做内存泄露的管理。
@@ -367,7 +365,4 @@ tradeOrder info：id=<span class="hljs-number">0</span>, status=已支付
 
  ###### &nbsp;&nbsp;&nbsp; 讲师回复：
 > &nbsp;&nbsp;&nbsp; 如果 key 都是强引用，当 ThreadLocal 不再使用时，然而 ThreadLocalMap 中还是存在对 ThreadLocal 的强引用，那么 GC 是无法回收的，从而造成内存泄漏。弱引用可以避免长期存活的线程（例如线程池）导致 ThreadLocal 无法回收造成的内存泄漏。
-
-##### **杰：
-> 666
 
