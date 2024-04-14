@@ -14,7 +14,7 @@
 <p data-nodeid="201102">现在，我们对 Netty 的整体结构已经有了一个大概的印象，下面我们一起看下 Netty 的逻辑架构，学习下 Netty 是如何做功能分解的。</p>
 <h3 data-nodeid="201103">Netty 逻辑架构</h3>
 <p data-nodeid="201104">下图是 Netty 的逻辑处理架构。Netty 的逻辑处理架构为典型网络分层架构设计，共分为网络通信层、事件调度层、服务编排层，每一层各司其职。图中包含了 Netty 每一层所用到的核心组件。我将为你介绍 Netty 的每个逻辑分层中的各个核心组件以及组件之间是如何协调运作的。</p>
-<p data-nodeid="201105"><img src="https://s0.lgstatic.com/i/image/M00/60/58/Ciqc1F-NO9KAUOtaAAE1S5uRlDE275.png" alt="Drawing 1.png" data-nodeid="201305"></p>
+<p data-nodeid="201105"><img src="https://github.com/PeipengWang/picture/blob/master/20240414223657.png" alt="Drawing 1.png" data-nodeid="201305"></p>
 <h4 data-nodeid="201106">网络通信层</h4>
 <p data-nodeid="201107">网络通信层的职责是执行网络 I/O 的操作。它支持多种网络协议和 I/O 模型的连接操作。当网络数据读取到内核缓冲区后，会触发各种网络事件，这些网络事件会分发给事件调度层进行处理。</p>
 <p data-nodeid="201108">网络通信层的<strong data-nodeid="201317">核心组件</strong>包含<strong data-nodeid="201318">BootStrap、ServerBootStrap、Channel</strong>三个组件。</p>
