@@ -1,4 +1,3 @@
-@[toc]
 # 手写Spring与基本原理解析
 详细请跳转  https://bugstack.cn/md/spring/develop-spring
 这里是学习上述小博哥的《手写Spring》做的简易记录，夹杂着很多个人私活，建议直接看链接
