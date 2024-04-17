@@ -3,7 +3,7 @@
 <p data-nodeid="201091">本节课以 Netty 4.1.42 为基准版本，我将分别从 Netty <strong data-nodeid="201269">整体结构</strong>、<strong data-nodeid="201270">逻辑架构</strong>、<strong data-nodeid="201271">源码结构</strong>三个方面对其进行介绍。</p>
 <h3 data-nodeid="201092">Netty 整体结构</h3>
 <p data-nodeid="201093">Netty 是一个设计非常用心的<strong data-nodeid="201278">网络基础组件</strong>，Netty 官网给出了有关 Netty 的整体功能模块结构，却没有其他更多的解释。从图中，我们可以清晰地看出 Netty 结构一共分为三个模块：</p>
-<p data-nodeid="201094"><img src="https://github.com/PeipengWang/picture/blob/master/20240414223420.png" alt="Drawing 0.png" data-nodeid="201281"></p>
+<p data-nodeid="201094"><img src="https://raw.githubusercontent.com/PeipengWang/picture/master/20240414223420.png" alt="Drawing 0.png" data-nodeid="201281"></p>
 <h4 data-nodeid="201095">1. Core 核心层</h4>
 <p data-nodeid="201096">Core 核心层是 Netty 最精华的内容，它提供了底层网络通信的通用抽象和实现，包括可扩展的事件模型、通用的通信 API、支持零拷贝的 ByteBuf 等。</p>
 <h4 data-nodeid="201097">2. Protocol Support 协议支持层</h4>
