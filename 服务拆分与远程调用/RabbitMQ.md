@@ -141,17 +141,6 @@ public class PublisherTest {
 }
 
 ```
-### 1.7.1. 1建立连接时会出现以下界面  
-<img src="_v_images/20220213150716568_6770.png" alt="" width="961">
-
-### 1.7.2. 2创建队列完成后出现以下界面
-<img src="_v_images/20220213150800527_18873.png" alt="" width="1422">
-
-### 1.7.3. 3发送消息完成后
-<img src="_v_images/20220213151238024_20548.png" alt="" width="813">
-
-
-
 
 # 2. Spring AMQP
 ## 2.1. 简单入门
