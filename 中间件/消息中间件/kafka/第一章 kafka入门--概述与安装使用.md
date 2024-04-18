@@ -100,17 +100,17 @@ Kafka的绝大数代码都是Scala语言编写的，而Scala语言本身就是�
 
 #### **1.2.1.2安装Kafka**
 
-**Ø** ***\*下载软件安装包\****：kafka_2.12-3.6.1.tgz，下载地址：https://kafka.apache.org/downloads
+***下载软件安装包***：kafka_2.12-3.6.1.tgz，下载地址：https://kafka.apache.org/downloads
 
-l 这里的3.6.1，是Kafka软件的版本。截至到2023年12月24日，Kafka最新版本为3.6.1。
+ 这里的3.6.1，是Kafka软件的版本。截至到2023年12月24日，Kafka最新版本为3.6.1。
 
-l 2.12是对应的Scala开发语言版本。Scala2.12和Java8是兼容的，所以可以直接使用。
+ 2.12是对应的Scala开发语言版本。Scala2.12和Java8是兼容的，所以可以直接使用。
 
-l tgz是一种linux系统中常见的压缩文件格式，类似与windows系统的zip和rar格式。所以Windows环境中可以直接使用压缩工具进行解压缩。
+ tgz是一种linux系统中常见的压缩文件格式，类似与windows系统的zip和rar格式。所以Windows环境中可以直接使用压缩工具进行解压缩。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps4.jpg) 
 
-**Ø** ***\*解压文件\****：kafka_2.12-3.6.1.tgz，解压目录为非系统盘的根目录，比如e:/
+**Ø** ***解压文件***：kafka_2.12-3.6.1.tgz，解压目录为非系统盘的根目录，比如e:/
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps5.jpg) 
 
@@ -130,13 +130,11 @@ l tgz是一种linux系统中常见的压缩文件格式，类似与windows系统
 当前版本Kafka软件内部依然依赖ZooKeeper进行多节点协调调度，所以启动Kafka软件之前，需要先启动ZooKeeper软件。不过因为Kafka软件本身内置了ZooKeeper软件，所以无需额外安装ZooKeeper软件，直接调用脚本命令启动即可。具体操作步骤如下：
 
 Ø 进入Kafka解压缩文件夹的config目录，修改zookeeper.properties配置文件
-
+```
 \# the directory where the snapshot is stored.
-
 \# 修改dataDir配置，用于设置ZooKeeper数据存储位置，该路径如果不存在会自动创建。
-
 dataDir=E:/kafka_2.12-3.6.1/data/zk
-
+```
 Ø 打开DOS窗口，进入e:/kafka_2.12-3.6.1/bin/windows目录
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps6.jpg) 
@@ -156,41 +154,32 @@ zookeeper-server-start.bat ../../config/zookeeper.properties
 Ø 为了操作方便，也可以在kafka解压缩后的目录中，创建脚本文件zk.cmd。
 
 \# 调用启动命令，且同时指定配置文件。
-
+```
 call bin/windows/zookeeper-server-start.bat config/zookeeper.properties
-
+```
 #### **1.2.1.4启动Kafka**
 
 Ø 进入Kafka解压缩文件夹的config目录，修改server.properties配置文件
-
+```
 \# Listener name, hostname and port the broker will advertise to clients.
-
 \# If not set, it uses the value for "listeners".
-
 \# 客户端访问Kafka服务器时，默认连接的服务为本机的端口***\*9092\****，如果想要改变，可以修改如下配置
-
 \# 此处我们不做任何改变，默认即可
-
 \#advertised.listeners=PLAINTEXT://your.host.name:9092
-
- 
-
 \# A comma separated list of directories under which to store log files
-
 \# 配置Kafka数据的存放位置，如果文件目录不存在，会自动生成。
-
 log.dirs=E:/kafka_2.12-3.6.1/data/kafka
+```
 
 Ø 打开DOS窗口，进入e:/kafka_2.12-3.6.1/bin/windows目录
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps9.jpg) 
 
 Ø 调用启动指令，传递配置文件的路径
-
 \# 因为当前目录为windows，所以需要通过相对路径找到kafka的配置文件。
-
+```
 kafka-server-start.bat ../../config/server.properties
-
+```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps10.jpg) 
 
 Ø 出现如下界面，Kafka启动成功。
@@ -198,11 +187,11 @@ kafka-server-start.bat ../../config/server.properties
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps11.jpg) 
 
 Ø 为了操作方便，也可以在kafka解压缩后的目录中，创建脚本文件kfk.cmd。
-
+```
 \# 调用启动命令，且同时指定配置文件。
 
 call bin/windows/kafka-server-start.bat config/server.properties
-
+```
 Ø DOS窗口中，输入jps指令，查看当前启动的软件进程
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps12.jpg) 
@@ -217,26 +206,21 @@ call bin/windows/kafka-server-start.bat config/server.properties
 
 #### **1.2.2.1创建主题**
 
-Ø 启动ZooKeeper，Kafka服务进程（略）
-
 Ø 打开DOS窗口，进入e:/kafka_2.12-3.6.1/bin/windows目录
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps13.jpg) 
-
 Ø DOS窗口输入指令，创建主题
 
 \# Kafka是通过***\*kafka-topics.bat\****指令文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
 
 \# 调用指令创建主题时，需要传递多个参数，而且参数的前缀为两个横线。因为参数比较多，为了演示方便，这里我们只说明必须传递的参数，其他参数后面课程中会进行讲解
 
-\# ***\*--bootstrap-server\**** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为***\*localhost:9092\****，用空格隔开
+***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为***\*localhost:9092\****，用空格隔开
 
-\# ***\*--create\**** : 表示对主题的创建操作，是个操作参数，后面无需增加参数值
+***--create*** : 表示对主题的创建操作，是个操作参数，后面无需增加参数值
 
-\# ***\*--topic\**** : 主题的名称，后面接的参数值一般就是见名知意的字符串名称，类似于java中的字符串类型标识符名称，当然也可以使用数字，只不过最后还是当成数字字符串使用。
-
+***--topic*** : 主题的名称，后面接的参数值一般就是见名知意的字符串名称，类似于java中的字符串类型标识符名称，当然也可以使用数字，只不过最后还是当成数字字符串使用。
 \# 指令
-
 kafka-topics.bat --bootstrap-server localhost:9092 --create --topic test
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps14.jpg) 
@@ -244,53 +228,42 @@ kafka-topics.bat --bootstrap-server localhost:9092 --create --topic test
 #### **1.2.2.2查询主题**
 
 Ø DOS窗口输入指令，查看所有主题
-
-\# Kafka是通过***\*kafka-topics.bat\****文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
-
-\# ***\*--bootstrap-server\**** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
-
-\# ***\*--list\**** : 表示对所有主题的查询操作，是个操作参数，后面无需增加参数值
+Kafka是通过***\*kafka-topics.bat\****文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
+***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
+ ***list*** : 表示对所有主题的查询操作，是个操作参数，后面无需增加参数值
 
 \# 指令
-
+```
 kafka-topics.bat --bootstrap-server localhost:9092 --list
-
+```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps15.jpg) 
 
 Ø DOS窗口输入指令，查看指定主题信息
 
-\# ***\*--bootstrap-server\**** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
-
-\# ***\*--describe\**** : 查看主题的详细信息
-
-\# ***\*--topic\**** : 查询的主题名称
+***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
+***--describe*** : 查看主题的详细信息
+***--topic*** : 查询的主题名称
 
 \# 指令
-
+```
 kafka-topics.bat --bootstrap-server localhost:9092 --describe --topic test
-
+```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps16.jpg) 
 
-#### **1.2.2.3修改主题**
-
+#### 1.2.2.3修改主题
 创建主题后，可能需要对某些参数进行修改，那么就需要使用指令进行操作。
-
 Ø DOS窗口输入指令，修改指定主题的参数
 
-\# Kafka是通过***\*kafka-topics.bat\****文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
+\# Kafka是通过***kafka-topics.bat***文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
 
-\# ***\*--bootstrap-server\**** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
-
-\# ***\*--alter\**** : 表示对所有主题的查询操作，是个操作参数，后面无需增加参数值
-
-\# ***\*--topic\**** : 修改的主题名称
-
-\# ***\*--partitions\**** : 修改的配置参数：分区数量
-
+\# ***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开  
+\# ***--alter*** : 表示对所有主题的查询操作，是个操作参数，后面无需增加参数值  
+\# ***--topic*** : 修改的主题名称  
+\# ***--partitions*** : 修改的配置参数：分区数量  
 \# 指令
-
+```
 kafka-topics.bat --bootstrap-server localhost:9092 --topic test --alter --partitions 2
-
+```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps17.jpg) 
 
 #### **1.2.2.4删除主题**
@@ -299,27 +272,27 @@ kafka-topics.bat --bootstrap-server localhost:9092 --topic test --alter --partit
 
 Ø DOS窗口输入指令，删除指定名称的主题
 
-\# Kafka是通过***\*kafka-topics.bat\****文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
+\# Kafka是通过***kafka-topics.bat***文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
 
-\# ***\*--bootstrap-server\**** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
+\# ***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
 
 \# ***\*--delete\****: 表示对主题的删除操作，是个操作参数，后面无需增加参数值。默认情况下，删除操作是逻辑删除，也就是说数据存储的文件依然存在，但是通过指令查询不出来。如果想要直接删除，需要在server.properties文件中设置参数delete.topic.enable=true
 
-\# ***\*--topic\**** : 删除的主题名称
+\# ***--topic*** : 删除的主题名称
 
 \# 指令
-
+```
 kafka-topics.bat --bootstrap-server localhost:9092 --topic test --delete
-
+```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps18.jpg) 
 
-***\*注意\****：windows系统中由于权限或进程锁定的问题，删除topic会导致kafka服务节点异常关闭。
+***注意***：windows系统中由于权限或进程锁定的问题，删除topic会导致kafka服务节点异常关闭。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps19.jpg) 
 
 请在后续的linux系统下演示此操作。
 
-### **1.1.3** ***\*生产数据\****
+### **1.1.3** ***生产数据***
 
 消息主题创建好了，就可以通过Kafka客户端向Kafka服务器的主题中发送消息了。Kafka生产者客户端并不是一个独立的软件系统，而是一套API接口，只要通过接口能连接Kafka并发送数据的组件我们都可以称之为Kafka生产者。下面我们就演示几种不同的方式：
 
@@ -331,13 +304,13 @@ kafka-topics.bat --bootstrap-server localhost:9092 --topic test --delete
 
 Ø DOS窗口输入指令，进入生产者控制台
 
-\# Kafka是通过***\*kafka-console-producer.bat\****文件进行消息生产者操作的。
+\# Kafka是通过***kafka-console-producer.bat***文件进行消息生产者操作的。
 
 \# 调用指令时，需要传递多个参数，而且参数的前缀为两个横线，因为参数比较多。为了演示方便，这里我们只说明必须传递的参数，其他参数后面课程中会进行讲解
 
-\# ***\*--bootstrap-server\**** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为***\*localhost:9092\****，用空格隔开。早期版本的Kafka也可以通过 --broker-list参数进行连接，当前版本已经不推荐使用了。
+\# ***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为***\*localhost:9092\****，用空格隔开。早期版本的Kafka也可以通过 --broker-list参数进行连接，当前版本已经不推荐使用了。
 
-\# ***\*--topic\**** : 主题的名称，后面接的参数值就是之前已经创建好的主题名称。
+\# ***--topic*** : 主题的名称，后面接的参数值就是之前已经创建好的主题名称。
 
 \# 指令
 
@@ -349,14 +322,11 @@ kafka-console-producer.bat --bootstrap-server localhost:9092 --topic test
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps22.jpg) 
 
-***\*注意\****：这里的数据需要回车后，才能真正将数据发送到Kafka服务器。
-
+***注意***：这里的数据需要回车后，才能真正将数据发送到Kafka服务器。
 #### **1.2.3.2工具操作**
-
 有的时候，使用命令行进行操作还是有一些麻烦，并且操作起来也不是很直观，所以我们一般会采用一些小工具进行快速访问。这里我们介绍一个kafkatool_64bit.exe工具软件。软件的安装过程比较简单，根据提示默认安装即可，这里就不进行介绍了。
 
 Ø 安装好以后，我们打开工具
-
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps23.jpg) 
 
 Ø 点击左上角按钮File -> Add New Connection...建立连接
@@ -366,9 +336,7 @@ kafka-console-producer.bat --bootstrap-server localhost:9092 --topic test
 Ø 点击Test按钮测试
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps25.jpg) 
-
 Ø 增加连接
-
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps26.jpg) 
 
 Ø 按照下面的步骤，生产数据
@@ -384,13 +352,12 @@ kafka-console-producer.bat --bootstrap-server localhost:9092 --topic test
 一般情况下，我们也可以通过Java程序来生产数据，所以接下来，我们就演示一下IDEA中使用Kafka Java API来生产数据：
 
 Ø 创建Kafka项目
-
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps29.jpg) 
 
 Ø 修改pom.xml文件，增加Maven依赖
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps30.jpg) 
-
+```
 <dependencies>
 
   <dependency>
@@ -404,7 +371,7 @@ kafka-console-producer.bat --bootstrap-server localhost:9092 --topic test
   </dependency>
 
 </dependencies>
-
+```
 Ø 创建 com.atguigu.kafka.test.KafkaProducerTest类
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps31.jpg) 
@@ -412,7 +379,7 @@ kafka-console-producer.bat --bootstrap-server localhost:9092 --topic test
 Ø 添加main方法，并增加生产者代码
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps32.jpg) 
-
+```
 package com.atguigu.kafka.test;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -478,8 +445,8 @@ public class KafkaProducerTest {
   }
 
 }
-
-### **1.1.4** ***\*消费数据\****
+```
+### **1.1.4** ***消费数据***
 
 消息已经通过Kafka生产者客户端发送到Kafka服务器中了。那么此时，这个消息就会暂存在Kafka中，我们也就可以通过Kafka消费者客户端对服务器指定主题的消息进行消费了。
 
@@ -491,18 +458,17 @@ public class KafkaProducerTest {
 
 Ø DOS窗口输入指令，进入消费者控制台
 
-\# Kafka是通过***\*kafka-console-consumer.bat\****文件进行消息消费者操作的。
+\# Kafka是通过***kafka-console-consumer.bat***文件进行消息消费者操作的。
 
 \# 调用指令时，需要传递多个参数，而且参数的前缀为两个横线，因为参数比较多。为了演示方便，这里我们只说明必须传递的参数，其他参数后面课程中会进行讲解
 
-\# ***\*--bootstrap-server\**** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为***\*localhost:9092\****，用空格隔开。早期版本的Kafka也可以通过 --broker-list参数进行连接，当前版本已经不推荐使用了。
+\# ***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为***\*localhost:9092\****，用空格隔开。早期版本的Kafka也可以通过 --broker-list参数进行连接，当前版本已经不推荐使用了。
 
-\# ***\*--topic\**** : 主题的名称，后面接的参数值就是之前已经创建好的主题名称。其实这个参数并不是必须传递的参数，因为如果不传递这个参数的话，那么消费者会消费所有主题的消息。如果传递这个参数，那么消费者只能消费到指定主题的消息数据。
+\# ***--topic\**** : 主题的名称，后面接的参数值就是之前已经创建好的主题名称。其实这个参数并不是必须传递的参数，因为如果不传递这个参数的话，那么消费者会消费所有主题的消息。如果传递这个参数，那么消费者只能消费到指定主题的消息数据。
 
-\# ***\*--from-beginning\**** : 从第一条数据开始消费，无参数值，是一个标记参数。默认情况下，消费者客户端连接上服务器后，是不会消费到连接之前所生产的数据的。也就意味着如果生产者客户端在消费者客户端连接前已经生产了数据，那么这部分数据消费者是无法正常消费到的。所以在实际环境中，应该是先启动消费者客户端，再启动生产者客户端，保证消费数据的完整性。增加参数后，Kafka就会从第一条数据开始消费，保证消息数据的完整性。
+\# ***--from-beginning*** : 从第一条数据开始消费，无参数值，是一个标记参数。默认情况下，消费者客户端连接上服务器后，是不会消费到连接之前所生产的数据的。也就意味着如果生产者客户端在消费者客户端连接前已经生产了数据，那么这部分数据消费者是无法正常消费到的。所以在实际环境中，应该是先启动消费者客户端，再启动生产者客户端，保证消费数据的完整性。增加参数后，Kafka就会从第一条数据开始消费，保证消息数据的完整性。
 
 \# 指令
-
 kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps34.jpg) 
@@ -522,7 +488,7 @@ kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps36.jpg) 
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps37.jpg) 
-
+```
 package com.atguigu.kafka.test;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -608,8 +574,8 @@ public class KafkaConsumerTest {
   }
 
 }
-
-### **1.1.5** ***\*源码关联\*******\*(可选)\****
+```
+### **1.1.5** ***源码关联******\*(可选)\****
 
 将源码压缩包kafka-3.6.1-src.tgz解压缩到指定位置
 
