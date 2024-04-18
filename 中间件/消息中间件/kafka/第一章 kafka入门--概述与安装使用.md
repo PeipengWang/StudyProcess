@@ -345,7 +345,7 @@ kafka-console-producer.bat --bootstrap-server localhost:9092 --topic test
 
 Ø 增加成功后，点击绿色箭头按钮进行查询，工具会显示当前数据
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E4%B8%AD%E9%97%B4%E4%BB%B6/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/kafka/%E7%AC%AC%E4%B8%80%E7%AB%A0%20kafka%E5%85%A5%E9%97%A8--%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8.assets/wps28.jpg) 
+![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps28.jpg) 
 
 #### **1.2.3.3 Java API**
 
