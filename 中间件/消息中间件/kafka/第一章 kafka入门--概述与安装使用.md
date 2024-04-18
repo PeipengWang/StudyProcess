@@ -28,13 +28,13 @@ Kafka拥有作为一个消息系统应该具备的功能，但是却有着独特
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps2.jpg) 
 
- *** JMS Provider ***：JMS消息提供者。其实就是实现JMS接口和规范的消息中间件，也就是我们提供消息服务的软件系统，比如RabbitMQ、ActiveMQ、Kafka。
+ ***JMS Provider***：JMS消息提供者。其实就是实现JMS接口和规范的消息中间件，也就是我们提供消息服务的软件系统，比如RabbitMQ、ActiveMQ、Kafka。
 
- *** JMS Message ***：JMS消息。这里的消息指的就是数据。一般采用Java数据模型进行封装，其中包含消息头，消息属性和消息主体内容。
+ ***JMS Message***：JMS消息。这里的消息指的就是数据。一般采用Java数据模型进行封装，其中包含消息头，消息属性和消息主体内容。
 
-*** JMS Producer： ***JMS消息生产者。所谓的生产者，就是生产数据的客户端应用程序，这些应用通过JMS接口发送JMS消息。
+***JMS Producer：***JMS消息生产者。所谓的生产者，就是生产数据的客户端应用程序，这些应用通过JMS接口发送JMS消息。
 
-*** JMS Consumer ***：JMS消息消费者。所谓的消费者，就是从消息提供者（*** JMS *** *** Provider ***）中获取数据的客户端应用程序，这些应用通过JMS接口接收JMS消息。
+***JMS Consumer***：JMS消息消费者。所谓的消费者，就是从消息提供者（***JMS*** ***Provider***）中获取数据的客户端应用程序，这些应用通过JMS接口接收JMS消息。
 
 Ø JMS支持两种消息发送和接收模型：一种是P2P（Peer-to-Peer）点对点模型，另外一种是发布/订阅（Publish/Subscribe）模型。
 
@@ -92,7 +92,7 @@ l ZooKeeper创建数据节点时，会根据业务场景创建临时节点或永
 
 作为开源分布式事件流处理平台，Kafka分布式软件环境的安装相对比较复杂，不利于Kafka软件的入门学习和练习。所以我们这里先搭建相对比较简单的windows单机环境，让初学者快速掌握软件的基本原理和用法，后面的课程中，我们再深入学习Kafka软件在生产环境中的安装和使用。
 
-#### **1.2.1.1安装Java8（略）**
+#### **1.2.1.1安装Java8（略**
 
 当前Java软件开发中，主流的版本就是Java  8，而Kafka 3.X官方建议Java版本更新至Java11，但是Java8依然可用。未来Kafka 4.X版本会完全弃用Java8，不过，咱们当前学习的Kafka版本为3.6.1版本，所以使用Java8即可，无需升级。
 
