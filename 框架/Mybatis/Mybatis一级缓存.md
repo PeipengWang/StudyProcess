@@ -3,7 +3,7 @@
 
 ![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/8fc7d848db41451ab568730b1ea95615.png)
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/9cb4809b35fc49f79ffc7b6ba18df72a.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/9cb4809b35fc49f79ffc7b6ba18df72a.png)
 
 
 ## 一级缓存特点  
