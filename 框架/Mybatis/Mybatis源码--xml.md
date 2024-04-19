@@ -1,4 +1,3 @@
-@[toc]
 # mybatis
 ## 是什么
 
@@ -6,9 +5,9 @@ MyBatis 是一款优秀的持久层框架，它支持自定义 SQL、存储过�
 
 ——来自官方文档
 ## 架构设计
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/134ef586da37432ba2d2c3a3d70d5eba.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/134ef586da37432ba2d2c3a3d70d5eba.png)
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/4db93c917f824b73a49299a32dc030b9.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/4db93c917f824b73a49299a32dc030b9.png)
 
 通过XMLConfigBuilder解析xml文件放到Configuration对象中
 

@@ -29,7 +29,7 @@ session : 每一次 HTTP 请求都会产生一个新的 bean，该 bean 仅在�
 通过无参构造方法构造出一个普通对象，我们可以通过getBean方式通过一个Map里获取一个单例对象(默认配置的时sigleton)，当然多例不会需要这个Map  
 5、bean的初始化  
 依赖注入后执行的方法：  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/07d81907bdae4a28b6c2d926431510d7.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/07d81907bdae4a28b6c2d926431510d7.png)
 
 这个方法时在依赖注入之后要做的事情  
 
@@ -40,7 +40,7 @@ session : 每一次 HTTP 请求都会产生一个新的 bean，该 bean 仅在�
 初始化：是为对象中的属性赋值的过程。  
 
 大家总是会错误的理解Bean的“实例化”和“初始化”过程，总会以为初始化就是对象执行构造函数生成对象实例的过程，其实不然，在初始化阶段实际对象已经实例化出来了，初始化阶段进行的是依赖的注入和执行一些用户自定义的初始化逻辑。对于Bean的构建过程，网上有个非常经典的流程图如下：  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/3a7c667524af40b2a2fed3d0112ca651.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/3a7c667524af40b2a2fed3d0112ca651.png)
 
 
 

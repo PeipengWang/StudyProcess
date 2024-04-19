@@ -18,28 +18,30 @@ Trying to pull elasticsearch
 ```
 
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201127112832656.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201127112832656.png)
 
 ```shell
  docker pull elasticsearch
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201127112920324.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201127112920324.png)
 查看下载情况：
 如果出现错误可以尝试加上版本号
+
 ```
 docker images
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201127113152295.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201127113152295.png)
 elsaticsearch默认用java写的，会默认占用2G的内存空间，因此在启动的时候可能需要对内存进行限制，如下所示：
 
 ```shell
  docker run -e ES_JAVA_OPTS="-Xms256m -Xmx256m" -d -p 9300:9300 -p 9200:9200 --name ES02 5acf0e8da90b
 ```
 限制为256m，并且端口分别为
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201127113721607.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201127113721607.png)
 
 访问：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2020112713472922.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/2020112713472922.png)
+
 # 二、 概念原理
 以 员工文档 的形式存储为例：一个文档代表一个员工数据。存储数据到ElasticSearch 的行为叫做 索引 ，但在索引一个文档之前，需要确定将文档存储在哪里。
  一个 ElasticSearch 集群可以 包含多个 索引 ，相应的每个索引可以包含多个 类型 。 这些不同的类型存储着多个 文档 ，每个文档又有 多个 属性 。
@@ -48,18 +50,19 @@ elsaticsearch默认用java写的，会默认占用2G的内存空间，因此在�
 – 类型-表
 – 文档-表中的记录
 – 属性-列
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201127150234375.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201127150234375.png)
 发送请求：/索引名称/类型名称/特定属性
+
 # 三、 利用Postman软件测试ES（快速入门）
 ## 1. 发送数据
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201127151709737.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201127151709737.png)
 ## 2. 响应数据
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201127151759812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201127151759812.png)
 
 ## 3. 查找：利用GET方法
 ### （1）简单查找
 直接利用精确地索引来查找
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201127152153507.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201127152153507.png)
 ### （2）查找所有
 
 ```shell
@@ -121,5 +124,3 @@ GET /megacorp/employee/_search
 ## 2. 配置文件
 由于不同版本有很大的不同，需要进一步去学习
 
-
- 

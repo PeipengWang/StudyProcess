@@ -117,7 +117,7 @@ public class User {
 ```
 # 四，创建持久层与对应的xml数据操作文件
 ## 1，持久层接口
- 
+
 
 ```c
 package com.uestc.wpp.mapper;
@@ -213,6 +213,5 @@ User(id=1, name=wpp, pwd=1234, perm=user:add)
 # 总结
 主要进行导入依赖，编写yml配置文件，注意要编写对应的实体类，然后编写持久层的对应xml文件中的sql语句，然后再服务层进行操作，最后得到输出
 文件结构如下所示：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201117113933106.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
-
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201117113933106.png)
 

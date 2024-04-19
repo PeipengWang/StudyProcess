@@ -1,9 +1,4 @@
-
-<font color=#999AAA >JSR-107、Spring缓存抽象、整合Redis
-
-</font>
-
-@[TOC](SpringBoot整合----缓存)
+SpringBoot整合----缓存)
 
 
 <hr style=" border:solid; width:100px; height:1px;" color=#000000 size=1">
@@ -33,9 +28,8 @@ Expiry每一个存储在Cache中的条目有一个定义的有效期。一旦超
 
 <font color=#999AAA >Spring从3.1开始定义了org.springframework.cache.Cache和org.springframework.cache.CacheManager接口来统一不同的缓存技术；并支持使用JCache（JSR-107）注解简化我们开发；
 
-
 **几个重要概念及缓存注解**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201123105537278.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201123105537278.png)
 **简要说明：**
 
 @Cacheable注解加载方法中，那么该方法第一次会查询数据库，然后就会吧数据放在缓存中，使用Cache 进行数据的读取等操作。
@@ -74,7 +68,7 @@ CREATE TABLE `employee` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201123111912122.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201123111912122.png)
 
 ## 2.导入依赖
 
@@ -118,9 +112,10 @@ spring:
 
 ```
 ##  4. 整合Mybatis编写bean，mapper，service，controller
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201123150834884.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201123150834884.png)
 运行结果
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201123150948323.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201123150948323.png)
+
 ## 5. 开启基于注解的缓存
 
 ```java
@@ -240,8 +235,9 @@ String key() default "";
 ```
 指定缓存的数据，可以用它来指定，如果不指定。默认是使用该参数的值
 key可以取得值
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201123152859882.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
-3）. condition
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201123152859882.png)
+3). condition
+
 ```java
 String condition() default "";
 ```
@@ -252,7 +248,8 @@ eg：`@Cacheable（condition="#id>0"）`只有id属性大于0的数据才会进�
 String unless() default "";
 ```
 否决缓存条件，跟condition相反，只有条件是false才会进行缓存。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201123152809835.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201123152809835.png)
+
 # 六、@CachePut与@CacheEvict
 
 @CachePut：既调用方法，又更新缓存数据，修改了数据库的某个数据，同时更新缓存
@@ -346,9 +343,10 @@ nested exception is java.lang.IllegalArgumentException: DefaultSerializer requir
 public class Employee implements Serializable 
 ```
 再次测试得到输出结果：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2020112415332266.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/2020112415332266.png)
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201124153517923.png#pic_center)
 在上面的redis可视化可以看到，需要用json工具转化一下：序列化
+
 ## 5.json 序列化
 重新编写序列化工具类
 
@@ -392,15 +390,17 @@ RedisTemplate<Object,Employee> redisTemplate1;
 ```
 
 可视化输出redis结果为：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201124160005833.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201124160005833.png)
+
 # 八、测试缓存
 ## 1. 原理
 CacheManager：Cache缓存组件来实际给缓存中存储数据
 默认使用的是SimpleCacheManager，但是如果我们引入Redis的starter之后就会变为RedisCacheManager，RedisCacheManager帮我们创建RedisCache来作为缓存组件，RedisCache通过操作redis缓存数据
 因此我们可以直接运行主程序来测试：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201124162227497.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201124162227497.png)
 从上述可以看出，默认保存的数据k-v都是object；利用序列化来保存的，即默认创建RedisCacheManager操作redis的时候使用的是RedisTemplate<Object，Object>
 源代码如下：
+
 ```java
 	@Bean
 	@ConditionalOnMissingBean(name = "redisTemplate")
@@ -459,7 +459,7 @@ public class MyRedisConfig {
 
 ```
 输出结果
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201124165558284.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201124165558284.png)
 
 ## 3. 需要多个CacheManager时
 在2.0之前需要定义多个Manager，2.0后好像不需要了

@@ -1,7 +1,5 @@
 
 
-@[TOC](日志)
-
 
 <hr style=" border:solid; width:100px; height:1px;" color=#000000 size=1">
 
@@ -61,14 +59,14 @@ SpringBoot自带的日志框架
       <scope>compile</scope>
     </dependency>
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/202011201515171.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/202011201515171.png)
 
 1）、SpringBoot底层也是使用slf4j+logback的方式进行日志记录
 2）、SpringBoot把其他日志都转换成了slf4j
 3）、中间替换包
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201120151958842.png#pic_center)
-4）、如果我们要引入其他框架，一定要把这个框架的默认日志移除掉。
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201120151958842.png)
+4)、如果我们要引入其他框架，一定要把这个框架的默认日志移除掉。
 
 # 四. 日志的使用
 ## 1. 默认配置
@@ -104,17 +102,17 @@ class SpringbootLogging01ApplicationTests {
 
 ```
 输出为：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201120154807936.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201120154807936.png)
 这时会发现只显示了debug，warn和error三个级别的日志，因此需要注意以下几点：
 （1）日志的级别为：trace<info<debug<warn<error
 （2）SpringBoot默认是denug级别的输出，因此不会显示info与trace级别的日志
-（3）可以在配置文件中调整日志输出级别
+（3)可以在配置文件中调整日志输出级别
 
 ```properties
 logging.level.com.uestc.springboot=trace
 ```
 这样就可以把日志级别调整为trace级别
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201120155305820.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201120155305820.png)
 
 ## 2，日志配置位置
 ```properties
@@ -158,7 +156,6 @@ logback-spring.xml：日志框架就不加载日志的配置项，由SpringBoot�
 ## 5. 切换日志框架
 可以按照slf4j的日志适配图，进行相关切换：
 slf4j+log4j的方式
-
 
 
 

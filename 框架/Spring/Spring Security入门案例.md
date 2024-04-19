@@ -74,16 +74,16 @@ authorities="ROLE_ADMIN" />
 </beans>
 ```
 文件整体结构
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200515231807204.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20200515231807204.png)
 输出效果：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200515231829124.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20200515231829124.png)
 默认登陆
 User：user
 Password:user
 输出：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200515231941115.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20200515231941115.png)
 若登陆失败：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200515232011170.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20200515232011170.png)
 **进一步改进**
 ①.登陆界面：login.html
 
@@ -186,13 +186,13 @@ http://www.springframework.org/schema/security/spring-security.xsd">
 ```
 **输出**
 文件结构
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200515232654807.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20200515232654807.png)
 登陆：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200515232745687.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20200515232745687.png)
 登陆成功
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2020051523281180.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/2020051523281180.png)
 登陆失败：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200515232844649.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20200515232844649.png)
 重点总结：在配置过程中，主要注意spring-security.xml的配置
 
 ```

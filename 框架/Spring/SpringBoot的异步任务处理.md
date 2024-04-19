@@ -1,4 +1,3 @@
-@[TOC](SpringBoot的异步任务处理)
 # 为什么要用异步任务
 
 异步(async)是相对于同步(sync)而言的，很好理解。同步就是一件事一件事的执行。只有前一个任务执行完毕，才能执行后一个任务。而异步比如：
@@ -91,6 +90,6 @@ public class AsyncController {
 
 ```
 测试结果：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201130134101605.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201130134101605.png)
 首先success完成响应，然后控制台打印出结果
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201130134145815.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201130134145815.png)

@@ -297,7 +297,7 @@ String SCOPE_PROTOTYPE = ConfigurableBeanFactory.SCOPE_PROTOTYPE;
     }
 }
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/259da69098ef48d8a37e01539154e477.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/259da69098ef48d8a37e01539154e477.png)
 
 
 Pointcut:切入点接口，定义用于获取 ClassFilter、MethodMatcher 的两个类，这两个接口获取都是切点表达式提供的内容。  
@@ -396,7 +396,7 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
     }
 
 ```
-  
+
 ## 通过注解配置和包自动扫描的方式完成Bean对象的注册
 
 在XmlBeanDefinitionReader中解析<context:component-scan />标签，扫描类组装BeanDefinition然后注册到容器中的操作在ClassPathBeanDefinitionScanner#doScan中实现。  
@@ -405,7 +405,7 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
 
 依赖于 BeanFactoryPostProcessor 在 Bean 生命周期的属性，可以在 Bean 对象实例化之前，改变属性信息。所以这里通过实现 BeanFactoryPostProcessor 接口，完成对配置文件的加载以及摘取占位符中的在属性文件里的配置。
 这样就可以把提取到的配置信息放置到属性配置中了，buffer.replace(startIdx, stopIdx + 1, propVal); propertyValues.addPropertyValue
-  
+
 Component注解扫描原理：  
 定义  
 ```

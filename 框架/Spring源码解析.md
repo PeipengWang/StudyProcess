@@ -2,7 +2,7 @@
 ## BeanFactory实现
 到底什么是BeanFactory？  
 它是ApplicationContext的父接口  
-![](_v_images/20230405143237690_7089.png)
+![](https://raw.githubusercontent.com/PeipengWang/picture/master/20230405143237690_7089.png)
 它才是 Spring 的核心容器，主要的 ApplicationContext 实现都 [组合]了他的功能。  
 通过反射的方式来构造BeanFactory来进一步解析  
 这里通过反射的方法来获取该成员变量，进行分析  

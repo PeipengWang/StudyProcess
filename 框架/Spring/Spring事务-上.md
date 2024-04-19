@@ -130,5 +130,5 @@ interface PlatformTransactionManager{
 ```
 ## 事务失效场景
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/348be7578ac64474907d5157ea145a8e.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/348be7578ac64474907d5157ea145a8e.png)
 

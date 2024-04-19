@@ -1,7 +1,5 @@
 
 
-@[TOC](SpringBoot与消息队列)
-
 
 <hr style=" border:solid; width:100px; height:1px;" color=#000000 size=1">
 
@@ -70,29 +68,29 @@ Exchange 和Queue的绑定可以是多对多的关系。
 **Broker（消息代理）**
 表示消息队列服务器实体
 整体通信连接方式如下图所示：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2020112511255768.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/2020112511255768.png)
 
 
 
 # 二、RabbitMQ运行机制
 ## 1. AMQP 中的消息路由
 • AMQP 中消息的路由过程和 Java 开发者熟悉的 JMS 存在一些差别，AMQP 中增加了Exchange 和 Binding 的角色。生产者把消息发布到 Exchange 上，消息最终到达队列并被消费者接收，而 Binding 决定交换器的消息应该发送到那个队列。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125112804235.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125112804235.png)
 
 ## 2.Exchange 类型
 Exchange分发消息时根据类型的不同分发策略有区别，目前共四种类型：direct、fanout、topic、headers 。headers 匹配AMQP 消息的 header而不是路由键， headers 交换器和 direct 交换器完全一致，但性能差很多，目前几乎用不到了，所以直接看另外三种类型：
 ### （1）Direct Exchange（点对点）
 消息中的路由键（routing key）如果和 Binding 中的 bindingkey 一致， 交换器就将消息发到对应的队列中。路由键与队列名完全匹配，如果一个队列绑定到交换机要求路由键为“dog”，则只转发 routing key 标记为“dog”的消息，不会发“dog.puppy”，也不会转发“dog.guard”等等。**它是完全匹配、单播的模式。**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125144953299.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125144953299.png)
 
 ### （2）Fanout Exchange（广播）
 每个发到 fanout 类型交换器的消息都会分到所有绑定的队列上去。fanout 交换器不处理路由键，只是简单的将队列绑定到交换器上，每个发送到交换器的消息都会被转发到与该交换器绑定的所有队列上。**很像子网广播，每台子网内的主机都获得了一份复制的消息。fanout 类型转发息是最快的。**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125145025286.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125145025286.png)
 
 
 ### （3）Topic Exchange（模糊匹配）
 topic 交换器通过模式匹配分配消息的路由键属性，将路由键和某个模式进行匹配，此时队列需要绑定到一个模式上。它将路由键和绑定键的字符串切分成单词，这些 单词之间用点隔开。它同样也会识别两个通配符：**符号“#”和符号“* ”。 # 匹配 0 个或多个单词， *匹配一个单词**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125145121123.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125145121123.png)
 
 
 # 三、RabbitMQ的安装配置
@@ -102,8 +100,9 @@ topic 交换器通过模式匹配分配消息的路由键属性，将路由键�
 ```shell
 docker pull rabbitmq:3-management
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125202440828.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125202440828.png)
 查看已下载的镜像
+
 ```shell
 docker images
 ```
@@ -113,30 +112,33 @@ docker images
 docker run -d -p 5672:5672 -p 15672:15672 --name myrabbitmq 87505dc99f21
 ```
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125202234214.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125202234214.png)
 外部访问：服务器地址：15672
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125203116776.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125203116776.png)
 
 登陆：
 Username：guest
 password：guest
 登陆界面
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125203250213.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125203250213.png)
+
 ## 2.配置
 ### （1）配置Exchange
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125203913512.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125204108251.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125203913512.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125204108251.png)
 
 ### （2）配置queue
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125204441305.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125204441305.png)
 ### （3）Exchanger绑定queue
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125205237937.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125205723320.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125205237937.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125205723320.png)
+
 ### （4）测试发送
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125210127128.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125210127128.png)
 消息队列
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125210207814.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201125210318559.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125210207814.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201125210318559.png)
+
 # 四、 SpringBoot整合RabbitMQ
 ## 1. 导入依赖
 
@@ -196,7 +198,7 @@ class WppApplicationTests {
 }
 
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2020112620304630.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/2020112620304630.png)
 ## 4.  json序列化
 编写一个配置文件将序列化方式配置为json方式
 ```java
@@ -217,11 +219,12 @@ public class MyAMQPConfig {
 
 ```
 通过可视化界面验证可以看出：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201126204927468.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201126204927468.png)
 广播的发送方式与单播的代码类似，但是广播无论法哪个队列，所有的exchange有绑定的queue都会收到。
+
 ## 5.  @RabbitListenner与@EnableRabbit
  @RabbitListenner：用来打开信道监听
- 
+
 
 ```java
 package com.uestc.wpp;
@@ -281,7 +284,7 @@ public class BookService {
 
 ```
 启动主程序，结果如下所示。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201126211903162.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201126211903162.png)
 
 ## 6. AmdqAdmin
 AmdqAdmin用来创建和删除Queue，Exchange和Binding，可以用代码方式来完成我们上述在可视化界面进行的操作。
@@ -297,7 +300,7 @@ AmdqAdmin用来创建和删除Queue，Exchange和Binding，可以用代码方式
     }
 ```
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201126215346700.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201126215346700.png)
 ### （2）. 创建queue
 代码：
 
@@ -309,7 +312,7 @@ AmdqAdmin用来创建和删除Queue，Exchange和Binding，可以用代码方式
         amqpAdmin.declareQueue(new Queue("admin.queue"));
     }
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201126215619336.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201126215619336.png)
 ### （3）. 绑定
 
 ```java
@@ -327,5 +330,5 @@ public Binding(String destination, DestinationType destinationType, String excha
 ```
 分别为目的地，目的地类型，交换器名称，routingKey名字和arguments。
 绑定结果演示：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201126220244738.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201126220244738.png)
 

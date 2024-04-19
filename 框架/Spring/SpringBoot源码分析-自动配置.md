@@ -131,9 +131,9 @@ static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImp
 ```
 其中registerBeanDefinitions方法会把我们的主配置类所在的包下的所有的组件进行扫描
 例如
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201118145629794.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201118145629794.png)
 这个文件会扫描com.uestc.wang包下的主配置类WangApplication和所有子包进行扫描
-由此可知：**@AutoConfigurationPackage会将主配置类（@SpringBootApplication所在的类）的所在包及下面所有子包里面的所有组件扫描到Spring容器中**
+由此可知：**@AutoConfigurationPackage会将主配置类（@SpringBootApplication所在的类)的所在包及下面所有子包里面的所有组件扫描到Spring容器中**
 
 ### （2）@Import(AutoConfigurationImportSelector.class)
 同上面类似，@Import是给容器中导入组件，这个组件为AutoConfigurationImportSelector.class
@@ -152,7 +152,6 @@ AutoConfigurationImportSelector.class：导入哪些组件选择器，会将所�
 ```
 会导入很多很多自动配置类（xxxAutoConfiguration），给容器中导入这个场景需要的所有组件，并配置这些组件，有了自动配置类，免去了手动编写注入功能组件的工作。
 SpringBoot在启动的时候会从类路径下的META-INF/Spring.factories中获取EableAutoConfiguration指定的值，将这些值自动配置类导入到容器中，自动配置类就生效，并进行自动配置。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/202011181522532.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201118152323281.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
-
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/202011181522532.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201118152323281.png)
 

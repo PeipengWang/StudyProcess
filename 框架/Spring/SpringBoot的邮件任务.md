@@ -1,7 +1,6 @@
-
 邮件发送，在我们的日常开发中，也非常的多，使用原理如下所示：
 我们配置zhangsan的邮箱，然后发送给lisi。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201130141900442.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201130141900442.png)
 Springboot也帮我们做了支持，使用流程如下：
 邮件发送需要引入spring-boot-start-mail
 SpringBoot 自动配置MailSenderAutoConfiguration
@@ -49,7 +48,7 @@ spring.mail.properties.mail.smtp.ssl.enable=true;
     }
 ```
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2020113014435296.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/2020113014435296.png)
 复杂发送
 
 ```java

@@ -48,10 +48,10 @@ public class ScheduledService {
  设置步长每4s打印一次：1/4  *  *  *  *  *
  特别注意星期可以用数字0-7，其中0和7都代表周日，或者用SUN-SAT来表示。
  可以在这里借助工具自动生成corn：[corn自动生成器](http://www.bejson.com/othertools/cron/)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201130135932303.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201130135932303.png)
 
 输出结果：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201130135959757.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20201130135959757.png)
 
 
 

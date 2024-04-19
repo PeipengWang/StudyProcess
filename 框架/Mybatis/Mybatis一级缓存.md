@@ -1,8 +1,7 @@
-@[toc]
 # Mybatis一级缓存原理
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/95f948d0d7d44b0cab1eddcf26ab825e.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/95f948d0d7d44b0cab1eddcf26ab825e.png)
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/8fc7d848db41451ab568730b1ea95615.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/8fc7d848db41451ab568730b1ea95615.png)
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/9cb4809b35fc49f79ffc7b6ba18df72a.png)
 
@@ -29,5 +28,5 @@
 在一个session内，不过期、不更新、不限制；  
 与spring整合时，如果开启了事务，事务内，Spring通过ThreadLocal始终使用同一个sqlSession，一级缓存生效； 如果没有开启事务，每次查询前会创建一个sqlSession，查询结束后会关闭sqlSession,所以一级缓存无效；   
 ## Spring集成
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/22faa71e46044619bdab5483d9082021.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/22faa71e46044619bdab5483d9082021.png)
 

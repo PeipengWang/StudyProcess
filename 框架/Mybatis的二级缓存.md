@@ -1,4 +1,4 @@
 # Mybatis的二级缓存
-![](_v_images/20230716152914237_7843.png)
-![](_v_images/20230716221750800_16572.png)
+![](https://raw.githubusercontent.com/PeipengWang/picture/master/20230716152914237_7843.png)
+![](https://raw.githubusercontent.com/PeipengWang/picture/master/20230716221750800_16572.png)
 

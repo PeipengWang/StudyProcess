@@ -1,4 +1,3 @@
-@[toc]
 # mybatis配置与标签大全
 摘自官方文档：https://mybatis.org/mybatis-3/zh_CN/configuration.html
 在使用mybatis时一般会有两个配置文件：mybatis.xml和*Mapper.xml
@@ -607,7 +606,7 @@ public interface DatabaseIdProvider {
 
 ## XML 映射器
 MyBatis 的真正强大在于它的语句映射，这是它的魔力所在。由于它的异常强大，映射器的 XML 文件就显得相对简单。如果拿它跟具有相同功能的 JDBC 代码进行对比，你会立即发现省掉了将近 95% 的代码。MyBatis 致力于减少使用成本，让用户能更专注于 SQL 代码。  
-  
+
 SQL 映射文件只有很少的几个顶级元素（按照应被定义的顺序列出）：
 
 cache – 该命名空间的缓存配置。  
