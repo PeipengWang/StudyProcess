@@ -41,7 +41,8 @@ Kubernetes：Google开源的的容器编排工具
 
 kubernetes，是一个全新的基于容器技术的分布式架构领先方案，是谷歌严格保密十几年的秘密武器----Borg系统的一个开源版本，于2014年9月发布第一个版本，2015年7月发布第一个正式版本。
 
-kubernetes的本质是一组服务器集群，它可以在集群的每个节点上运行特定的程序，来对节点中的容器进行管理。目的是实现资源管理的自动化，主要提供了如下的主要功能：
+- [ ] kubernetes的本质是一组服务器集群，它可以在集群的每个节点上运行特定的程序，来对节点中的容器进行管理。目的是实现资源管理的自动化，主要提供了如下的主要功能：
+
 
 - 自我修复：一旦某一个容器崩溃，能够在1秒中左右迅速启动新的容器
 - 弹性伸缩：可以根据需要，自动对集群中正在运行的容器数量进行调整
@@ -160,13 +161,55 @@ node02	192.168.5.5	docker，kubectl，kubeadm，kubelet
 
 ## 2.6 环境初始化
 
+### 2.6.0 1-8可以直接简化为
+
+```
+# 关闭防火墙
+systemctl stop firewalld
+systemctl disable firewalld
+
+# 关闭selinux
+sed -i 's/enforcing/disabled/' /etc/selinux/config  # 永久
+setenforce 0  # 临时
+
+# 关闭swap
+swapoff -a  # 临时
+sed -ri 's/.*swap.*/#&/' /etc/fstab    # 永久
+
+# 关闭完swap后，一定要重启一下虚拟机！！！
+# 根据规划设置主机名
+hostnamectl set-hostname <hostname>
+查看 hostname
+# 在master添加hosts
+cat >> /etc/hosts << EOF
+159.75.251.138 k8s-node2
+43.143.251.77 k8s-node1
+47.121.29.164 k8s-master
+EOF
+
+
+# 将桥接的IPv4流量传递到iptables的链
+cat > /etc/sysctl.d/k8s.conf << EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+
+sysctl --system  # 生效
+
+
+# 时间同步
+yum install ntpdate -y
+ntpdate time.windows.com
+```
+
+
+
 ### 2.6.1 检查操作系统的版本
 
 ```
 # 此方式下安装kubernetes集群要求Centos版本要在7.5或之上
-[root@master ~]# cat /etc/redhat-release
-Centos Linux 7.5.1804 (Core)
-
+[root@VM-20-15-centos ~]#  cat /etc/redhat-release
+CentOS Linux release 7.6.1810 (Core) 
 ```
 
 ### 2.6.2 主机名解析
@@ -175,13 +218,14 @@ Centos Linux 7.5.1804 (Core)
 
 ```
 # 主机名成解析 编辑三台服务器的/etc/hosts文件，添加下面内容
-192.168.90.100 master
-192.168.90.106 node1
-192.168.90.107 node2
+159.75.251.138 k8s-node2
+43.143.251.77 k8s-node1
+47.121.29.164 k8s-master
 
 ```
 
- 时间同步
+###  2.6.3 时间同步
+
 kubernetes要求集群中的节点时间必须精确一直，这里使用chronyd服务从网络同步时间
 
 企业中建议配置内部的会见同步服务器
@@ -213,10 +257,14 @@ kubernetes和docker 在运行的中会产生大量的iptables规则，为了不�
 ### 2.6.5 禁用selinux
 
 ```
-# 编辑 /etc/selinux/config 文件，修改SELINUX的值为disable
-# 注意修改完毕之后需要重启linux服务
-SELINUX=disabled
+# 关闭selinux
+sed -i 's/enforcing/disabled/' /etc/selinux/config  # 永久
+setenforce 0  # 临时
 
+查看是否关闭
+sestatus
+如果 SELinux 处于已禁用状态，将会输出类似以下内容：
+SELinux status:  
 ```
 
 ### 2.6.6 禁用swap分区
@@ -232,49 +280,20 @@ vim /etc/fstab
 
 ```
 
-### 2.6.7 修改linux的内核参数
-
-```
-# 修改linux的内核采纳数，添加网桥过滤和地址转发功能
-# 编辑/etc/sysctl.d/kubernetes.conf文件，添加如下配置：
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-net.ipv4.ip_forward = 1
-
-# 重新加载配置
-[root@master ~]# sysctl -p
-# 加载网桥过滤模块
-[root@master ~]# modprobe br_netfilter
-# 查看网桥过滤模块是否加载成功
-[root@master ~]# lsmod | grep br_netfilter
-```
-
-### 2.6.8 配置ipvs功能
+### 2.6.7 配置ipvs功能
 
 在Kubernetes中Service有两种带来模型，一种是基于iptables的，一种是基于ipvs的两者比较的话，ipvs的性能明显要高一些，但是如果要使用它，需要手动载入ipvs模块
 
 ```
-# 1.安装ipset和ipvsadm
-[root@master ~]# yum install ipset ipvsadm -y
-# 2.添加需要加载的模块写入脚本文件
-[root@master ~]# cat <<EOF> /etc/sysconfig/modules/ipvs.modules
-#!/bin/bash
-modprobe -- ip_vs
-modprobe -- ip_vs_rr
-modprobe -- ip_vs_wrr
-modprobe -- ip_vs_sh
-modprobe -- nf_conntrack_ipv4
+[root@master ~]# cat /etc/sysctl.d/k8s.cof << EOF
+net.briger.briger-nf-call-ip6tables = 1
+net.briger.briger-nf-call-iptables = 1
 EOF
-# 3.为脚本添加执行权限
-[root@master ~]# chmod +x /etc/sysconfig/modules/ipvs.modules
-# 4.执行脚本文件
-[root@master ~]# /bin/bash /etc/sysconfig/modules/ipvs.modules
-# 5.查看对应的模块是否加载成功
-[root@master ~]# lsmod | grep -e ip_vs -e nf_conntrack_ipv4
-
 ```
 
-### 2.6.9 安装docker
+
+
+### 2.6.8 安装docker
 
 ```
 # 1、切换镜像源
@@ -285,15 +304,15 @@ EOF
 
 # 3、安装特定版本的docker-ce
 # 必须制定--setopt=obsoletes=0，否则yum会自动安装更高版本
-[root@master ~]# yum install --setopt=obsoletes=0 docker-ce-18.06.3.ce-3.el7 -y
+[root@master ~]# yum install --setopt=obsoletes=0 docker-ce-19.03.6 docker-ce-cli-19.03.6 containerd.io -y
 
 # 4、添加一个配置文件
 #Docker 在默认情况下使用Vgroup Driver为cgroupfs，而Kubernetes推荐使用systemd来替代cgroupfs
 [root@master ~]# mkdir /etc/docker
 [root@master ~]# cat <<EOF> /etc/docker/daemon.json
 {
-	"exec-opts": ["native.cgroupdriver=systemd"],
-	"registry-mirrors": ["https://kn0t2bca.mirror.aliyuncs.com"]
+"exec-opts": ["native.cgroupdriver=systemd"],
+"registry-mirrors": ["https://kn0t2bca.mirror.aliyuncs.com"]
 }
 EOF
 
@@ -302,7 +321,7 @@ EOF
 [root@master ~]# systemctl enable docker
 ```
 
-### 2.6.10 安装Kubernetes组件
+### 2.6.9 安装Kubernetes组件
 
 ```
 # 1、由于kubernetes的镜像在国外，速度比较慢，这里切换成国内的镜像源
@@ -316,35 +335,59 @@ repo_gpgcheck=0
 gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
 			http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 
+# 简化操作
+cat > /etc/yum.repos.d/kubernetes.repo << EOF
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+EOF
+
+
 # 3、安装kubeadm、kubelet和kubectl
-[root@master ~]# yum install --setopt=obsoletes=0 kubeadm-1.17.4-0 kubelet-1.17.4-0 kubectl-1.17.4-0 -y
+[root@master ~]# yum install -y kubelet-1.23.6 kubeadm-1.23.6 kubectl-1.23.6
+systemctl enable kubelet
 
 # 4、配置kubelet的cgroup
-#编辑/etc/sysconfig/kubelet, 添加下面的配置
-KUBELET_CGROUP_ARGS="--cgroup-driver=systemd"
-KUBE_PROXY_MODE="ipvs"
+修改 /etc/docker/daemon.json，加入以下内容
+"exec-opts": ["native.cgroupdriver=systemd"]
+注意这个文件是一个json文件，如果已经添加了配置，需要加上一个逗号
+# 重启 docker
+systemctl daemon-reload
+systemctl restart docker
 
 # 5、设置kubelet开机自启
 [root@master ~]# systemctl enable kubelet
 
 ```
 
-### 2.6.11 准备集群镜像
+### 2.6.10 准备集群镜像
 
 ```
 # 在安装kubernetes集群之前，必须要提前准备好集群需要的镜像，所需镜像可以通过下面命令查看
 [root@master ~]# kubeadm config images list
-
+W0420 23:20:16.386165   18507 version.go:104] falling back to the local client version: v1.23.6
+k8s.gcr.io/kube-apiserver:v1.23.6
+k8s.gcr.io/kube-controller-manager:v1.23.6
+k8s.gcr.io/kube-scheduler:v1.23.6
+k8s.gcr.io/kube-proxy:v1.23.6
+k8s.gcr.io/pause:3.6
+k8s.gcr.io/etcd:3.5.1-0
+k8s.gcr.io/coredns/coredns:v1.8.6
+上述不存在则下载
 # 下载镜像
 # 此镜像kubernetes的仓库中，由于网络原因，无法连接，下面提供了一种替换方案
 images=(
-	kube-apiserver:v1.17.4
-	kube-controller-manager:v1.17.4
-	kube-scheduler:v1.17.4
-	kube-proxy:v1.17.4
-	pause:3.1
-	etcd:3.4.3-0
-	coredns:1.6.5
+	kube-apiserver:v1.23.6
+	kube-controller-manager:v1.23.6
+	kube-scheduler:v1.23.6
+	kube-proxy:v1.23.6
+	pause:3.6
+	etcd:3.5.1-0
+	coredns:1.8.6
 )
 
 for imageName in ${images[@]};do
@@ -360,24 +403,52 @@ done
 下面的操作只需要在master节点上执行即可
 
 ```
-# 创建集群
-[root@master ~]# kubeadm init \
-	--apiserver-advertise-address=192.168.90.100 \
-	--image-repository registry.aliyuncs.com/google_containers \
-	--kubernetes-version=v1.17.4 \
-	--service-cidr=10.96.0.0/12 \
-	--pod-network-cidr=10.244.0.0/16
-# 创建必要文件
-[root@master ~]# mkdir -p $HOME/.kube
-[root@master ~]# sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-[root@master ~]# sudo chown $(id -u):$(id -g) $HOME/.kube/config
+# 在 Master 节点下执行
+kubeadm init \
+  --apiserver-advertise-address=47.121.29.164 \
+  --image-repository=registry.aliyuncs.com/google_containers \
+  --kubernetes-version=v1.23.6 \
+  --service-cidr=10.96.0.0/12 \
+  --pod-network-cidr=10.244.0.0/16
+# 安装成功后，复制如下配置并执行
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+systemctl restart kubelet
 ```
 
-下面的操作只需要在node节点上执行即可
+如果出现问题
 
 ```
-kubeadm join 192.168.0.100:6443 --token awk15p.t6bamck54w69u4s8 \
-    --discovery-token-ca-cert-hash sha256:a94fa09562466d32d29523ab6cff122186f1127599fa4dcd5fa0152694f17117 
+查看日志方法
+systemctl status kebelet
+详细日志
+journalctl -xefu kubelet
+卸载重置
+kubeadm reset
+```
+
+
+
+### 2.6.12 加入节点
+
+```
+分别在 k8s-node1 和 k8s-node2 执行
+
+# 下方命令可以在 k8s master 控制台初始化成功后复制 join 命令
+
+kubeadm join 192.168.113.120:6443 --token w34ha2.66if2c8nwmeat9o7 --discovery-token-ca-cert-hash sha256:20e2227554f8883811c01edd850f0cf2f396589d32b57b9984de3353a7389477
+
+
+# 如果初始化的 token 不小心清空了，可以通过如下命令获取或者重新申请
+# 如果 token 已经过期，就重新申请
+kubeadm token create
+
+# token 没有过期可以通过如下命令获取
+kubeadm token list
+
+# 获取 --discovery-token-ca-cert-hash 值，得到值后需要在前面拼接上 sha256:
+openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | \
+openssl dgst -sha256 -hex | sed 's/^.* //
 ```
 
 在master上查看节点信息
