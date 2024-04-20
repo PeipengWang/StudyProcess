@@ -74,7 +74,7 @@ node：集群的数据平面，负责为容器提供运行环境 ( 干活 )
 
 ![image-20240420003131336](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240420003131336.png)
 
-面，以部署一个nginx服务来说明kubernetes系统各个组件调用关系：
+下面，以部署一个nginx服务来说明kubernetes系统各个组件调用关系：
 
 1. 首先要明确，一旦kubernetes环境启动之后，master和node都会将自身的信息存储到etcd数据库中
 
