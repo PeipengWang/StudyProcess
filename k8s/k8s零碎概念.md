@@ -1,4 +1,4 @@
-<pre>
+
 # k8s
 ## 基本结构
 两台服务器
@@ -111,13 +111,13 @@ k8s里所有的操作都是部署一个个的pod，一个pod可以理解为一�
           statefulset需要保证的几个方面：网络，文件系统
                  Handless Service：用于定义网络标志（DNS domain），格式为stateSetName-[0-n-1]。将服务名当成一个访问路径，直接暴露在DNS中，而不需要分配Cluster IP
                  VolumeClaim Template： 用于创建持久化卷的模板，以便为每个 Pod 分配独立的持久化存储。
-   守护进程
+      守护进程
         DaemonSet控制器：确保k8s的每个节点都运行一个副本。
         用守护进程监控应用，例如日志收集、系统监控、系统程序等
         日志收集： Fluentd、 Elasticsearch、Logstash
         系统监控：Prometheus Node Exporter、New Relic agent、Ganglia gmonnd等
         系统程序：Kube-proxy、kube-dns
-   任务/定时任务
+      任务/定时任务
         Job：一次性任务，运行一次就销毁
         CronJob：周期任务，在Job基础上加了定时器
 ### 服务发现
@@ -194,4 +194,3 @@ RoleBinding 是一种用于将 Role 或 ClusterRole 绑定到特定用户、组�
 3. 角色和角色绑定
 4. 创建方式
 
-</pre>
