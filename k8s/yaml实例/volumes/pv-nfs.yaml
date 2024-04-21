@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolume # 描述资源对象为 PV 类型
+metadata:
+  name: pv0003 # PV 的名字
+spec:
+  capacity: # 容量配置
+    storage: 10Gi # pv 的容量
+  volumeMode: Filesystem # 存储类型为文件系统
+  accessModes: # 访问模式：ReadWriteOnce、ReadWriteMany、ReadOnlyMany
+    - ReadWriteOnce # 可被单节点独写
+  persistentVolumeReclaimPolicy: Retain # 回收策略
+  storageClassName: slow # 创建 PV 的存储类名，需要与 pvc 的相同
+  mountOptions: # 加载配置
+    - hard
+    - nfsvers=4.1
+  nfs: # 连接到 nfs
+    path: /data/nfs/rw/test-pv # 存储路径
+    server: 192.168.113.121 # nfs 服务地址

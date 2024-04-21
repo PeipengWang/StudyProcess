@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: wolfcode-external-domain
+  name: wolfcode-external-domain
+spec:
+  type: ExternalName
+  externalName: www.wolfcode.cn

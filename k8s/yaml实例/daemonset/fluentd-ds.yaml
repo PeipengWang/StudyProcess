@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: DaemonSet # 创建 DaemonSet 资源
+metadata:
+  name: fluentd # 名字
+spec:
+  selector:
+    matchLabels:
+      app: logging
+  template:
+    metadata:
+      labels:
+        app: logging
+        id: fluentd
+      name: fluentd
+    spec:
+      containers:
+      - name: fluentd-es
+        image: agilestacks/fluentd-elasticsearch:v1.3.0
+        env: # 环境变量配置
+         - name: FLUENTD_ARGS # 环境变量的 key
+           value: -qq # 环境变量的 value
+        volumeMounts: # 加载数据卷，避免数据丢失
+         - name: containers # 数据卷的名字
+           mountPath: /var/lib/docker/containers # 将数据卷挂载到容器内的哪个目录
+         - name: varlog
+           mountPath: /varlog
+      volumes: # 定义数据卷
+         - hostPath: # 数据卷类型，主机路径的模式，也就是与 node 共享目录
+             path: /var/lib/docker/containers # node 中的共享目录
+           name: containers # 定义的数据卷的名称
+         - hostPath:
+             path: /var/log
+           name: varlog

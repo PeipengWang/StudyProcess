@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-sc
+  labels:
+    app: nginx-sc
+spec:
+  type: NodePort
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+  selector:
+    app: nginx-sc
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nginx-sc
+spec:
+  replicas: 1
+  serviceName: "nginx-sc"
+  selector:
+    matchLabels:
+      app: nginx-sc
+  template:
+    metadata:
+      labels:
+        app: nginx-sc
+    spec:
+      containers:
+      - image: nginx
+        name: nginx-sc
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html # 挂载到容器的哪个目录
+          name: nginx-sc-test-pvc # 挂载哪个 volume
+  volumeClaimTemplates:
+  - metadata:
+      name: nginx-sc-test-pvc
+    spec:
+      storageClassName: managed-nfs-storage
+      accessModes:
+      - ReadWriteMany
+      resources:
+        requests:
+          storage: 1Gi

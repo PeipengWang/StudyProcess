@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    app: nginx
+---
+apiVersion: apps/v1 
+kind: StatefulSet # StatefulSet 类型的资源
+metadata:
+  name: web # StatefulSet 对象的名字
+spec:
+  serviceName: "nginx" # 使用哪个 service 来管理 dns
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports: # 容器内部要暴露的端口
+        - containerPort: 80 # 具体暴露的端口号
+          name: web # 该端口配置的名字
