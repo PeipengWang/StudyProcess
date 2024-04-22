@@ -40,15 +40,15 @@
 Redis服务，确保两个Redis实例的数据一致性可以通过Redis的复制（Replication）功能来实现。通过在Kubernetes中正确配置Redis的主从复制，可以确保数据在两个Redis实例之间保持同步。
 
 ## 资源和对象
-资源清单（Resource Manifest）通常指的是用于描述和配置Kubernetes资源的YAML文件。这些清单文件包含了对于Kubernetes中各种资源（如Pod、Service、Deployment等）的定义和配置信息。以下是一些常见的Kubernetes资源清单：
-1、Pod清单：描述一个或多个容器的运行规范，包括容器的镜像、命令、参数、环境变量等信息。
-2、Service清单：描述服务的规范，包括服务的类型、端口映射、选择器等信息。
-3、Deployment清单：描述部署应用程序的规范，包括副本数、更新策略、容器模板等信息
-4、PersistentVolume清单 和 PersistentVolumeClaim清单：描述持久化存储的规范，包括存储类型、访问模式、容量等信息。
-5、Ingress清单：描述Ingress资源的规范，包括主机名、路径、后端服务等信息。
+资源清单（Resource Manifest）通常指的是用于描述和配置Kubernetes资源的YAML文件。这些清单文件包含了对于Kubernetes中各种资源（如Pod、Service、Deployment等）的定义和配置信息。以下是一些常见的Kubernetes资源清单：  
+1、Pod清单：描述一个或多个容器的运行规范，包括容器的镜像、命令、参数、环境变量等信息。  
+2、Service清单：描述服务的规范，包括服务的类型、端口映射、选择器等信息。  
+3、Deployment清单：描述部署应用程序的规范，包括副本数、更新策略、容器模板等信息  
+4、PersistentVolume清单 和 PersistentVolumeClaim清单：描述持久化存储的规范，包括存储类型、访问模式、容量等信息。  
+5、Ingress清单：描述Ingress资源的规范，包括主机名、路径、后端服务等信息。  
 
-基于资源创建出来的实例就叫对象
-它们可以通过YAML或JSON格式的清单文件来定义，并通过Kubernetes API进行创建、管理和操作。通过使用这些对象，你可以轻松地在Kubernetes集群中部署和管理应用程序，实现高可用、可扩展和自动化的容器化工作负载。
+基于资源创建出来的实例就叫对象  
+它们可以通过YAML或JSON格式的清单文件来定义，并通过Kubernetes API进行创建、管理和操作。通过使用这些对象，你可以轻松地在Kubernetes集群中部署和管理应用程序，实现高可用、可扩展和自动化的容器化工作负载。  
 
 ## 对象的规约和状态
 在Kubernetes中，规约（Desired State）和状态（Actual State）是两个关键概念，它们描述了Kubernetes系统如何管理和维护应用程序和基础设施的状态。
