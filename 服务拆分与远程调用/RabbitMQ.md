@@ -4,7 +4,7 @@
 异步通讯：不需要马上回复，例如收发短信  
 同步通讯时效性较强，可以立即得到结果，但是也会有一定问题，如下所示为一个支付服务与其调用的服务，在此项服务中用户发送支付请求，支付服务会依次远程调用订单服务，仓储服务和短息服务，在这个调用过程是一个链式的过程，总用时为500ms。  
 在这个服务中，每次修改其它服务，就要相应的去修改支付服务的代码，会产生耦合度高的问题；在调用过程中，调用者为了进行实时响应，会一直处在等待状态，等到调用的服务返回数据，会产生性能和吞吐能力下降的问题；同时，调用链的每个服务都要等待其它服务调用完成，在高并发条件下产生额外的资源的浪费；最后，调用链的一个服务失败会导致整个级联的失败，如同多米诺骨牌一样迅速崩塌，导致整个微服务失败。由此产生了异步通讯的解决方案  
-<img src="_v_images/20220103211646396_843.png" alt="" width="946">
+<img src="https://raw.githubusercontent.com/PeipengWang/picture/master/20220103211646396_843.png" alt="" width="946">
 
 总结：  
 同步调用的优点：  
@@ -22,7 +22,7 @@
 在事件模式中，支付服务是事件发布者（publisher），在支付完成后只需要发布一个支付成功的事件（event），事件中带上订单id。  
 订单服务和物流服务是事件订阅者（Consumer），订阅支付成功的事件，监听到事件后完成自己业务即可。  
 为了解除事件发布者与订阅者之间的耦合，两者并不是直接通信，而是有一个中间人（Broker）。发布者发布事件到Broker，不关心谁来订阅事件。订阅者从Broker订阅事件，不关心谁发来的消息。  
-<img src="_v_images/20220103214031901_4452.png" alt="" width="781">
+<img src="https://raw.githubusercontent.com/PeipengWang/picture/master/20220103214031901_4452.png" alt="" width="781">
 
 Broker 是一个像数据总线一样的东西，所有的服务要接收数据和发送数据都发到这个总线上，这个总线就像协议一样，让服务间的通讯变得标准和可控。  
 好处：  
@@ -36,7 +36,7 @@ Broker 是一个像数据总线一样的东西，所有的服务要接收数据�
 需要依赖于Broker的可靠、安全、性能    
 好在现在开源软件或云平台上 Broker 的软件是非常成熟的，比较常见的一种就是我们今天要学习的MQ技术。    
 ## 1.3. 几种MQ的对比  
-<img src="_v_images/20220103215057625_18647.png" alt="" width="919">
+<img src="https://raw.githubusercontent.com/PeipengWang/picture/master/20220103215057625_18647.png" alt="" width="919">
 
 ## 1.4. docker安装运行RabbitMQ 流程
 1、安装docker  
@@ -90,7 +90,7 @@ queue：缓存消息
 virtual host： 虚拟主机，对queue、exchange等资源的逻辑分组  
 ## 1.6. 五种模型  
 ### 1.6.1. 基本消息队列  
-![](_v_images/20220209215426016_2296.png)
+![](https://raw.githubusercontent.com/PeipengWang/picture/master/20220209215426016_2296.png)
 publisher：消息发布者，将消息发布到队列  
 queue：接收消息并缓存  
 consumer：订阅队列，处理队列中的消息  
@@ -268,7 +268,7 @@ public void listenWorkQueue2(String msg) throws InterruptedException {
 ## 2.3. 发布/订阅
 实际为一次发送多个消费者都能接收到同样的数据的过程  
 发布订阅的模型如图：  
-<img src="_v_images/20220220131809379_13195.png" alt="" width="1287">
+<img src="https://raw.githubusercontent.com/PeipengWang/picture/master/20220220131809379_13195.png" alt="" width="1287">
 可以看到，在订阅模型中，多了一个exchange角色，而且过程略有变化：
 Publisher：生产者，也就是要发送消息的程序，但是不再发送到队列中，而是发给X（交换机）  
 Exchange：交换机，图中的X。一方面，接收生产者发送的消息。另一方面，知道如何处理消息，例如递交给某个特别队列、递交给所有队列、或是将消息丢弃。到底如何操作，取决于Exchange的类型。Exchange有以下3种类型：  
@@ -277,6 +277,7 @@ Direct：定向，把消息交给符合指定routing key 的队列
 Topic：通配符，把消息交给符合routing pattern（路由模式） 的队列  
 Consumer：消费者，与以前一样，订阅队列，没有变化  
 Queue：消息队列也与以前一样，接收消息、缓存消息。  
+
 ### 2.3.1. Fanout（广播）模式  
 #### 2.3.1.1. 配置消费者的配置类  
 声明交换机和消息队列，并将交换机和消息队列进行绑定  
@@ -335,7 +336,7 @@ public class FanoutConfig {
 }
 ```
 配置完成后，可以发现名为itcast.fanout的交换机绑定了两个队列，分别为fanout.queue1和fanout.queue2的两个队列。，关闭项目后依然存在。  
-<img src="_v_images/20220220135606841_21350.png" alt="" width="767">
+<img src="https://raw.githubusercontent.com/PeipengWang/picture/master/20220220135606841_21350.png" alt="" width="767">
 
 #### 2.3.1.2. 消息发送
 在publisher服务的SpringAmqpTest类中添加测试方法：  
@@ -381,7 +382,7 @@ Binding
 队列与交换机的绑定，不能是任意绑定了，而是要指定一个RoutingKey（路由key）
 消息的发送方在 向 Exchange发送消息时，也必须指定消息的 RoutingKey。
 Exchange不再把消息交给每一个绑定的队列，而是根据消息的Routing Key进行判断，只有队列的Routingkey与消息的 Routing key完全一致，才会接收到消息
-<img src="_v_images/20220220142211105_6575.png" alt="" width="1127">
+<img src="https://raw.githubusercontent.com/PeipengWang/picture/master/20220220142211105_6575.png" alt="" width="1127">
 
 #### 2.3.2.1. 接收消息
 基于注解声明队列和交换机  
@@ -429,7 +430,7 @@ Routingkey 一般都是有一个或多个单词组成，多个单词之间以”
 举例：  
 item.#：能够匹配item.spu.insert 或者 item.spu  
 item.*：只能匹配item.spu  
-<img src="_v_images/20220220145559813_953.png" alt="" width="1006">
+<img src="https://raw.githubusercontent.com/PeipengWang/picture/master/20220220145559813_953.png" alt="" width="1006">
 解释：  
 
 Queue1：绑定的是china.# ，因此凡是以 china.开头的routing key 都会被匹配到。包括china.news和china.weather  
@@ -454,7 +455,7 @@ public void testSendTopicExchange() {
     // 发送消息
     rabbitTemplate.convertAndSend(exchangeName, "china.news", message);
 }
-``` 
+```
 #### 2.3.3.2. 消息接收  
 在consumer服务的SpringRabbitListener中添加方法：  
 ```
@@ -483,5 +484,4 @@ Topic交换机接收的消息RoutingKey必须是多个单词，以 **.** 分割
 Topic交换机与队列绑定时的bindingKey可以指定通配符  
 #：代表0个或多个词  
 *：代表1个词  
-
 

@@ -1,5 +1,3 @@
-
-@[toc]
 # Java 数据结构
 详细请转到[@pdai的博客](https://pdai.tech/md/java/thread/java-thread-x-juc-collection-BlockingQueue.html)
 ## 1. 基本数据结构
@@ -39,7 +37,7 @@ private static final int DEFAULT_CAPACITY = 10;
 扩容机制触发条件：空间已满
 扩容大小：1.5倍
 源码调用路径
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/1a593e54b3584f0396ac94b4ad89a8a6.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/1a593e54b3584f0396ac94b4ad89a8a6.png)
 
 
 其中，在add的时候，会调用 this.ensureCapacityInternal(this.size + 1);其中size+1是当前添加后的容量值，传入ensureExplicitCapacity方法，源码如下：
@@ -358,7 +356,7 @@ TreeMap底层通过红黑树(Red-Black tree)实现，也就意味着containsKey(
 
 左旋(Rotate Left)：  
 左旋的过程是将x的右子树绕x逆时针旋转，使得x的右子树成为x的父亲，同时修改相关节点的引用。旋转之后，二叉查找树的属性仍然满足。  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/5685ccf12d4344fa922a7f5ba4c4a4ac.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/5685ccf12d4344fa922a7f5ba4c4a4ac.png)
 
 
 左旋代码：  
@@ -382,7 +380,7 @@ private void rotateLeft(Entry<K,V> p) {
 }
 ```
 右旋：右旋的过程是将x的左子树绕x顺时针旋转，使得x的左子树成为x的父亲，同时修改相关节点的引用。旋转之后，二叉查找树的属性仍然满足。  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/09440ebb0917460d9a157a8b214b9378.png)  
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/09440ebb0917460d9a157a8b214b9378.png)  
 
 TreeMap中右旋代码如下:
 ```
@@ -471,7 +469,7 @@ remove 操作的线程安全性。
 get 操作需要遍历链表，但是 remove 操作会"破坏"链表。如果 remove 破坏的节点 get 操作已经过去了，那么这里不存在任何问题。如果 remove 先破坏了一个节点，分两种情况考虑。  
  1、如果此节点是头节点，那么需要将头节点的 next 设置为数组该位置的元素，table 虽然使用了 volatile 修饰，但是 volatile 并不能提供数组内部操作的可见性保证，所以源码中使用了 UNSAFE 来操作数组，请看方法 setEntryAt。  
  2、如果要删除的节点不是头节点，它会将要删除节点的后继节点接到前驱节点中，这里的并发保证就是 next 属性是 volatile 的。  
- 
+
 #### ConcurrentHashMap - JDK 1.8
 
 在JDK1.8中，ConcurrentHashMap选择了与HashMap类似的数组+链表+红黑树的方式实现，而加锁则采用CAS和synchronized实现。  

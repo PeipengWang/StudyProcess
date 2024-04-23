@@ -62,7 +62,7 @@ Exception in thread "main" java.util.ConcurrentModificationException
 
 当删除 3 的map后，再次读取 set 会报错，原因分析：
 debug程序发现，sets 与 map所指向的地址是一样的，当删除 map 值后相应的 sets 值也会丢失，这时候再读取下一个就会出现问题了。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/51782860534b4466b05ef9de4ab30df9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Z-56bmP,size_15,color_FFFFFF,t_70,g_se,x_16)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/51782860534b4466b05ef9de4ab30df9.png)
 想要解决这个问题，可以考虑在读取到 sets 之后重新定义一个 lists 集合，把 sets 里的数据放进去来遍历增删。
 代码如下:
 

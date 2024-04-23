@@ -8,7 +8,7 @@ Tomcat目前支持BIO（阻塞 I/O）、NIO（非阻塞 I/O）、AIO（异步非
 第二次阻塞 accept调用：客户端连接后，服务器会等待客户端发送数据，如果客户端没有发送数据，那么服务端将会一直阻塞等待客户端发送数据  
 在Tomcat中，维护了一个worker线程池来处理socket请求，如果worker线程池没有空闲线程，则Acceptor将会阻塞，所以在有大量请求连接到服务器却不发送消息（占用线程，阻塞与accept的调用）的情况下，会导致服务器压力极大  
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/aa93da1322504ed0b0c3feac82316616.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/aa93da1322504ed0b0c3feac82316616.png)
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/297a2091fff546ac9d28a2928dca6b94.png)
 
 ## NIO  
@@ -24,7 +24,7 @@ startInternal()主要作用在于初始化连接，启动工作线程池poller �
 acceptor用于监听Socket连接请求，每个acceptor启动以后就开始循环调用 ServerSocketChannel 的 accept() 方法获取新的连接，然后调用 endpoint.setSocketOptions(socket) 处理新的连接，在endpoint.setSocketOptions(socket) 中 则会通过getPoller0().register(channel)，将当前的NioChannel 注册到Poller中，此逻辑在Acceptor .run()中处理  
 
 调用getPoller0().register(channel)后，请求socket被包装为一个 PollerEvent，然后添加到 events 中，此过程是由poller线程去做的，poller 的 run() 会循环调用 events() 方法处理注册到 Selector （每一个poller会开启一个 Selector）上的channal ，监听该 channel 的 OP_READ 事件，如果状态为 readable，那么在 processKey ()中将该任务放到 worker 线程池中执行。整个过程大致如下图所示  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2f5537ac2d684aebb29418abbc7f8b1b.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/2f5537ac2d684aebb29418abbc7f8b1b.png)
 
 在NIO模型，不是一个连接就要对应一个处理线程了，连接会被注册到Selector上面，当Selector监听到有效的请求，才会分发一个对应线程去处理，当连接没有请求时，是没有工作线程来处理的
 ## Tomcat中修改
@@ -36,5 +36,4 @@ org.apache.coyote.http11.Http11AprProtocol：APR
 ## 总结
 BIO每个连接都会创建一个线程，对性能开销大，不适合高并发场景。  
 NIO基于多路复用选择器监测连接状态在通知线程处理，当监控到连接上有请求时，才会分配一个线程来处理，利用少量的线程来管理了大量的连接，优化了IO的读写，但同时也增加CPU的计算，适用于连接数较多的场景  
-
 

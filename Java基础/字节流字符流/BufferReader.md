@@ -13,7 +13,7 @@ BufferedReader是从缓冲区之中读取内容，所有的输入的字节数据
 2、public String readLine() throws IOException 一次性从缓冲区中将内容全部读取进来。  
 System.in本身表示的是InputStream（字节流），现在要求接收的是一个字符流，需要将字节流转为字符流才可以，InputStreamReader。  
 BufferedReader接收键盘输入时实例化如下：  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/3d6fd3f2837844a48bafba1795a24ff0.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/3d6fd3f2837844a48bafba1795a24ff0.png)
 
 ```
 import java.io.* ;

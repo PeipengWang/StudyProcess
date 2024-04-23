@@ -11,9 +11,10 @@
 # Java 内存区域与相应内存溢出异常  
 对于Java程序员来说，在虚拟机自动内存管理的机制下，不需要再为每一个new操作去写配对的delete/free代码，不容易出现内存溢出与内存泄露的问题，但是，一旦出现这种问题，如果不了解虚拟机怎样运行的，修正问题将会异常艰巨。  
 ## 数据区  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/87f2f7faadca4f3f9ea1bf1a7ddb531b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Z-56bmP,size_20,color_FFFFFF,t_70,g_se,x_16)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/ecaf80a7c38d496ba24eed9ff387c0f2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Z-56bmP,size_20,color_FFFFFF,t_70,g_se,x_16)
-可以笼统的将Java虚拟机内存分为堆（Heap）内存和栈（Stack）内存，  
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/87f2f7faadca4f3f9ea1bf1a7ddb531b.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/ecaf80a7c38d496ba24eed9ff387c0f2.png)
+可以笼统的将Java虚拟机内存分为堆（Heap）内存和栈（Stack)内存，  
+
 ### 程序计数器（线程私有）  
 可以看做是当前线程执行的字节码的行号指示器。由于Java虚拟机的多线程是通过线程轮流切换、分配处理器执行时间的方式来实现的，在任何一个确定的时刻，一个处理器只会执行一条线程的指令。因此，为了线程切换后能够恢复到正确的执行位置，每条线程都需要一个独立的程序计数器，每条线程互不影响，这类内存被称为“线程私有”的内存。  
 如果线程正在执行一个Java方法，这个计数器记录的是蒸菜执行的虚拟机字节码指令的地址；如果执行的是native方法，这个计数器指针为空（Undefined）。  
@@ -69,10 +70,11 @@ Java堆是垃圾收集器管理的内存区域，因此也被成为不GC堆。
 句柄访问，Java堆会划分处一块内存作为句柄池，栈中的reference中存储的就是对象的句柄池，而句柄中包含了对象实例数据与类型数据各自具体的地址信息结构如下所示  
 在这里插入图片描述  
 直接指针访问，reference存放的是直接对象的地址，内存布局需要考虑如何存放对象。好处是速度快，HotSpot主要使用这种方式。  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/bdc515c91ca34e1dab1c65d6404e5bd2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Z-56bmP,size_20,color_FFFFFF,t_70,g_se,x_16)  
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/bdc515c91ca34e1dab1c65d6404e5bd2.png)  
+
 ## 虚拟机设置内存大小  
 先罗列网友整理的表格：  
-![](https://img-blog.csdnimg.cn/14792c5df30e4a97b64109762d7735eb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Z-56bmP,size_20,color_FFFFFF,t_70,g_se,x_16)
+![](https://raw.githubusercontent.com/PeipengWang/picture/master/14792c5df30e4a97b64109762d7735eb.png)
 
 ### 堆
 -Xms20m -Xmx20m -XX:+HeapDumpOnOutOfMemoryError  
@@ -130,7 +132,8 @@ Java堆和方法区有着显著的不确定性，一个接口的多个实现类�
 #### 标记-整理算法
 复制收集算法在对象存活率较高时就要执行较多的复制操作，效率将会变低。更关键的是，如果不想浪费50%的空间，就需要有额外的空间进行分配担保，以应对被使用的内存中所有对象都100%存活的极端情况，所以在老年代一般不能直接选用这种算法。   
 根据老年代的特点，有人提出了另外一种“标记-整理”（Mark-Compact）算法，标记过程仍然与“标记-清除”算法一样，但后续步骤不是直接对可回收对象进行清理，而是让所有存活的对象都向一端移动，然后直接清理掉端边界以外的内存  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/31c91626f2fa44f6ad5d5c1a7145e0e1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Z-56bmP,size_20,color_FFFFFF,t_70,g_se,x_16)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/31c91626f2fa44f6ad5d5c1a7145e0e1.png)
+
 ### 内存分配
 在学习垃圾收集器的种类之前首先需要了解在堆中Eden区和Old区的对象内存分配  
 #### 对象优先在Eden分配  
@@ -291,7 +294,7 @@ Java虚拟机设计团队有意把“通过一个全限定名来获取描述改�
 #### 双亲委派模型
 双亲委派模型的工作流程是：  
 如果一个类加载器受到了类加载的请求，它不会自己尝试加载这个类，而是委托它的父类加载器去完成，每一个层次的类加载器都是这样，因此都传输到顶层的启动类加载器中，只有当父类加载器反馈无法完成这个加载请求的时候（搜索范围内没有需要的类），子类加载器才会去完成加载。  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/e242319ab7bf4996890383ae527d87e8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Z-56bmP,size_20,color_FFFFFF,t_70,g_se,x_16)  
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/e242319ab7bf4996890383ae527d87e8.png)  
 
 1、启动类加载器(Bootstrap ClassLoader),它是属于虚拟机自身的一部分，用C++实现的，主要负责加载<JAVA_HOME>\lib目录中或被-Xbootclasspath指定的路径中的并且文件名是被虚拟机识别的文件。它等于是所有类加载器的爸爸。  
 2、扩展类加载器(Extension ClassLoader),它是Java实现的，独立于虚拟机，主要负责加载<JAVA_HOME>\lib\ext目录中或被java.ext.dirs系统变量所指定的路径的类库。  

@@ -1,9 +1,9 @@
-@[toc]
 # Java网络编程原理与实践--从Socket到BIO再到NIO
 ## Socket基本架构
 图来源：https://zhuanlan.zhihu.com/p/462497498
 既然是网络的东西肯定得放个网络架构图，这张图不多说，感兴趣可以去链接详细看一下
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/49f33f5f19e7439bbdad1d164f853790.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/49f33f5f19e7439bbdad1d164f853790.png)
+
 ## Socket 基本使用
 转自：https://blog.csdn.net/a78270528/article/details/80318571
 ### 简单一次发送接收
@@ -446,7 +446,7 @@ NIO是面向缓冲区的。数据读取到一个它的稍后处理的缓冲区�
 Java NIO的非阻塞模式，是一个线程从某通道发送请求或者读取数据，但是它仅能得到目前可用的数据，如果目前没有数据可用时，就什么都不会获取，而不是保持线程阻塞，所以直至数据变得可以读取之前，该线程可以继续做其他的事情。非阻塞写也是如此，一个线程请求写入一些数据到某通道，但不需要等待它完全写入，这个线程同时可以去做别的事情。  
 通俗理解：NIO是可以做到用一个线程来处理多个操作的。假设有10000个请求过来，根据实际情况，可以分配50或者100个线程来处理。不像之前的阻塞IO那样，非得分配10000个。  
 HTTP2.0使用了多路复用的技术，做到了同一个连接并发处理多个请求，而且并发请求的数量比HTTP1.1大了好几个数量级。  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/e69f7d1d1c88438eab439dcf7c4df3df.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/e69f7d1d1c88438eab439dcf7c4df3df.png)
 
 
 ### Buffer
@@ -542,7 +542,7 @@ public class Channel {
     }
 }
 
-``` 
+```
 ### Selector（选择器）  
 #### 基本介绍  
 

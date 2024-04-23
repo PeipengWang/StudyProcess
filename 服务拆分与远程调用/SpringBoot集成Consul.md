@@ -9,7 +9,7 @@ Consul 是一种强大的工具，可帮助组织更好地管理其分布式系�
 
 ## 基本概念与原理  
 ### consule的角色  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/fee0c81fa37044db81bdb5a5f7caa412.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/fee0c81fa37044db81bdb5a5f7caa412.png)
 
 Consul 有三种主要的角色：开发者 (Dev)、客户端 (Client) 和服务器 (Server)。这些角色用于组织 Consul 集群中的节点，以实现服务发现、健康检查和键值存储等功能。以下是对这三种角色的简要描述：  
 
@@ -26,7 +26,7 @@ Consul 有三种主要的角色：开发者 (Dev)、客户端 (Client) 和服务
 服务器节点通常以多节点的方式部署，以确保高可用性和冗余。这些节点组成了Consul集群的核心，保持一致的状态信息。  
 服务器节点还可以配置数据中心之间的复制和通信，以实现全局的服务发现和协调。  
 ### 原理  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/4302c5f9eae74b7eb6371946c188408a.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/4302c5f9eae74b7eb6371946c188408a.png)
 
 了解什么是服务发现、健康检查和分布式键值存储，这是Consul的核心概念。  
 服务发现及注册：  
@@ -57,7 +57,7 @@ producer启动时，会将自己的ip/host等信息通过发送请求告知consu
 服务注册是Consul的一个功能，允许应用程序注册自己的服务实例，以便其他应用程序可以发现并与之通信。  
 当一个服务启动时，它会通过Consul代理向Consul集群注册自己的服务信息，包括服务名称、IP地址、端口等。  
 注册的服务信息存储在Consul的目录中，供其他应用程序查询。  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/4c604bbe3ec0427496352b20fb6e0b37.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/4c604bbe3ec0427496352b20fb6e0b37.png)
 
 ## 安装Consul  
 下载和安装Consul，可以选择适合你操作系统的版本。   

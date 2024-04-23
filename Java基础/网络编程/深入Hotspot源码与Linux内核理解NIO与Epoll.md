@@ -1,12 +1,11 @@
 转载自[Netty篇-第1章-深入Hotspot源码与Linux内核理解NIO与Epoll](https://zhuanlan.zhihu.com/p/589980018?utm_id=0)
 
-@[TOC](这里写目录标题)
 # 一、I/O模型详解
 ## 1.内核空间和用户空间
 思考：物理内存是有限的（比如16G内存），怎么把有限的内存分配给不同的进程？
 Linux 给每个进程虚拟出一块很大的地址空间，比如 32 位机器上进程的虚拟内存地址空间是 4GB，从 0x00000000 到 0xFFFFFFFF。但这 4GB 并不是真实的物理内存，而是进程访问到了某个虚拟地址，如果这个地址还没有对应的物理内存页，就会产生缺页中断，分配物理内存，MMU（内存管理单元）会将虚拟地址与物理内存页的映射关系保存在页表中，再次访问这个虚拟地址，就能找到相应的物理内存页。每个进程的这 4GB 虚拟地址空间分布如下图所示：
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/e908779eb1ed4c848ba9291e10699594.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/e908779eb1ed4c848ba9291e10699594.png)
 
 用户空间从低到高依次是代码区、数据区、堆、共享库与 mmap 内存映射区、栈、环境变量。其中堆向高地址增长，栈向低地址增长。
 用户空间上还有一个共享库和 mmap 映射区，Linux 提供了内存映射函数 mmap， 它可将文件内容映射到这个内存区域，用户通过读写这段内存，从而实现对文件的读取和修改，无需通过 read/write 系统调用来读写文件，省去了用户空间和内核空间之间的数据拷贝，Java 的 MappedByteBuffer 就是通过它来实现的；用户程序用到的系统共享库也是通过 mmap 映射到了这个区域。
@@ -23,7 +22,7 @@ CPU 在执行系统调用的过程中会从用户态切换到内核态，CPU 在
 ## 2.阻塞与唤醒
 **思考：当用户线程发起一个阻塞式的 read 调用，数据未就绪时，线程就会阻塞，那阻塞具体是如何实现的呢？**
 Linux 内核将线程当作一个进程进行 CPU 调度，内核维护了一个可运行的进程队列，所有处于TASK_RUNNING状态的进程都会被放入运行队列中，本质是用双向链表将task_struct链接起来，排队使用 CPU 时间片，时间片用完重新调度 CPU。所谓调度就是在可运行进程列表中选择一个进程，再从 CPU 列表中选择一个可用的 CPU，将进程的上下文恢复到这个 CPU 的寄存器中，然后执行进程上下文指定的下一条指令。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/4d2d2ce9d18d4ed78cc6dd1c2dce0057.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/4d2d2ce9d18d4ed78cc6dd1c2dce0057.png)
 而阻塞的本质就是将进程的task_struct移出运行队列，添加到等待队列，并且将进程的状态的置为TASK_UNINTERRUPTIBLE或者TASK_INTERRUPTIBLE，重新触发一次 CPU 调度让出 CPU。
 
 **思考：线程是如何唤醒的呢？**
@@ -33,16 +32,17 @@ Linux 内核将线程当作一个进程进行 CPU 调度，内核维护了一个
 ## 3.Socket Read 系统调用的过程
 以Linux操作系统为例，一次socket read 系统调用的过程：
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/5aff057629a743a3b1d83bede50fdc46.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/5aff057629a743a3b1d83bede50fdc46.png)
 首先 CPU 在用户态执行应用程序的代码，访问进程虚拟地址空间的用户空间；
 read 系统调用时 CPU 从用户态切换到内核态，执行内核代码，内核检测到 Socket 上的数据未就绪时，将进程的task_struct结构体从运行队列中移到等待队列，并触发一次 CPU 调度，这时进程会让出 CPU；
 当网卡数据到达时，内核将数据从内核空间拷贝到用户空间的 Buffer，接着将进程的task_struct结构体重新移到运行队列，这样进程就有机会重新获得 CPU 时间片，系统调用返回，CPU 又从内核态切换到用户态，访问用户空间的数据。
 总结：
 当用户线程发起 I/O 调用后，网络数据读取操作会经历两个步骤：
 用户线程等待内核将数据从网卡拷贝到内核空间。（数据准备阶段）
-内核将数据从内核空间拷贝到用户空间（应用进程的缓冲区）。
+内核将数据从内核空间拷贝到用户空间（应用进程的缓冲区)。
 各种 I/O 模型的区别就是：
 它们实现这两个步骤的方式是不一样的。
+
 ## 4.Unix(linux)下5种I/O模型
 ### 4.1 I/O 模型作用
 是为了解决内存和外部设备速度差异的问题。
@@ -57,8 +57,8 @@ I/O多路复用（multiplexing I/O）
 信号驱动式I/O（signal-driven I/O）
 异步I/O（asynchronous I/O）
 其中信号驱动式IO在实际中并不常用
-![在这里插入图片描述](https://img-blog.csdnimg.cn/72d1131e01a142c4bebb0712c8cde525.png)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/04d7c15c631a460e9250d6a6af44a89e.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/72d1131e01a142c4bebb0712c8cde525.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/04d7c15c631a460e9250d6a6af44a89e.png)
 
 ## 5.网络IO分类
 Java共支持3种网络编程IO模式：BIO，NIO，AIO
@@ -66,12 +66,12 @@ Java共支持3种网络编程IO模式：BIO，NIO，AIO
 # 二、BIO-同步阻塞模型
 ## 1.概念
 同步阻塞模型，一个客户端连接对应一个处理线程。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/3e89c06868fb4ae79dfb2fdb9d712783.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/3e89c06868fb4ae79dfb2fdb9d712783.png)
 
 ## 2.工作逻辑图
 
 ## 3.BIO代码逻辑
-![在这里插入图片描述](https://img-blog.csdnimg.cn/5cdc09835d9d45398cf2f6437f7a36d6.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/5cdc09835d9d45398cf2f6437f7a36d6.png)
 ## 4.BIO代码示例
 ### 4.1 服务端单线程代码
 
@@ -192,7 +192,7 @@ BIO 方式适用于连接数目比较小且固定的架构， 这种方式对服
 ## 7.telnet连接服务端测试
 CMD任务框：
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/18c1639c5272490bb6b76bc13d24fe99.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/18c1639c5272490bb6b76bc13d24fe99.png)
 
 输入命令telnet
 
@@ -354,7 +354,7 @@ Channel(通道)， Buffer(缓冲区)，Selector(多路复用器)
 2、channel 会注册到 selector 上，由 selector 根据 channel 读写事件的发生将其交由某个空闲的线程处理
 3、NIO 的 Buffer 和 channel 都是既可以读也可以写
 ## 5、多路复用器Selector模式工作原理图
-![在这里插入图片描述](https://img-blog.csdnimg.cn/0cc60a58d67e4b129d675e59fb36e15a.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/0cc60a58d67e4b129d675e59fb36e15a.png)
 ## 6.NIO非阻塞底层原理
 （1）轮询机制：在JDK1.4版本是用linux的内核函数select()或poll()来实现，跟上面的NioServer代码类似，selector每次都会轮询所有的sockchannel看下哪个channel有读写事件，有的话就处理，没有就继续遍历。
 （2）事件通知机制：JDK1.5开始引入了epoll基于事件响应机制来优化NIO。
@@ -368,7 +368,7 @@ selector.select()  //阻塞等待需要处理的事件发生
 ```
 
 ## 8.多路复用器Selector底层源码
-![在这里插入图片描述](https://img-blog.csdnimg.cn/8aced36c6db54324bacb27b15fa763dd.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/8aced36c6db54324bacb27b15fa763dd.png)
 
 NIO整个调用流程：
 1.Selector.open() :创建EPoll实例（Selector），用文件描述符epfd代表。创建一个集合EPollArrayWapper。
@@ -426,7 +426,7 @@ epfd是Epoll对应的文件描述符，events表示调用者所有可用事件�
 
 ## 10.Linux 内核函数比较
 I/O多路复用底层主要用的Linux 内核·函数（select，poll，epoll）来实现，windows不支持epoll实现，windows底层是基于winsock2的select函数实现的(不开源)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2891f80206944fd0b979ac1f97312d8c.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/2891f80206944fd0b979ac1f97312d8c.png)
 
 ## 11.Redis线程模型
 Redis就是典型的基于epoll的NIO线程模型(nginx也是)，epoll实例收集所有事件(连接与读写事件)，由一个服务端线程连续处理所有事件命令。
@@ -517,7 +517,7 @@ public class AIOClient {
 ```
 
 # 四、BIO、 NIO、 AIO 对比
-![在这里插入图片描述](https://img-blog.csdnimg.cn/6952875ff9c1427ea6a7812e5a855d27.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/6952875ff9c1427ea6a7812e5a855d27.png)
 
 # 五、为什么Netty使用NIO而不是AIO？
 在Linux系统上，AIO的底层实现仍使用Epoll，没有很好实现AIO，因此在性能上没有明显的优势，而且被JDK封装了一层不容易深度优化，Linux上AIO还不够成熟。Netty是异步非阻塞框架，Netty在NIO上做了很多异步的封装。
@@ -564,7 +564,7 @@ public class AIOClient {
 # 七、Tomcat的 I/O 模型
 1.Tomcat支持I/O模型
 Tomcat 支持的多种 I/O 模型和应用层协议。Tomcat 支持的 I/O 模型有：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/d0bb8cc57482417982befbf1941f62b3.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/d0bb8cc57482417982befbf1941f62b3.png)
 
 IO模型	描述
 BIO （JIoEndpoint）	同步阻塞式IO，即Tomcat使用传统的http://java.io进行操作。该模式下每个请求都会创建一个线程，对性能开销大，不适合高并发场景。优点是稳定，适合连接数目小且固定架构。
@@ -588,7 +588,7 @@ I/O 调优实际上是连接器类型的选择，一般情况下默认都是 NIO
 
 在 Tomcat 中，EndPoint 组件的主要工作就是处理 I/O，而 NioEndpoint 利用 Java NIO API 实现了多路复用 I/O 模型。Tomcat的NioEndpoint 是基于主从Reactor多线程模型设计。
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/336e05465898427faadf52b27ab959f5.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/336e05465898427faadf52b27ab959f5.png)
 
 
 
@@ -600,7 +600,7 @@ I/O 调优实际上是连接器类型的选择，一般情况下默认都是 NIO
 
 
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/dba0c02dd03f414daa432660e62c6fd4.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/dba0c02dd03f414daa432660e62c6fd4.png)
 
 
 
@@ -659,11 +659,10 @@ SynchronizedStack 内部维护了一个对象数组，并且用数组来实现�
 NIO 和 NIO.2 最大的区别是，一个是同步一个是异步。异步最大的特点是，应用程序不需要自己去触发数据从内核空间到用户空间的拷贝。
 
 思考：Tomcat如何实现异步I/O的？
-![在这里插入图片描述](https://img-blog.csdnimg.cn/f15eca7755814981a39c2694eff803ae.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/f15eca7755814981a39c2694eff803ae.png)
 
 
 Nio2Endpoint 中没有 Poller 组件，也就是没有 Selector。在异步 I/O 模式下，Selector 的工作交给内核来做了。
-
 
 
 

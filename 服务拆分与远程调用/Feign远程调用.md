@@ -84,8 +84,8 @@ public class OrderService {
 ③ 编写FeignClient接口
 ④ 使用FeignClient中定义的方法代替RestTemplate
 # 自定义配置
-![](_v_images/20211225225036282_12232.png)
-1）在 application.yml 文件中进行配置，包括全局配置和针对某个服务的配置，如下所示
+![](https://raw.githubusercontent.com/PeipengWang/picture/master/20211225225036282_12232.png)
+1)在 application.yml 文件中进行配置，包括全局配置和针对某个服务的配置，如下所示
 ①全局配置
 ```
 feign:  

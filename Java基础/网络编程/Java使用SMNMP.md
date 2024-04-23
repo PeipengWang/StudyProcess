@@ -47,7 +47,7 @@ SNMP基本组件包括网络管理系统NMS（Network Management System）、代
 ## 原理
 SNMP有两个内容，其一是其本身，专门负责管理节点，其二是一个Trap，用于监测报警。  
 通俗的理解，SNMP可以看作是一个C/S结构。在客户机中，一般会部署一个snmpd的守护进程，而在服务端（管理端）会下载一个snmp工具包，这个包中包含了许多用于管理客户端网络节点的的工具，例如get，set，translate等等。下图可能会帮你更加清晰的理解这个概念：  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/60ba4387a2c4468694ca76c6f10126b8.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/60ba4387a2c4468694ca76c6f10126b8.png)
 
 上图中，161表示的是双方进行通信时所用的默认端口号，被管理端会打开一个守护进程，负责监听161端口发来的请求；管理端会提供一个SNMP工具包，利用工具包中的命令可以向
 被管理端的161端口发送请求包，以获取响应。  

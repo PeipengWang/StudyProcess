@@ -4,11 +4,11 @@
 2.数据流方向不同，可分为：输入流，输出流  
 3.功能不同，可分为：节点流，处理流  
 节点流：节点流从一个特定的数据源读写数据。即节点流是直接操作文件，网络等的流，例如FileInputStream和FileOutputStream，他们直接从文件中读取或往文件中写入字节流。  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/4bf8fd5e94e34b999ae60497024530bc.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/4bf8fd5e94e34b999ae60497024530bc.png)
 
 处理流：“连接”在已存在的流（节点流或处理流）之上通过对数据的处理为程序提供更为强大的读写功能。过滤流是使用一个已经存在的输入流或输出流连接创建的，过滤流就是对节点流进行一系列的包装。例如BufferedInputStream和BufferedOutputStream，使用已经存在的节点流来构造，提供带缓冲的读写，提高了读写的效率，以及DataInputStream和DataOutputStream，使用已经存在的节点流来构造，提供了读写Java中的基本数据类型的功能。他们都属于过滤流。  
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/210de1dcf2874b16a6b2f64d80faa500.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/210de1dcf2874b16a6b2f64d80faa500.png)
 
 ## 字节流与字符流处理区别
 ### 字节流

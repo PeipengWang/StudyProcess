@@ -18,7 +18,7 @@ chars s = {'你','好'}；
 String str2 = new String(s);
 ```
 两者不同：直接赋值和通过构造函数创建主要区别在于存储的区域不不同，直接赋值存储在字符串串常量量池中每次创建对象都会在常量池中寻找，如果有则直接指向这个常量池中数据的地址，如果没有则创建放入常量池中，如下图所示；
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200721223930393.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20200721223930393.png)
 因此，直接构造由于具有final特性，因此如果定义两个一样的”Hello“，两个定义的常量的地址是一样的，验证代码如下所示
 
 ```
@@ -29,7 +29,7 @@ String str2 = new String(s);
 上面代码输出结果为true。
 需要注意的是”==“执行的是地址是否相同的操作，由此可以看出，虽然定义了两个str1，str2，但是他们所指向的字符串地址是相同的。
 相反，通过构造函数创建，存储在堆内存中。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200721224014658.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20200721224014658.png)
 
 对于通过构造器赋值的验证程序如下所示：
 
@@ -63,9 +63,9 @@ equals方法的底层代码如下所示
 当调用某个字符串串**对象**的 intern() 方式，会去**字符串常量量池**中寻找，如果已经存在一个值相等的字符串串
 对象的话，则直接返回该对象的引用，如果不不存在，则在字符串串常量量池中创建该对象，并返回。
 ## 常用的方法
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200722095233907.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20200722095233907.png)
 
-①![在这里插入图片描述](https://img-blog.csdnimg.cn/20200722095157416.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+①![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/20200722095157416.png)
 1，字符串截取
 
 ```
@@ -160,5 +160,4 @@ true，当调用 str4 的 intern 方法时，如果字符串串常量池已经�
 String 是不可变类，一旦创建了了String对象，我们就无法改变它的值。因此，它是线程安全的，同一个字符串串实例例可以被多个线程共享，保证了了多线程的安全性。
 4，在使用 HashMap 的时候，用 String 做 key 有什什么好处？
 HashMap 内部实现是通过 key 的 hashcode 来确定 value 的存储位置，而因为字符串是不可变的，当创建字符串时，它的 hashcode 被缓存下来，不需要再次计算，所以相比于其他对象更更快。
-
 

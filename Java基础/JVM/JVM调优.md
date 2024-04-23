@@ -1,7 +1,7 @@
 # JVM调优
 ## 1、开始
 JVM调优不是常规手段，性能问题一般第一选择是优化程序，最后的选择才是进行JVM调优。  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/f051959705be48668a008f321c367e6e.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/f051959705be48668a008f321c367e6e.png)
 
 JVM的自动内存管理本来就是为了将开发人员从内存管理的泥潭里拉出来。即使不得不进行JVM调优，也绝对不能拍脑门就去调整参数，一定要全面监控，详细分析性能数据。  
 
@@ -135,7 +135,7 @@ seconds
 -Xloggc:filename:与上面几个配合使用，把相关日志信息记录到文件以便分析。
 ```
 ## 7、JVM调优工具
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/ffc9253fc9f64e2d8955d852570c3019.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/ffc9253fc9f64e2d8955d852570c3019.png)
 
 Linux 命令行工具  
 进行性能监控和问题排查的时候，常常是结合操作系统本身的命令行工具来进行。  
@@ -228,5 +228,4 @@ iostat
 https://www.cnblogs.com/baihuitestsoftware/articles/6483690.html
 https://cloud.tencent.com/developer/article/1812722
 https://www.51cto.com/article/311739.html
-
 

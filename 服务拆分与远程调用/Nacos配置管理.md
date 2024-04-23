@@ -94,7 +94,7 @@ public class PatternProperties {
 [spring.application.name].yaml，例如：userservice.yaml
 而[spring.application.name].yaml不包含环境，因此可以被多个环境共享。
 1）添加一个环境共享配置
-![](_v_images/20211219211712019_2317.png)
+![](https://raw.githubusercontent.com/PeipengWang/picture/master/20211219211712019_2317.png)
 
 2）在user-service中读取共享配置
 ```
@@ -141,15 +141,15 @@ public class UserController {
 这样，UserApplication(8081)使用的profile是dev，UserApplication2(8082)使用的profile是test。
 启动UserApplication和UserApplication2
 分别得到结果：
-![](_v_images/20211219214755713_32629.png)
-![](_v_images/20211219214820634_12308.png)
+![](https://raw.githubusercontent.com/PeipengWang/picture/master/20211219214755713_32629.png)
+![](https://raw.githubusercontent.com/PeipengWang/picture/master/20211219214820634_12308.png)
 可以看出来，不管是dev，还是test环境，都读取到了envSharedValue这个属性的值。
 5）配置共享的优先级
 当nacos、服务本地同时出现相同属性时，优先级有高低之分：
-![](_v_images/20211219214944173_3885.png)
+![](https://raw.githubusercontent.com/PeipengWang/picture/master/20211219214944173_3885.png)
 
 ## 搭建Nacos集群
-<img src="_v_images/20211219215150930_1432.png" alt="" width="643">
+<img src="https://raw.githubusercontent.com/PeipengWang/picture/master/20211219215150930_1432.png" alt="" width="643">
 
 ### 搭建集群的基本步骤：
 搭建数据库，初始化数据库表结构

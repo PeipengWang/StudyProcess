@@ -4,7 +4,7 @@ https://www.cnblogs.com/lojunren/p/3856290.html
 https://www.51cto.com/article/717096.html
 linux下的I/O复用epoll详解
   要深刻理解epoll，首先得了解epoll的三大关键要素：mmap、红黑树、链表。
-  
+
 ## IO多路复用
 首先需要了解什么是IO多路复用
 IO多路复用是一种同步的IO模型。利用IO多路复用模型，可以实现一个线程监视多个文件句柄；一旦某个文件句柄就绪，就能够通知到对应应用程序进行相应的读写操作；没有文件句柄就绪时就会阻塞应用程序，从而释放出CPU资源。
@@ -30,7 +30,7 @@ epoll模型是采用时间通知机制来触发相关的IO操作。它没有FD�
 epoll模型最大的优点是将轮询改成了回调，大大提高了CPU执行效率，也不会随FD数量的增加而导致效率下降。当然，它也没有FD数量限制，也就是说，它能支持的FD上限是操作系统的最大文件句柄数。一般而言，1G 内存大概支持 10 万个句柄。分布式系统中常用的组件如Redis、Nginx都是优先采用epoll模型。
 它的缺点是只能在Linux下工作。
 ### 对比
-![在这里插入图片描述](https://img-blog.csdnimg.cn/699d448f938742b983dbcf3ec626d6a0.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/699d448f938742b983dbcf3ec626d6a0.png)
 
 ## epool模型工作原理
 主要是通过调用以下三个系统函数来注册、激活FD，从而触发相关的 IO 操作：
@@ -39,7 +39,7 @@ epoll模型最大的优点是将轮询改成了回调，大大提高了CPU执行
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/23b59ba537e04c59b40ab68e2cd6ac2e.png)
 
 （3）epoll_wait()函数，轮询所有的callback集合，并触发对应的 IO 操作
-![在这里插入图片描述](https://img-blog.csdnimg.cn/4ff501fa29e5407b846a987ddd14bd82.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/4ff501fa29e5407b846a987ddd14bd82.png)
 
 
 

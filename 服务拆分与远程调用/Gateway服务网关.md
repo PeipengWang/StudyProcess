@@ -61,7 +61,7 @@ spring:
 4、 启动网关服务进行测试
 
 5、流程总结
-![](_v_images/20211226175412204_21744.png)
+![](https://raw.githubusercontent.com/PeipengWang/picture/master/20211226175412204_21744.png)
 总结：
 网关搭建步骤：
 创建项目，引入nacos服务发现和gateway依赖
@@ -70,7 +70,7 @@ spring:
 路由id：路由的唯一标示
 路由目标（uri）：路由的目标地址，http代表固定地址，lb代表根据服务名负载均衡
 路由断言（predicates）：判断路由的规则，
-路由过滤器（filters）：对请求或响应做处理
+路由过滤器（filters)：对请求或响应做处理
 接下来，就重点来学习路由断言和路由过滤器的详细知识
 ## 断言工厂
 我们在配置文件中写的断言规则只是字符串，这些字符串会被Predicate Factory读取并处理，转变为路由判断的条件
