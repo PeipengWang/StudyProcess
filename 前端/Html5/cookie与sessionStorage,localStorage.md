@@ -1,5 +1,5 @@
 # cookie
-![在这里插入图片描述](https://img-blog.csdnimg.cn/76372917f8ae4e5892ef6681f214a86c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Z-56bmP,size_20,color_FFFFFF,t_70,g_se,x_16)![在这里插入图片描述](https://img-blog.csdnimg.cn/76233a901b9d4aa2b5f71b3cf34ffa83.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/76372917f8ae4e5892ef6681f214a86c.png)![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/76233a901b9d4aa2b5f71b3cf34ffa83.png)
 
 
 localStorage 和 sessionStorage 属性允许在浏览器中存储 key/value 对的数据。

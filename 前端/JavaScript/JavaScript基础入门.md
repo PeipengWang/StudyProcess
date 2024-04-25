@@ -94,7 +94,7 @@ window.onload = function () {};    // JavaScript
 $(document).ready(function () {}); // jQuery
 以上两种方式都是在 HTML 文档完毕后再执行 DOM 操作，但它们还是有一定的区别，如下图：
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/b0a682f9246e4e558ae06ae89705f4ab.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/b0a682f9246e4e558ae06ae89705f4ab.png)
 ## 字段处理
 ### repalce
 replace() 方法返回一个由替换值（replacement）替换部分或所有的模式（pattern）匹配项后的新字符串。模式可以是一个字符串或者一个正则表达式，替换值可以是一个字符串或者一个每次匹配都要调用的回调函数。如果pattern是字符串，则仅替换第一个匹配项。

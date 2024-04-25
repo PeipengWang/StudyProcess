@@ -24,14 +24,14 @@ Ajax的出现使客户端与服务器端传输数据少了很多，也快了很�
 ### Comet的实现主要有两种方式：
 基于Ajax的长轮询（long-polling）方式
 　　浏览器发出XMLHttpRequest 请求，服务器端接收到请求后，会阻塞请求直到有数据或者超时才返回，浏览器JS在处理请求返回信息（超时或有效数据）后再次发出请求，重新建立连接。在此期间服务器端可能已经有新的数据到达，服务器会选择把数据保存，直到重新建立连接，浏览器会把所有数据一次性取回。
-　　![在这里插入图片描述](https://img-blog.csdnimg.cn/e39c419cf40d415a86a10a3d8bbc1db6.png)
+　　![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/e39c419cf40d415a86a10a3d8bbc1db6.png)
 
 2.  基于 Iframe 及 htmlfile 的流（http streaming）方式
 
 　　Iframe是html标记，这个标记的src属性会保持对指定服务器的长连接请求，服务器端则可以不停地返回数据，相对于第一种方式，这种方式跟传统的服务器推则更接近。
 
 在第一种方式中，浏览器在收到数据后会直接调用JS回调函数，但是这种方式该如何响应数据呢？可以通过在返回数据中嵌入JS脚本的方式，如“<script type="text/javascript">js_func(“data from server ”)</script>”，服务器端将返回的数据作为回调函数的参数，浏览器在收到数据后就会执行这段JS脚本。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/0b6f2465ac344f41b7857814c9668c9d.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/0b6f2465ac344f41b7857814c9668c9d.png)
 
 
 但是这种方式有一个明显的不足之处：IE、Morzilla Firefox 下端的进度栏都会显示加载没有完成，而且 IE 上方的图标会不停的转动，表示加载正在进行。Google 的天才们使用一个称为“htmlfile”的 ActiveX 解决了在 IE 中的加载显示问题，并将这种方法应用到了 gmail+gtalk 产品中。
@@ -68,7 +68,7 @@ Sec-WebSocket-Protocol: chat
 “HTTP/1.1 101 Switching Protocols”中101为服务器返回的状态码，所有非101的状态码都表示handshake并未完成。
 Data Framing
 Websocket协议通过序列化的数据包传输数据。数据封包协议中定义了opcode、payload length、Payload data等字段。具体封包格式如下图所示：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/d5a1af04c07e4b03ab69ac29e655f593.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/d5a1af04c07e4b03ab69ac29e655f593.png)
 
 FIN: 标识是否为此消息的最后一个数据包，占 1 bit
 RSV1, RSV2, RSV3:  用于扩展协议，一般为0，各占1bit
@@ -87,5 +87,5 @@ Payload data：应用层数据
 相对于Opening Handshake，Closing Handshake则简单得多，主动关闭的一方向另一方发送一个关闭类型的数据包，对方收到此数据包之后，再回复一个相同类型的数据包，关闭完成。
 关闭类型数据包遵守封包协议，Opcode为0x8，Payload data可以用于携带关闭原因或消息。 
 虽然现阶段websocket协议还处于草案阶段，不过浏览器早就开始开始支持了，以下是不同浏览器兼容列表:
-![在这里插入图片描述](https://img-blog.csdnimg.cn/0c4786cdf4114847ae20fa9b00804130.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/0c4786cdf4114847ae20fa9b00804130.png)
 

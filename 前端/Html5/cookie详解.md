@@ -1,4 +1,3 @@
-@[TOC](Cookie)
 # Cookie
 ## 为什么要用Cookie？
 HTTP协议本身是无状态的。什么是无状态呢，即服务器无法判断用户身份。Cookie可以记录访问者的身份。
@@ -40,7 +39,7 @@ resp.addCookie(cookie);
 查看当前页面的cookie
 f12进入application为全局cookie
 当前访问网址的请求cookie与返回cookie
-![在这里插入图片描述](https://img-blog.csdnimg.cn/32d64b98614a442782b59ec266234aee.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/32d64b98614a442782b59ec266234aee.png)
 
 通过命令方式也可以
 f12进入console

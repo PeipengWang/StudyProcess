@@ -17,7 +17,7 @@ jQuery DataTables 是一个功能丰富且灵活的 jQuery 插件，用于创建
 一般会去官方地址根据需求来下载，如果简单本地使用的话直接引用就行
 下载地址：https://datatables.net/download/
 可以根据选择自由下载
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2741c0c363274b1e829d980934668b97.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/2741c0c363274b1e829d980934668b97.png)
 
 ## 入门使用
 分三步：
@@ -55,10 +55,10 @@ jQuery DataTables 是一个功能丰富且灵活的 jQuery 插件，用于创建
     $('#myTable').DataTable();
   } );
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/c385099e1aa1464b80526e9c531de617.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/c385099e1aa1464b80526e9c531de617.png)
 
 此时效果为
-![在这里插入图片描述](https://img-blog.csdnimg.cn/510ef2d6abea4343a0ef5994656c26bc.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/510ef2d6abea4343a0ef5994656c26bc.png)
 
 可以清楚的看到能够快速对我们的表格数据进行了美化，不用再重复写css和js代码了。
 ## 通过获得数据源来生成表格
@@ -154,7 +154,7 @@ jQuery DataTables 是一个功能丰富且灵活的 jQuery 插件，用于创建
   } );
 ```
 这里上面的数据有6列，但是我么可以通过定义columns的方式仅仅展示其中4列
-![在这里插入图片描述](https://img-blog.csdnimg.cn/4da871b32bc14c26ad65b5f67492dbdd.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/4da871b32bc14c26ad65b5f67492dbdd.png)
 
 3、实例
 让 DataTables 显示来自 Javascript 对象实例，首先需要定义一个实例对象
