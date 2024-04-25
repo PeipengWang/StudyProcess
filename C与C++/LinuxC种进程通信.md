@@ -32,7 +32,7 @@ https://zhuanlan.zhihu.com/p/268389190
 **向消息队列中写数据，实际上是向这个数据结构中插入一个新结点；从消息队列汇总读数据，实际上是从这个数据结构中删除一个结点。**  
 消息队列提供了一个从一个进程向另外一个进程发送一块数据的方法  
 消息队列也有管道一样的不足，就是每个数据块的最大长度是有上限的，系统上全体队列的最大总长度也有一个上限  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/direct/324aac893bd64bea8158b80baa3edabb.png)  
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/324aac893bd64bea8158b80baa3edabb.png)  
 学习：https://zhuanlan.zhihu.com/p/268389190
 
 # Linux事件驱动编程  
@@ -43,7 +43,6 @@ https://zhuanlan.zhihu.com/p/268389190
 3. 有个循环，不断从队列取出事件，根据不同的事件，调用不同的函数，如onClick()、onKeyDown()等；  
 
 例如：epoll
-
 
 
 
