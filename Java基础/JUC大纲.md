@@ -1,5 +1,5 @@
 JUC  类汇总和学习指南
-Lock框架和Tools类  
+*   Lock框架和Tools类  
     *   [接口: Condition]  
     *   [接口: Lock]  
     *   [接口: ReadWriteLock]  
@@ -42,9 +42,7 @@ Lock框架和Tools类
     *   [ScheduledExecutorService]  
     *   [AbstractExecutorService]  
     *   [FutureTask]  
-
-
-    *   [核心: ThreadPoolExecutor](#%E6%A0%B8%E5%BF%83-threadpoolexecutor)
-    *   [核心: ScheduledThreadExecutor](#%E6%A0%B8%E5%BF%83-scheduledthreadexecutor)
-    *   [核心: Fork/Join框架](#%E6%A0%B8%E5%BF%83-forkjoin%E6%A1%86%E6%9E%B6)
-    *   [工具类: Executors](#%E5%B7%A5%E5%85%B7%E7%B1%BB-executors)
+    *   [核心: ThreadPoolExecutor]  
+    *   [核心: ScheduledThreadExecutor]  
+    *   [核心: Fork/Join框架]   
+    *   [工具类: Executors]   
