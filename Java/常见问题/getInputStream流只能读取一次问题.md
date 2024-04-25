@@ -1,0 +1,8 @@
+# getInputStream流只能读取一次问题
+一般我们会在InterceptorAdapter拦截器中对请求进行验证
+正常普通接口请求，request.getParameter()可以获取，能多次读取
+如果我们的接口是用@RequestBody来接受数据，那么我们在拦截器中
+需要读取request的输入流 ，因为 ServletRequest中getReader()和getInputStream()只能调用一次
+这样就会导致controller 无法拿到数据。
+
+InputStream默认不实现reset的相关方法，而ServletInputStream也没有重写reset的相关方法，这样就无法重复读取流，这就是我们从request对象中获取的输入流就只能读取一次的原因。
