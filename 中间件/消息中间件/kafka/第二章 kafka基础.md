@@ -163,8 +163,8 @@ Kafka集群中含有多个服务节点，而分布式系统中经典的主从（
 
 1) 第一次启动Kafka集群时，会同时启动多个Broker节点，每一个Broker节点就会连接ZooKeeper，并尝试创建一个临时节点 **controller**
 2) 因为ZooKeeper中一个节点不允许重复创建，所以多个Broker节点，最终只能有一个Broker节点可以创建成功，那么这个创建成功的Broker节点就会自动作为Kafka集群控制器节点，用于管理整个Kafka集群。
-3) 没有选举成功的其他Slave节点会创建Node监听器，用于监听 ***\*/controller\****节点的状态变化。
-4) 一旦Controller节点出现故障或挂掉了，那么对应的ZooKeeper客户端连接就会中断。ZooKeeper中的 **controller** 节点就会自动被删除，而其他的那些Slave节点因为增加了监听器，所以当监听到 **controller** 节点被删除后，就会马上向ZooKeeper发出创建 ***\*/controller\**** 节点的请求，一旦创建成功，那么该Broker就变成了新的Controller节点了。
+3) 没有选举成功的其他Slave节点会创建Node监听器，用于监听 **controller**节点的状态变化。
+4) 一旦Controller节点出现故障或挂掉了，那么对应的ZooKeeper客户端连接就会中断。ZooKeeper中的 **controller** 节点就会自动被删除，而其他的那些Slave节点因为增加了监听器，所以当监听到 **controller** 节点被删除后，就会马上向ZooKeeper发出创建 **controller** 节点的请求，一旦创建成功，那么该Broker就变成了新的Controller节点了。
 
 现在我们能明白启动Kafka集群之前，为什么要先启动ZooKeeper集群了吧。就是因为ZooKeeper可以协助Kafka进行集群管理。
 
@@ -644,7 +644,7 @@ d. 分区副本数量大于1且小于Short.MaxValue，一般取值小于等于Br
 
 Ø 更新副本状态机的状态：NewReplica
 
-Ø 更新分区状态机的状态为：OnlinePartition，从正常的副本列表中的获取第一个作为分区的***\*Leader副本\****，所有的副本作为分区的同步副本列表，我们称之为***\*ISR( In-Sync Replica)。\****在ZK路径***\*/brokers/topics/主题名\****上增加分区节点***\*/partitions，\****及状态***\*/state\****节点。
+Ø 更新分区状态机的状态为：OnlinePartition，从正常的副本列表中的获取第一个作为分区的**Leader副本**，所有的副本作为分区的同步副本列表，我们称之为**ISR( In-Sync Replica)。**在ZK路径brokers/topics/主题名**上增加分区节点**partitions，**及状态**state**节点。
 
 Ø 更新副本状态机的状态：OnlineReplica
 
@@ -656,17 +656,17 @@ d. 分区副本数量大于1且小于Short.MaxValue，一般取值小于等于Br
 
 文件目录名：主题名 + 分区编号
 
-| ***\*文件名\****           | ***\*说明\****               |
+| **文件名**           | **说明**               |
 | -------------------------- | ---------------------------- |
 | 0000000000000000.log       | 数据文件，用于存储传输的小心 |
 | 0000000000000000.index     | 索引文件，用于定位数据       |
 | 0000000000000000.timeindex | 时间索引文件，用于定位数据   |
 
-## **2.****4** **生产消息**
+## **2.4** **生产消息**
 
 Topic主题已经创建好了，接下来我们就可以向该主题生产消息了，这里我们采用Java代码通过Kafka Producer API的方式生产数据。
 
-### **2****.****4****.1** **生产消息的基本步骤**
+### **2.4.1** **生产消息的基本步骤**
 
 **（一）创建Map类型的配置对象，根据场景增加相应的配置属性：**
 
@@ -1210,7 +1210,7 @@ Kafka中Topic是对数据逻辑上的分类，而Partition才是数据真正存�
 ```
 for ( int i = 0; i < 1; i++ ) {
 
-  ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", ***\*0\****, "key" + i, "value" + i);
+  ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", 0, "key" + i, "value" + i);
 
   final Future<RecordMetadata> send = producer.send(record, new Callback() {
 
@@ -1308,7 +1308,7 @@ import java.util.Map;
 
  */
 
-public class ***\*KafkaPartitionerMock\**** implements Partitioner {
+public class **KafkaPartitionerMock** implements Partitioner {
 
   /**
 
@@ -1392,7 +1392,7 @@ public class ProducerPartitionTest {
 
 ​    configMap.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
-​    configMap.put( ProducerConfig.PARTITIONER_CLASS_CONFIG, ***\*KafkaPartitionerMock\****.class.getName());
+​    configMap.put( ProducerConfig.PARTITIONER_CLASS_CONFIG, KafkaPartitionerMock.class.getName());
 
  
 
@@ -1472,7 +1472,7 @@ public class ProducerPartitionTest {
 
 通过图形，可以看出，这种应答方式，数据已经存储到了分区Leader副本中，那么数据相对来讲就比较安全了，也就是可靠性比较高。之所以说相对来讲比较安全，就是因为现在只有一个节点存储了数据，而数据并没有来得及进行备份到follower副本，那么一旦当前存储数据的broker节点出现了故障，数据也依然会丢失。
 
-#### **2.4.5.3ACK = -1(默认)**
+#### 2.4.5.3ACK = -1(默认)
 
 当生产数据时，Kafka Leader副本和Follower副本都已经将数据接收到并写入到了日志文件后，再对当前的数据请求进行响应（确认应答），如果是同步发送数据，此时就可以发送下一条数据了。如果是异步发送数据，回调方法就会被触发。
 
@@ -1488,9 +1488,9 @@ public class ProducerPartitionTest {
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps77.jpg) 
 
-### **2****.****4****.****6** **消息去重 & 有序**
+### 2.4.6 消息去重 & 有序
 
-#### **2.4.6.1数据重试**
+#### 2.4.6.1数据重试
 
 由于网络或服务节点的故障，Kafka在传输数据时，可能会导致数据丢失，所以我们才会设置ACK应答机制，尽可能提高数据的可靠性。但其实在某些场景中，数据的丢失并不是真正地丢失，而是“虚假丢失”，比如咱们将ACK应答设置为1，也就是说一旦Leader副本将数据写入文件后，Kafka就可以对请求进行响应了。
 
@@ -1500,7 +1500,7 @@ public class ProducerPartitionTest {
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps79.jpg) 
 
-所以在这种情况下，kafka Producer会尝试对超时的请求数据进行重试(***\*retry\****)操作。通过重试操作尝试将数据再次发送给Kafka。
+所以在这种情况下，kafka Producer会尝试对超时的请求数据进行重试(retry)操作。通过重试操作尝试将数据再次发送给Kafka。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps80.jpg) 
 
