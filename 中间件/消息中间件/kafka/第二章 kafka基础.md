@@ -1,11 +1,11 @@
-# **第二章** Kafka基础
+# 第二章 Kafka基础
 
 Kafka借鉴了JMS规范的思想，但是却并没有完全遵循JMS规范，因此从设计原理上，Kafka的内部也会有很多用于数据传输的组件对象，这些组件对象之间会形成关联，组合在一起实现高效的数据传输。所以接下来，我们就按照数据流转的过程详细讲一讲Kafka中的基础概念以及核心组件。
 
 ## 2.1 集群部署
 
 
-### 2.1.1 **解压文件**
+### 2.1.1 解压文件
 
 (1) 在磁盘根目录创建文件夹cluster，文件夹名称不要太长
 (2) 将kafka安装包kafka-3.6.1-src.tgz解压缩到kafka文件夹
@@ -580,41 +580,41 @@ d. 分区副本数量大于1且小于Short.MaxValue，一般取值小于等于Br
 其他副本索引 = 。。。随机值（基本算法为使用随机值执行多次模运算）
 
 
-***\*##################################################################\****
+##################################################################\
 
-***\*#\**** ***\*假设\**** 
+#\ 假设\ 
 
-***\*#   当前分区编号 : 0\****
+#   当前分区编号 : 0\
 
-***\*#   BrokerID列表 :【1，2，3，4】\****
+#   BrokerID列表 :【1，2，3，4】\
 
-***\*#   副本数量 : 4\****
+#   副本数量 : 4\
 
-***\*#   随机值（BrokerID列表长度）: 2\****
+#   随机值（BrokerID列表长度）: 2\
 
-***\*#   副本分配间隔随机值（BrokerID列表长度）: 2\****
+#   副本分配间隔随机值（BrokerID列表长度）: 2\
 
-***\*##################################################################\****
+##################################################################\
 
-\# ***\*第一个副本索引：（分区编号 + 随机值）% BrokerID列表长度 =（0 + 2）% 4 = 2\****
+\# 第一个副本索引：（分区编号 + 随机值）% BrokerID列表长度 =（0 + 2）% 4 = 2\
 
 \# 第一个副本所在BrokerID : 3
 
  
 
-\# ***\*第二个副本索引（第一个副本索引 + （1 +（副本分配间隔 + 0）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+0）%3））% 4 = 1\****
+\# 第二个副本索引（第一个副本索引 + （1 +（副本分配间隔 + 0）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+0）%3））% 4 = 1\
 
 \# 第二个副本所在BrokerID：2
 
  
 
-\# ***\*第三个副本索引：（第一个副本索引 + （1 +（副本分配间隔 + 1）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+1）%3））% 4 = 3\****
+\# 第三个副本索引：（第一个副本索引 + （1 +（副本分配间隔 + 1）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+1）%3））% 4 = 3\
 
 \# 第三个副本所在BrokerID：4
 
  
 
-\# ***\*第四个副本索引：（第一个副本索引 + （1 +（副本分配间隔 + 2）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+2）%3））% 4 = 0\****
+\# 第四个副本索引：（第一个副本索引 + （1 +（副本分配间隔 + 2）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+2）%3））% 4 = 0\
 
 \# 第四个副本所在BrokerID：1
 
@@ -1184,7 +1184,7 @@ public class KafkaProducerASynTest {
 
 ​        }
 
-​      })***\*.get()\****;
+​      }).get()\;
 
 ​      // TODO 发送当前数据
 
@@ -1575,7 +1575,7 @@ kafka是如何实现数据的幂等性操作呢，我们这里简单说一下流
 
 为了实现事务，Kafka引入了事务协调器（TransactionCoodinator）负责事务的处理，所有的事务逻辑包括分派PID等都是由TransactionCoodinator负责实施的。TransactionCoodinator 会将事务状态持久化到该主题中。
 
-事务基本的实现思路就是通过配置的事务ID，将生产者ID进行绑定，然后存储在Kafka专门管理事务的内部主题 ***\*__transaction_state\****中，而内部主题的操作是由事务协调器（TransactionCoodinator）对象完成的，这个协调器对象有点类似于咱们数据发送时的那个副本Leader。其实这种设计是很巧妙的，因为kafka将事务ID和生产者ID看成了消息数据，然后将数据发送到一个内部主题中。这样，使用事务处理的流程和咱们自己发送数据的流程是很像的。接下来，我们就把这两个流程简单做一个对比。
+事务基本的实现思路就是通过配置的事务ID，将生产者ID进行绑定，然后存储在Kafka专门管理事务的内部主题 __transaction_state\中，而内部主题的操作是由事务协调器（TransactionCoodinator）对象完成的，这个协调器对象有点类似于咱们数据发送时的那个副本Leader。其实这种设计是很巧妙的，因为kafka将事务ID和生产者ID看成了消息数据，然后将数据发送到一个内部主题中。这样，使用事务处理的流程和咱们自己发送数据的流程是很像的。接下来，我们就把这两个流程简单做一个对比。
 
 ##### 2.4.6.4.1 普通数据发送流程
 
@@ -1801,47 +1801,47 @@ Kafka系统早期设计的目的就是日志数据的采集和传输，所以数
 
 ##### 2.5.3.1.1 批次头
 
-| 数据项                      | 含义       | ***\*长度\**** |
+| 数据项                      | 含义       | 长度\ |
 | --------------------------------------- | --------------------- | -------------- |
-| ***\*BASE_OFFSET_OFFSET\****            | 基础偏移量偏移量      | 8              |
-| ***\*LENGTH_OFFSET\****                 | 长度偏移量            | 4              |
-| ***\*PARTITION_LEADER_EPOCH_OFFSET\**** | Leaader分区纪元偏移量 | 4              |
-| ***\*MAGIC_OFFSET\****                  | 魔数偏移量            | 1              |
-| ***\*ATTRIBUTES_OFFSET\****             | 属性偏移量            | 2              |
-| ***\*BASE_TIMESTAMP_OFFSET\****         | 基础时间戳偏移量      | 8              |
-| ***\*MAX_TIMESTAMP_OFFSET\****          | 最大时间戳偏移量      | 8              |
-| ***\*LAST_OFFSET_DELTA_OFFSET\****      | 最后偏移量偏移量      | 4              |
-| ***\*PRODUCER_ID_OFFSET\****            | 生产者ID偏移量        | 8              |
-| ***\*PRODUCER_EPOCH_OFFSET\****         | 生产者纪元偏移量      | 2              |
-| ***\*BASE_SEQUENCE_OFFSET\****          | 基础序列号偏移量      | 4              |
-| ***\*RECORDS_COUNT_OFFSET\****          | 记录数量偏移量        | 4              |
-| ***\*CRC_OFFSET\****                    | CRC校验偏移量         | 4              |
+| BASE_OFFSET_OFFSET\            | 基础偏移量偏移量      | 8              |
+| LENGTH_OFFSET\                 | 长度偏移量            | 4              |
+| PARTITION_LEADER_EPOCH_OFFSET\ | Leaader分区纪元偏移量 | 4              |
+| MAGIC_OFFSET\                  | 魔数偏移量            | 1              |
+| ATTRIBUTES_OFFSET\             | 属性偏移量            | 2              |
+| BASE_TIMESTAMP_OFFSET         | 基础时间戳偏移量      | 8              |
+| MAX_TIMESTAMP_OFFSET          | 最大时间戳偏移量      | 8              |
+| LAST_OFFSET_DELTA_OFFSET      | 最后偏移量偏移量      | 4              |
+| PRODUCER_ID_OFFSET            | 生产者ID偏移量        | 8              |
+| PRODUCER_EPOCH_OFFSET         | 生产者纪元偏移量      | 2              |
+| BASE_SEQUENCE_OFFSET          | 基础序列号偏移量      | 4              |
+| RECORDS_COUNT_OFFSET          | 记录数量偏移量        | 4              |
+| CRC_OFFSET                    | CRC校验偏移量         | 4              |
 
 批次头总的字节数为：61 byte
 
 ##### 2.5.3.1.2 数据体
 
-| ***\*数据项\****            | ***\*含义\****                     | ***\*长度\**** |
+| 数据项            | 含义                     | 长度 |
 | --------------------------- | ---------------------------------- | -------------- |
-| ***\*size\****              | 固定值                             | 1              |
-| ***\*offsetDelta\****       | 固定值                             | 1              |
-| ***\*timestampDelta\****    | 时间戳                             | 1              |
-| ***\*keySize\****           | Key字节长度                        | 1（动态）      |
-| ***\*keySize(Varint)\****   | Key变量压缩长度算法需要大小        | 1（动态）      |
-| ***\*valueSize\****         | value字节长度                      | 1（动态）      |
-| ***\*valueSize(Varint)\**** | Value变量压缩长度算法需要大小      | 1（动态）      |
-| ***\*Headers\****           | 数组固定长度                       | 1（动态）      |
-| ***\*sizeInBytes\****       | 上面长度之和的压缩长度算法需要大小 | 1              |
+| size              | 固定值                             | 1              |
+| offsetDelta       | 固定值                             | 1              |
+| timestampDelta    | 时间戳                             | 1              |
+| keySize           | Key字节长度                        | 1（动态）      |
+| keySize(Varint)   | Key变量压缩长度算法需要大小        | 1（动态）      |
+| valueSize         | value字节长度                      | 1（动态）      |
+| valueSize(Varint) | Value变量压缩长度算法需要大小      | 1（动态）      |
+| Headers           | 数组固定长度                       | 1（动态）      |
+| sizeInBytes       | 上面长度之和的压缩长度算法需要大小 | 1              |
 
 表中的后5个值为动态值，需要根据数据的中key，value变化计算得到。此处以数据key=key1，value=value1为例。
 
 压缩长度算法：
 
-***\*中间值1 = (算法参数 << 1) ^ (算法参数 >> 31));\****
+中间值1 = (算法参数 << 1) ^ (算法参数 >> 31));
 
-***\*中间值2 = Integer.numberOfLeadingZeros(中间值1);\****
+中间值2 = Integer.numberOfLeadingZeros(中间值1);
 
-***\*结果   = (38 - 中间值2) / 7 + 中间值2 / 32;\****
+结果   = (38 - 中间值2) / 7 + 中间值2 / 32;
 
  
 
@@ -1891,7 +1891,7 @@ Kafka系统早期设计的目的就是日志数据的采集和传输，所以数
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps100.jpg) 
 
-| ***\*数据项\****     | ***\*含义\****                                               |
+| 数据项     | 含义                                               |
 | -------------------- | ------------------------------------------------------------ |
 | baseOffset           | 当前batch中第一条消息的位移                                  |
 | lastOffset           | 最新消息的位移相对于第一条消息的唯一增量                     |
@@ -2045,7 +2045,7 @@ Kafka的设计目标是：高吞吐、高并发、高性能。为了做到以上
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps111.jpg) 
 
-为了提升数据的一致性，Kafka引入了高水位（HW ：High Watermark）机制，Kafka在不同的副本之间维护了一个水位线的机制（其实也是一个偏移量的概念），消费者只能读取到水位线以下的的数据。***\*这就是所谓的木桶理论：木桶中容纳水的高度，只能是水桶中最短的那块木板的高度\****。这里将整个分区看成一个木桶，其中的数据看成水，而每一个副本就是木桶上的一块木板，那么这个分区（木桶）可以被消费者消费的数据（容纳的水）其实就是数据最少的那个副本的最后数据位置（木板高度）。
+为了提升数据的一致性，Kafka引入了高水位（HW ：High Watermark）机制，Kafka在不同的副本之间维护了一个水位线的机制（其实也是一个偏移量的概念），消费者只能读取到水位线以下的的数据。这就是所谓的木桶理论：木桶中容纳水的高度，只能是水桶中最短的那块木板的高度。这里将整个分区看成一个木桶，其中的数据看成水，而每一个副本就是木桶上的一块木板，那么这个分区（木桶）可以被消费者消费的数据（容纳的水）其实就是数据最少的那个副本的最后数据位置（木板高度）。
 
 也就是说，消费者一开始在消费Leader的时候，虽然Leader副本中已经有a、b、c、d 4条数据，但是由于高水位线的限制，所以也只能消费到a、b这两条数据。
 
@@ -2079,7 +2079,7 @@ LEO=LEO+2=2
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps117.jpg) 
 
-***\*Leader副本偏移量更新：\****
+Leader副本偏移量更新：
 
 HW = Math.max[HW, min(LeaderLEO，F1-LEO，F2-LEO)]=0
 
@@ -2087,13 +2087,13 @@ HW = Math.max[HW, min(LeaderLEO，F1-LEO，F2-LEO)]=0
 
 由于两个Follower的数据拉取速率不一致，所以Follower-1抓取了2条数据，而Follower-2抓取了1条数据。Follower再收到数据后，会将数据写入文件，并更新自身的偏移量信息。
 
-***\*Follower-1副本偏移量更新：\****
+Follower-1副本偏移量更新：
 
 LEO=LEO+2=2
 
 HW = Math.min[LeaderHW, LEO]=0
 
-***\*Follower-2副本偏移量更新：\****
+Follower-2副本偏移量更新：
 
 LEO=LEO+1=1
 
@@ -2103,7 +2103,7 @@ HW = Math.min[LeaderHW, LEO]=0
 
 接下来Leader收到了生产者的数据C，那么此时会根据相同的方式更新自身的偏移量信息
 
-***\*Leader副本偏移量更新：\****
+Leader副本偏移量更新：
 
 LEO=LEO+1=3
 
@@ -2111,7 +2111,7 @@ LEO=LEO+1=3
 
 follower接着向Leader发送Fetch请求，同样会将最新的LEO作为参数传递给Leader。Leader收到请求后，会更新自身的偏移量信息。
 
-***\*Leader副本偏移量更新：\****
+Leader副本偏移量更新：
 
 HW = Math.max[HW, min(LeaderLEO，F1-LEO，F2-LEO)]=0
 
@@ -2127,13 +2127,13 @@ HW = Math.max[HW, min(LeaderLEO，F1-LEO，F2-LEO)]=0
 
 Follower收到数据后，会将数据写入文件，并更新自身偏移量信息
 
-***\*Follower-1副本偏移量更新：\****
+Follower-1副本偏移量更新：
 
 LEO=LEO+1=3
 
 HW = Math.min[LeaderHW, LEO]=1
 
-***\*Follower-2副本偏移量更新：\****
+Follower-2副本偏移量更新：
 
 LEO=LEO+1=2
 
@@ -2153,7 +2153,7 @@ HW = Math.min[LeaderHW, LEO]=1
 
 在Kafka中，一个Topic（主题）包含多个Partition（分区），Topic是逻辑概念，而Partition是物理分组。一个Partition包含多个Replica（副本），副本有两种类型Leader Replica/Follower Replica，Replica之间是一个Leader副本对应多个Follower副本。注意：分区数可以大于节点数，但副本数不能大于节点数。因为副本需要分布在不同的节点上，才能达到备份的目的。
 
-Kafka的分区副本中只有Leader副本具有数据写入的功能，而Follower副本需要不断向Leader发出申请，进行数据的同步。这里所有同步的副本会形成一个列表，我们称之为同步副本列表（**In-Sync Replicas**），也可以简称***\*ISR\****，除了***\*ISR\****以外，还有已分配的副本列表（***\*Assigned Replicas\****），简称***\*AR。\****这里的AR其实不仅仅包含ISR，还包含了没有同步的副本列表（***\*Out-of-Sync Replicas\****），简称***\*OSR\****
+Kafka的分区副本中只有Leader副本具有数据写入的功能，而Follower副本需要不断向Leader发出申请，进行数据的同步。这里所有同步的副本会形成一个列表，我们称之为同步副本列表（**In-Sync Replicas**），也可以简称ISR，除了ISR以外，还有已分配的副本列表（Assigned Replicas），简称AR。这里的AR其实不仅仅包含ISR，还包含了没有同步的副本列表（Out-of-Sync Replicas），简称OSR
 
 生产者Producer生产数据时，ACKS应答机制如果设置为all（-1），那此时就需要保证同步副本列表ISR中的所有副本全部接收完毕后，Kafka才会进行确认应答。
 
@@ -2179,7 +2179,7 @@ Kafka的分区副本中只有Leader副本具有数据写入的功能，而Follow
 
 （一）建Map类型的配置对象，根据场景增加相应的配置属性：
 
-| ***\*参数名\****              | ***\*参数作用\****                                           | ***\*类型\**** | ***\*默认值\**** | ***\*推荐值\****                              |
+| 参数名              | 参数作用                                           | 类型 | 默认值 | 推荐值                              |
 | ----------------------------- | ------------------------------------------------------------ | -------------- | ---------------- | --------------------------------------------- |
 | bootstrap.servers             | 集群地址，格式为：brokerIP1:端口号,brokerIP2:端口号          | 必须           |                  |                                               |
 | key.deserializer              | 对数据Key进行反序列化的类完整名称                            | 必须           |                  | Kafka提供的字符串反序列化类：StringSerializer |
@@ -2193,15 +2193,15 @@ Kafka的分区副本中只有Leader副本具有数据写入的功能，而Follow
 | fetch.max.bytes               | 消费者获取服务器端一批消息最大的字节数。如果服务器端一批次的数据大于该值（50m）仍然可以拉取回来这批数据，因此，这不是一个绝对最大值。一批次的大小受message.max.bytes （broker config）or max.message.bytes （topic config）影响 | 可选           | 52428800（50 m） |                                               |
 | offsets.topic.num.partitions  | 偏移量消费主题分区数                                         | 可选           | 50               |                                               |
 
-**（二）*****\*创建消费者对象\****
+**（二）**创建消费者对象
 
 根据配置创建消费者对象KafkaConsumer，向Kafka订阅（subscribe）主题消息，并向Kafka发送请求（poll）获取数据。
 
-**（三）*****\*获取数据\****
+**（三）**获取数据
 
 Kafka会根据消费者发送的参数，返回数据对象ConsumerRecord。返回的数据对象中包括指定的数据。
 
-| ***\*数据项\**** | ***\*数据含义\**** |
+| 数据项 | 数据含义 |
 | ---------------- | ------------------ |
 | topic            | 主题名称           |
 | partition        | 分区号             |
@@ -2212,7 +2212,7 @@ Kafka会根据消费者发送的参数，返回数据对象ConsumerRecord。返�
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps129.jpg) 
 
-**（四）*****\*关闭消费者\****
+**（四）**关闭消费者
 
 消费者消费完数据后，需要将对象关闭用以释放资源。一般情况下，消费者无需关闭。
 
@@ -2368,7 +2368,7 @@ Group Coordinator是Broker上的一个组件，用于管理和调度消费者组
 
 每个消费者只知道自己的分配信息，只有群主知道群组内所有消费者的分配信息。
 
-***\*指定分配策略的基本流程\****：
+指定分配策略的基本流程：
 
 (1) 第一个消费者设定group.id为test，向当前负载最小的节点发送请求查找消费调度器
 
@@ -2386,7 +2386,7 @@ Group Coordinator是Broker上的一个组件，用于管理和调度消费者组
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps146.jpg) 
 
-(5) 加入成功后，kafka将消费者组状态切换到准备rebalance，关闭和消费者的所有链接，等待它们重新加入。客户端重新申请加入，kafka从消费者组中挑选一个作为leader，其它的作为follower。（***\*步骤和之前相同，我们假设还是之前的消费者为Leader\****）
+(5) 加入成功后，kafka将消费者组状态切换到准备rebalance，关闭和消费者的所有链接，等待它们重新加入。客户端重新申请加入，kafka从消费者组中挑选一个作为leader，其它的作为follower。（步骤和之前相同，我们假设还是之前的消费者为Leader）
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps147.jpg) 
 
@@ -2396,7 +2396,7 @@ Group Coordinator是Broker上的一个组件，用于管理和调度消费者组
 
 Kafka提供的分区分配策略常用的有4个：
 
-**Ø** ***\*RoundRobinAssignor（轮询分配策略）\****
+**Ø** RoundRobinAssignor（轮询分配策略）
 
 每个消费者组中的消费者都会含有一个自动生产的UUID作为memberid。
 
@@ -2414,27 +2414,27 @@ Kafka提供的分区分配策略常用的有4个：
 
 从图中可以看出，轮询分配策略是存在缺点的，并不是那么的均衡，如果test1-2分区能够分配给消费者ccc是不是就完美了。
 
-**Ø** ***\*RangeAssignor（\****范围分配策略***\*）\****
+**Ø** RangeAssignor（范围分配策略）
 
 按照每个topic的partition数计算出每个消费者应该分配的分区数量，然后分配，分配的原则就是一个主题的分区尽可能的平均分，如果不能平均分，那就按顺序向前补齐即可。
 
-***\*#\*******\*所谓按\*******\*顺序\*******\*向前补齐就是：\****
+#所谓按顺序向前补齐就是：
 
-***\*假设【1,2,3,4,5】5\*******\*个分区\*******\*分\*******\*给\*******\*2个\*******\*消费者\*******\*：\****
+假设【1,2,3,4,5】5个分区分给2个消费者：
 
-5 / 2 = 2, 5 % 2 = 1 ***\*=>\**** 剩余的一个补在第一个中[2+1][2] ***\*=>\**** 结果为[1,2,3][4,5]
+5 / 2 = 2, 5 % 2 = 1 => 剩余的一个补在第一个中[2+1][2] => 结果为[1,2,3][4,5]
 
  
 
-***\*假设【1,2,3,4,5】5\*******\*个分区\*******\*分到3个\*******\*消费者\*******\*:\****
+假设【1,2,3,4,5】5个分区分到3个消费者:
 
-5 / 3 = 1, 5 % 3 = 2 ***\*=>\**** 剩余的两个补在第一个和第二个中[1+1][1+1][1] => 结果为[1,2][3,4][5]
+5 / 3 = 1, 5 % 3 = 2 => 剩余的两个补在第一个和第二个中[1+1][1+1][1] => 结果为[1,2][3,4][5]
 
 ![img](file:///C:\Users\wangp\AppData\Local\Temp\ksohtml16168\wps153.jpg) 
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps154.jpg) 
 
-***\*缺点\****：Range分配策略针对单个Topic的情况下显得比较均衡，但是假如Topic多的话, member排序靠前的可能会比member排序靠后的负载多很多。是不是也不够理想。
+缺点：Range分配策略针对单个Topic的情况下显得比较均衡，但是假如Topic多的话, member排序靠前的可能会比member排序靠后的负载多很多。是不是也不够理想。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps155.jpg) 
 
@@ -2442,7 +2442,7 @@ Kafka提供的分区分配策略常用的有4个：
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps156.jpg) 
 
-**Ø** ***\*StickyAssignor（粘性分区）\****
+**Ø** StickyAssignor（粘性分区）
 
 在第一次分配后，每个组成员都保留分配给自己的分区信息。如果有消费者加入或退出，那么在进行分区再分配时（一般情况下，消费者退出45s后，才会进行再分配，因为需要考虑可能又恢复的情况），尽可能保证消费者原有的分区不变，重新对加入或退出消费者的分区进行分配。
 
@@ -2452,11 +2452,11 @@ Kafka提供的分区分配策略常用的有4个：
 
 从图中可以看出，粘性分区分配策略分配的会更加均匀和高效一些。
 
-**Ø** ***\*CooperativeStickyAssignor\****
+**Ø** CooperativeStickyAssignor
 
 前面的三种分配策略再进行重分配时使用的是EAGER协议，会让当前的所有消费者放弃当前分区，关闭连接，资源清理，重新加入组和等待分配策略。明显效率是比较低的，所以从Kafka2.4版本开始，在粘性分配策略的基础上，优化了重分配的过程，使用的是COOPERATIVE协议，特点就是在整个再分配的过程中从图中可以看出，粘性分区分配策略分配的会更加均匀和高效一些，COOPERATIVE协议将一次全局重平衡，改成每次小规模重平衡，直至最终收敛平衡的过程。
 
-Kafka消费者默认的分区分配就是***\*RangeAssignor，CooperativeStickyAssignor\****
+Kafka消费者默认的分区分配就是RangeAssignor，CooperativeStickyAssignor
 
 #### **2.6.3.4偏移量offset**
 
@@ -2500,7 +2500,7 @@ public class KafkaConsumerTest {
 
 ​    paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 
-​    paramMap.put(***\*ConsumerConfig.AUTO_OFFSET_RESET_CONFIG\****, "***\*earliest\****");
+​    paramMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
 ​    paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
@@ -2614,27 +2614,27 @@ public class KafkaConsumerOffsetTest {
 
  
 
-​    ***\*// TODO 订阅主题\****
+​    // TODO 订阅主题
 
-​    ***\*c.subscribe(Collections.singletonList("test"));\****
+​    c.subscribe(Collections.singletonList("test"));
 
-​    ***\*// TODO 拉取数据，获取基本集群信息\****
+​    // TODO 拉取数据，获取基本集群信息
 
-​    ***\*c.poll(Duration.ofMillis(100));\****
+​    c.poll(Duration.ofMillis(100));
 
-​    ***\*// TODO 根据集群的基本信息配置需要消费的主题及偏移量\****
+​    // TODO 根据集群的基本信息配置需要消费的主题及偏移量
 
-​    ***\*final Set<TopicPartition> assignment = c.assignment();\****
+​    final Set<TopicPartition> assignment = c.assignment();
 
-​    ***\*for (TopicPartition topicPartition : assignment) {\****
+​    for (TopicPartition topicPartition : assignment) {
 
-​      ***\*if ( topicPartition.topic().equals("test") ) {\****
+​      if ( topicPartition.topic().equals("test") ) {
 
-​        ***\*c.seek(topicPartition, 0);\****
+​        c.seek(topicPartition, 0);
 
-​      ***\*}\****
+​      }
 
-​    ***\*}\****
+​    }
 
 ​    // TODO 拉取数据
 
@@ -2658,7 +2658,7 @@ public class KafkaConsumerOffsetTest {
 
 生产环境中，消费者可能因为某些原因或故障重新启动消费，那么如果不知道之前消费数据的位置，重启后再消费，就可能重复消费（earliest）或漏消费（latest）。所以Kafka提供了保存消费者偏移量的功能，而这个功能需要由消费者进行提交操作。这样消费者重启后就可以根据之前提交的偏移量进行消费了。注意，一旦消费者提交了偏移量，那么kafka会优先使用提交的偏移量进行消费。此时，auto.offset.reset参数是不起作用的。
 
-**Ø** ***\*自动提交\****
+**Ø** 自动提交
 
 所谓的自动提交就是消费者消费完数据后，无需告知kafka当前消费数据的偏移量，而是由消费者客户端API周期性地将消费的偏移量提交到Kafka中。这个周期默认为5000ms，可以通过配置进行修改。
 
@@ -2744,11 +2744,11 @@ public class KafkaConsumerCommitAutoTest {
 
 }
 
-**Ø** ***\*手动提交\****
+**Ø** 手动提交
 
 基于时间周期的偏移量提交，是我们无法控制的，一旦参数设置的不合理，或单位时间内数据量消费的很多，却没有来及的自动提交，那么数据就会重复消费。所以Kafka也支持消费偏移量的手动提交，也就是说当消费者消费完数据后，自行通过API进行提交。不过为了考虑效率和安全，kafka同时提供了异步提交和同步提交两种方式供我们选择。注意：需要禁用自动提交auto.offset.reset=false，才能开启手动提交
 
-**l** ***\*异步提交\****：向Kafka发送偏移量offset提交请求后，就可以直接消费下一批数据，因为无需等待kafka的提交确认，所以无法知道当前的偏移量一定提交成功，所以安全性比较低，但相对，消费性能会提高
+**l** 异步提交：向Kafka发送偏移量offset提交请求后，就可以直接消费下一批数据，因为无需等待kafka的提交确认，所以无法知道当前的偏移量一定提交成功，所以安全性比较低，但相对，消费性能会提高
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps165.jpg) 
 
@@ -2790,9 +2790,9 @@ public class KafkaConsumerCommitASyncTest {
 
 ​    paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 
-​    ***\*// TODO 禁用自动提交消费偏移量，默认取值为true\****
+​    // TODO 禁用自动提交消费偏移量，默认取值为true
 
-​    ***\*paramMap.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);\****
+​    paramMap.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 
 ​    paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
@@ -2822,13 +2822,13 @@ public class KafkaConsumerCommitASyncTest {
 
 ​      }
 
-​      ***\*// TODO 异步提交偏移量\****
+​      // TODO 异步提交偏移量
 
-​      ***\*//   此处需要注意，需要在拉取数据完成处理后再提交\****
+​      //   此处需要注意，需要在拉取数据完成处理后再提交
 
-​      ***\*//   否则提前提交了，但数据处理失败，下一次消费数据就拉取不到了\****
+​      //   否则提前提交了，但数据处理失败，下一次消费数据就拉取不到了
 
-​      ***\*consumer.commitAsync();\****
+​      consumer.commitAsync();
 
 ​    }
 
@@ -2836,7 +2836,7 @@ public class KafkaConsumerCommitASyncTest {
 
 }
 
-**l** ***\*同步提交\****：必须等待Kafka完成offset提交请求的响应后，才可以消费下一批数据，一旦提交失败，会进行重试处理，尽可能保证偏移量提交成功，但是依然可能因为以外情况导致提交请求失败。此种方式消费效率比较低，但是安全性高。
+**l** 同步提交：必须等待Kafka完成offset提交请求的响应后，才可以消费下一批数据，一旦提交失败，会进行重试处理，尽可能保证偏移量提交成功，但是依然可能因为以外情况导致提交请求失败。此种方式消费效率比较低，但是安全性高。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps166.jpg) 
 
@@ -2910,13 +2910,13 @@ public class KafkaConsumerCommitSyncTest {
 
 ​      }
 
-​      ***\*// TODO 同步提交偏移量\****
+​      // TODO 同步提交偏移量
 
-​      ***\*//   此处需要注意，需要在拉取数据完成处理后再提交\****
+​      //   此处需要注意，需要在拉取数据完成处理后再提交
 
-​      ***\*//   否则提前提交了，但数据处理失败，下一次消费数据就拉取不到了\****
+​      //   否则提前提交了，但数据处理失败，下一次消费数据就拉取不到了
 
-​      ***\*consumer.commitSync();\****
+​      consumer.commitSync();
 
 ​    }
 
@@ -2976,13 +2976,13 @@ public class KafkaConsumerTransactionTest {
 
 ​    paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
-​    ***\*// TODO 隔离级别：已提交读，读取已经提交事务成功的数据（默认）\****
+​    // TODO 隔离级别：已提交读，读取已经提交事务成功的数据（默认）
 
-​    ***\*//paramMap.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");\****
+​    //paramMap.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
 
-​    ***\*// TODO 隔离级别：未提交读，读取已经提交事务成功和未提交事务成功的数据\****
+​    // TODO 隔离级别：未提交读，读取已经提交事务成功和未提交事务成功的数据
 
-​    ***\*paramMap.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_uncommitted");\****
+​    paramMap.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_uncommitted");
 
 ​    paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
 
