@@ -4,130 +4,94 @@ Kafka借鉴了JMS规范的思想，但是却并没有完全遵循JMS规范，因
 
 ## 2.1 集群部署
 
-生产环境都是采用linux系统搭建服务器集群，但是我们的重点是在于学习kafka的基础概念和核心组件，所以这里我们搭建一个简单易用的windows集群方便大家的学习和练习。Linux集群的搭建会在第3章给大家进行讲解。
 
 ### 2.1.1 **解压文件**
 
 (1) 在磁盘根目录创建文件夹cluster，文件夹名称不要太长
-
-![img](file:///C:\Users\wangp\AppData\Local\Temp\ksohtml16168\wps1.jpg) 
-
 (2) 将kafka安装包kafka-3.6.1-src.tgz解压缩到kafka文件夹
 
-![img](file:///C:\Users\wangp\AppData\Local\Temp\ksohtml16168\wps2.jpg) 
-
-### 2.1.2 **安装ZooKeeper**
+### 2.1.2 安装ZooKeeper
 
 (1) 修改文件夹名为kafka-zookeeper
-
 因为kafka内置了ZooKeeper软件，所以此处将解压缩的文件作为ZooKeeper软件使用。
 
-![img](file:///C:\Users\wangp\AppData\Local\Temp\ksohtml16168\wps3.jpg) 
-
-
-
-### 2.1.3 **安装Kafka**
-
-(1) 将上面解压缩的文件复制一份，改名为kafka-node-1 
-
-(2) 修改config/server.properties配置文件
-
-(3) 将kafka-node-1文件夹复制两份，改名为kafka-node-2，kafka-node-3 
-
-(4) 分别修改kafka-node-2，kafka-node-3文件夹中的配置文件server.properties
-
+### 2.1.3 安装Kafka
+(1) 修改config/server.properties配置文件
+(2) 文件夹中的配置文件server.properties为server1.properties、server2.properties 和 server3.properties
 将文件内容中的broker.id=1分别改为broker.id=2，broker.id=3
-
 将文件内容中的9091分别改为9092，9093（如果端口冲突，请重新设置）
 
-将文件内容中的kafka-node-1分别改为kafka-node-2，kafka-node-3
+这个过程可以生成脚本
+```
+#!/bin/bash
 
-### 2.1.4 **封装启动脚本**
+# 复制并修改配置文件中的 broker.id 和端口号
+copy_and_modify_config() {
+    local original_file="$1"
+    local copy_file="$2"
 
-因为Kafka启动前，必须先启动ZooKeeper，并且Kafka集群中有多个节点需要启动，所以启动过程比较繁琐，这里我们将启动的指令进行封装。
+    # 复制配置文件
+    cp "$original_file" "$copy_file"
+    echo "Copied $original_file to $copy_file"
 
-(1) 在kafka-zookeeper文件夹下创建zk.cmd批处理文件 
+    # 修改配置文件中的 broker.id 和端口号
+    sed -i 's/^broker.id=1$/broker.id=2/g' "$copy_file"
+    sed -i 's/^broker.id=3$/broker.id=3/g' "$copy_file"
+    sed -i 's/^9091$/9092/g' "$copy_file"
+    sed -i 's/^9091$/9093/g' "$copy_file"
+}
 
-(2) 在zk.cmd文件中添加内容
+# 复制并修改 server1.properties
+copy_and_modify_config "config/server.properties" "config/server1.properties"
+echo "Modified server1.properties successfully!"
 
-\# 添加启动命令
+# 复制并修改 server2.properties
+copy_and_modify_config "config/server.properties" "config/server2.properties"
+echo "Modified server2.properties successfully!"
 
-call bin/windows/zookeeper-server-start.bat config/zookeeper.properties
+# 复制并修改 server3.properties
+copy_and_modify_config "config/server.properties" "config/server3.properties"
+echo "Modified server3.properties successfully!"
 
-(3) 在kafka-node-1，kafka-node-2，kafka-node-3文件夹下分别创建kfk.cmd批处理文件
+```
+这个脚本首先定义了一个名为 copy_and_modify_config 的函数，该函数接受两个参数：原始配置文件和要复制到的新文件路径。在函数中，首先使用 cp 命令复制原始配置文件到新文件，然后使用 sed 命令修改新文件中的内容。最后，我们分别调用该函数来复制和修改 server.properties 到 server1.properties、server2.properties 和 server3.properties 文件。
 
-![img](file:///C:\Users\wangp\AppData\Local\Temp\ksohtml16168\wps7.jpg) 
+要使用此脚本，只需将其保存为 .sh 文件，例如 copy-and-modify-config-files.sh，然后确保具有执行权限 (chmod +x copy-and-modify-config-files.sh)，最后运行它 (./copy-and-modify-config-files.sh)。执行完毕后，您将得到三个修改后的配置文件副本。
+### 2.1.4 封装启动脚本
+启动 Kafka 集群需要多个步骤，包括启动 ZooKeeper 实例和 Kafka 服务器实例。以下是一个简单的示例脚本，可以用来启动 Kafka 集群。假设您的 Kafka 集群由3个 Kafka 服务器实例和1个 ZooKeeper 实例组成。
+```
+#!/bin/bash
+# 启动 ZooKeeper
+echo "Starting ZooKeeper..."
+bin/zookeeper-server-start.sh config/zookeeper.properties > /dev/null 2>&1 &
+ZK_PID=$!
+echo "ZooKeeper started with PID $ZK_PID"
+# 等待一段时间以确保 ZooKeeper 启动完成
+sleep 5
+# 启动 Kafka 服务器实例
+for i in {1..3}; do
+    echo "Starting Kafka server $i..."
+    bin/kafka-server-start.sh config/server$i.properties > /dev/null 2>&1 &
+    KAFKA_PID=$!
+    echo "Kafka server $i started with PID $KAFKA_PID"
+done
+# 等待一段时间以确保 Kafka 服务器实例启动完成
+sleep 10
+echo "Kafka cluster started successfully!"
+```
+在此脚本中，假设您的 Kafka 服务器配置文件为 server1.properties、server2.properties 和 server3.properties，而 ZooKeeper 的配置文件为 zookeeper.properties。您需要根据实际情况调整这些文件的路径和内容。
 
-(4) 在kfk.bat文件中添加内容
-
-\# 添加启动命令
-
-call bin/windows/kafka-server-start.bat config/server.properties
-
-(5) 在cluster文件夹下创建cluster.cmd批处理文件，用于启动kafka集群
-
-![img](file:///C:\Users\wangp\AppData\Local\Temp\ksohtml16168\wps8.jpg) 
-
-(6) 在cluster.cmd文件中添加内容
-
-cd kafka-zookeeper
-
-start zk.cmd
-
-ping 127.0.0.1 -n 10 >nul
-
-cd ../kafka-node-1
-
-start kfk.cmd
-
-cd ../kafka-node-2
-
-start kfk.cmd
-
-cd ../kafka-node-3
-
-start kfk.cmd
-
-(7) 在cluster文件夹下创建cluster-clear.cmd批处理文件，用于清理和重置kafka数据
-
-![img](file:///C:\Users\wangp\AppData\Local\Temp\ksohtml16168\wps9.jpg) 
-
-(8) 在cluster-clear.cmd文件中添加内容
-
-cd kafka-zookeeper
-
-rd /s /q data
-
-cd ../kafka-node-1
-
-rd /s /q data
-
-cd ../kafka-node-2
-
-rd /s /q data
-
-cd ../kafka-node-3
-
-rd /s /q data
-
-(9) 双击执行cluster.cmd文件，启动Kafka集群
-
-集群启动命令后，会打开多个黑窗口，每一个窗口都是一个kafka服务，请不要关闭，一旦关闭，对应的kafka服务就停止了。如果启动过程报错，主要是因为zookeeper和kafka的同步问题，请先执行cluster-clear.cmd文件，再执行cluster.cmd文件即可。
-
-![image-20240428230708169](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428230708169.png) 
+要运行此脚本，只需将其保存为 .sh 文件，例如 start-kafka-cluster.sh，然后确保具有执行权限 (chmod +x start-kafka-cluster.sh)，最后运行它 (./start-kafka-cluster.sh)。
 
 ## 2.2 集群启动
 
-### 2.2.1 **相关概念**
+### 2.2.1 相关概念
 
 #### 2.2.1.1 代理：Broker
 
 使用Kafka前，我们都会启动Kafka服务进程，这里的Kafka服务进程我们一般会称之为Kafka Broker或Kafka Server。因为Kafka是分布式消息系统，所以在实际的生产环境中，是需要多个服务进程形成集群提供消息服务的。所以每一个服务节点都是一个broker，而且在Kafka集群中，为了区分不同的服务节点，每一个broker都应该有一个不重复的全局ID，称之为broker.id，这个ID可以在kafka软件的配置文件server.properties中进行配置
-
 \# 集群ID
-
 broker.id=0
-
 咱们的Kafka集群中每一个节点都有自己的ID，整数且唯一。
 
 | 主机      | kafka-broker1 | kafka-broker2 | kafka-broker3 |
@@ -135,7 +99,6 @@ broker.id=0
 | broker.id | 1             | 2             | 3             |
 
 #### 2.2.1.2 控制器：Controller
-
 Kafka是分布式消息传输系统，所以存在多个Broker服务节点，但是它的软件架构采用的是分布式系统中比较常见的主从（Master - Slave）架构，也就是说需要从多个Broker中找到一个用于管理整个Kafka集群的Master节点，这个节点，我们就称之为Controller。它是Apache Kafka的核心组件非常重要。它的主要作用是在Apache Zookeeper的帮助下管理和协调控制整个Kafka集群。
 
 ![image-20240428230758525](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428230758525.png) 
@@ -144,9 +107,9 @@ Kafka是分布式消息传输系统，所以存在多个Broker服务节点，但
 
 ![image-20240428230822859](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428230822859.png) 
 
-Kafka集群中Controller的基本功能：
+**Kafka集群中Controller的基本功能**：
 
-Broker管理
+**1、Broker管理**
 
 监听 /brokers/ids节点相关的变化：
 
@@ -154,15 +117,15 @@ Broker管理
 
  Broker对应的数据变化
 
- Topic管理
+**2、Topic管理**
 
-n 新增：监听 /brokers/topics节点相关的变化
+  新增：监听 /brokers/topics节点相关的变化
 
-n 修改：监听 /brokers/topics节点相关的变化
+  修改：监听 /brokers/topics节点相关的变化
 
-n 删除：监听 /admin/delete_topics节点相关的变化
+  删除：监听 /admin/delete_topics节点相关的变化
 
- Partation管理
+**3、Partation管理**
 
 监听 /admin/reassign_partitions节点相关的变化
 
@@ -174,13 +137,13 @@ n 删除：监听 /admin/delete_topics节点相关的变化
 
 启动分区状态机和副本状态机
 
-### **2.2.2 启动ZooKeeper**
+### 2.2.2 启动ZooKeeper
 
 Kafka集群中含有多个服务节点，而分布式系统中经典的主从（Master - Slave）架构就要求从多个服务节点中找一个节点作为集群管理Master，Kafka集群中的这个Master，我们称之为集群控制器Controller
 
 ![image-20240428230921798](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428230921798.png) 
 
-如果此时Controller节点出现故障，它就不能再管理集群功能，那么其他的Slave节点该如何是好呢？
+**如果此时Controller节点出现故障，它就不能再管理集群功能，那么其他的Slave节点该如何是好呢？**
 
 ![image-20240428230943814](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428230943814.png) 
 
@@ -188,15 +151,15 @@ Kafka集群中含有多个服务节点，而分布式系统中经典的主从（
 
 ![image-20240428231009326](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231009326.png) 
 
-ZooKeeper如何实现Kafka的节点选举呢？这就要说到我们用到ZooKeeper的3个功能：
+**ZooKeeper如何实现Kafka的节点选举呢？这就要说到我们用到ZooKeeper的3个功能：**
 
-Ø 一个是在ZooKeeper软件中创建节点Node，创建一个Node时，我们会设定这个节点是持久化创建，还是临时创建。所谓的持久化创建，就是Node一旦创建后会一直存在，而临时创建，是根据当前的客户端连接创建的临时节点Node，一旦客户端连接断开，那么这个临时节点Node也会被自动删除，所以这样的节点称之为临时节点。
+1、一个是在ZooKeeper软件中创建节点Node，创建一个Node时，我们会设定这个节点是持久化创建，还是临时创建。所谓的持久化创建，就是Node一旦创建后会一直存在，而临时创建，是根据当前的客户端连接创建的临时节点Node，一旦客户端连接断开，那么这个临时节点Node也会被自动删除，所以这样的节点称之为临时节点。
 
-Ø ZooKeeper节点是不允许有重复的,所以多个客户端创建同一个节点，只能有一个创建成功。
+2、ZooKeeper节点是不允许有重复的,所以多个客户端创建同一个节点，只能有一个创建成功。
 
-Ø 另外一个是客户端可以在ZooKeeper的节点上增加监听器，用于监听节点的状态变化，一旦监听的节点状态发生变化，那么监听器就会触发响应，实现特定监听功能。
+3、另外一个是客户端可以在ZooKeeper的节点上增加监听器，用于监听节点的状态变化，一旦监听的节点状态发生变化，那么监听器就会触发响应，实现特定监听功能。
 
-有了上面的三个知识点，我们这里就介绍一下Kafka是如何利用ZooKeeper实现Controller节点的选举的：
+**有了上面的三个知识点，我们这里就介绍一下Kafka是如何利用ZooKeeper实现Controller节点的选举的：**
 
 1) 第一次启动Kafka集群时，会同时启动多个Broker节点，每一个Broker节点就会连接ZooKeeper，并尝试创建一个临时节点 **controller**
 2) 因为ZooKeeper中一个节点不允许重复创建，所以多个Broker节点，最终只能有一个Broker节点可以创建成功，那么这个创建成功的Broker节点就会自动作为Kafka集群控制器节点，用于管理整个Kafka集群。
@@ -205,17 +168,17 @@ ZooKeeper如何实现Kafka的节点选举呢？这就要说到我们用到ZooKee
 
 现在我们能明白启动Kafka集群之前，为什么要先启动ZooKeeper集群了吧。就是因为ZooKeeper可以协助Kafka进行集群管理。
 
-### **2.2.3 启动Kafka**
+### 2.2.3 启动Kafka
 
 ZooKeeper已经启动好了，那我们现在可以启动多个Kafka Broker节点构建Kafka集群了。构建的过程中，每一个Broker节点就是一个Java进程，而在这个进程中，有很多需要提前准备好，并进行初始化的内部组件对象。
 
-#### **2.2.3.1初始化ZooKeeper**
+#### 2.2.3.1初始化ZooKeeper
 
-Kafka Broker启动时，首先会先创建ZooKeeper客户端（***\*KafkaZkClient\****），用于和ZooKeeper进行交互。客户端对象创建完成后，会通过该客户端对象向ZooKeeper发送创建Node的请求，注意，这里创建的Node都是持久化Node。
+Kafka Broker启动时，首先会先创建ZooKeeper客户端（**KafkaZkClient**），用于和ZooKeeper进行交互。客户端对象创建完成后，会通过该客户端对象向ZooKeeper发送创建Node的请求，注意，这里创建的Node都是持久化Node。
 
 ![image-20240428231104886](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231104886.png) 
 
-| ***\*节点\****              | ***\*类型\**** | ***\*说明\****                                               |
+| **节点**              | **类型** | **说明**                                               |
 | --------------------------- | -------------- | ------------------------------------------------------------ |
 | /admin/delete_topics        | 持久化节点     | 配置需要删除的topic，因为删除过程中，可能broker下线，或执行失败，那么就需要在broker重新上线后，根据当前节点继续删除操作，一旦topic所有的分区数据全部删除，那么当前节点的数据才会进行清理 |
 | /brokers/ids                | 持久化节点     | 服务节点ID标识，只要broker启动，那么就会在当前节点中增加子节点，brokerID不能重复 |
@@ -233,85 +196,83 @@ Kafka Broker启动时，首先会先创建ZooKeeper客户端（***\*KafkaZkClien
 | /log_dir_event_notification | 持久化节点     | 主要用于保存当broker当中某些数据路径出现异常时候,例如磁盘损坏,文件读写失败等异常时候,向ZooKeeper当中增加一个通知序号，Controller节点监听到这个节点的变化之后，就会做出对应的处理操作 |
 | /cluster/id                 | 持久化节点     | 主要用于保存kafka集群的唯一id信息，每个kafka集群都会给分配要给唯一id，以及对应的版本号 |
 
-#### **2.2.3.2初始化服务**
+#### 2.2.3.2初始化服务
 
 Kafka Broker中有很多的服务对象，用于实现内部管理和外部通信操作。
 
 ![image-20240428231144083](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231144083.png) 
 
-##### **2.2.3.2.1 启动任务调度器**
+##### 2.2.3.2.1 启动任务调度器
 
-每一个Broker在启动时都会创建内部调度器（***\*KafkaScheduler\****）并启动，用于完成节点内部的工作任务。底层就是Java中的定时任务线程池***\*ScheduledThreadPoolExecutor\****
+每一个Broker在启动时都会创建内部调度器（**KafkaScheduler**）并启动，用于完成节点内部的工作任务。底层就是Java中的定时任务线程池**ScheduledThreadPoolExecutor**
 
-##### **2.2.3.2.2 创建数据管理器**
+##### 2.2.3.2.2 创建数据管理器
 
-每一个Broker在启动时都会创建数据管理器（***\*LogManager\****），用于接收到消息后，完成后续的数据创建，查询，清理等处理。
+每一个Broker在启动时都会创建数据管理器（**LogManager**），用于接收到消息后，完成后续的数据创建，查询，清理等处理。
 
-##### **2.2.3.2.3 创建远程数据管理器**
+##### 2.2.3.2.3 创建远程数据管理器**
 
 每一个Broker在启动时都会创建远程数据管理器（RemoteLogManager），用于和其他Broker节点进行数据状态同步。
 
-##### **2.2.3.2.4 创建副本管理器**
+##### 2.2.3.2.4 创建副本管理器
 
-每一个Broker在启动时都会创建副本管理器（***\*ReplicaManager\****），用于对主题的副本进行处理。
+每一个Broker在启动时都会创建副本管理器（**ReplicaManager**），用于对主题的副本进行处理。
 
-##### **2.2.3.2.5 创建ZK元数据缓存**
+##### 2.2.3.2.5 创建ZK元数据缓存
 
-每一个Broker在启动时会将ZK的关于Kafka的元数据进行缓存，创建元数据对象（***\*ZkMetadataCache\****）
+每一个Broker在启动时会将ZK的关于Kafka的元数据进行缓存，创建元数据对象（**ZkMetadataCache**）
 
-##### **2.2.3.2.6 创建Broker通信对象**
+##### 2.2.3.2.6 创建Broker通信对象
 
 每一个Broker在启动时会创建Broker之间的通道管理器对象（BrokerToControllerChannelManager），用于管理Broker和Controller之间的通信。
 
-##### **2.2.3.2.7 创建网络通信对象**
+##### 2.2.3.2.7 创建网络通信对象
 
-每一个Broker在启动时会创建自己的网络通信对象（***\*SocketServer\****），用于和其他Broker之间的进行通信，其中包含了Java用于NIO通信的Channel、Selector对象。
+每一个Broker在启动时会创建自己的网络通信对象（**SocketServer**），用于和其他Broker之间的进行通信，其中包含了Java用于NIO通信的Channel、Selector对象。
 
 ![image-20240428231200748](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231200748.png) 
 
-##### **2.2.3.2.8 注册Broker节点**
+##### 2.2.3.2.8 注册Broker节点
 
 Broker启动时，会通过ZK客户端对象向ZK注册当前的Broker 节点ID，注册后创捷的ZK节点为临时节点。如果当前Broker的ZK客户端断开和ZK的连接，注册的节点会被删除。
 
-#### **2.2.3.3启动控制器**
+#### 2.2.3.3启动控制器
 
 控制器（KafkaController）是每一个Broker启动时都会创建的核心对象，用于和ZK之间建立连接并申请自己为整个Kafka集群的Master管理者。如果申请成功，那么会完成管理者的初始化操作，并建立和其他Broker之间的数据通道接收各种事件，进行封装后交给事件管理器，并定义了process方法，用于真正处理各类事件。
 
 ![image-20240428231222024](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231222024.png) 
 
-##### **2.2.3.3.1 初始化通道管理器**
+##### 2.2.3.3.1 初始化通道管理器
 
-创建通道管理器（***\*ControllerChannelManager\****），该管理器维护了Controller和集群所有Broker节点之间的网络连接，并向Broker发送控制类请求及接收响应。
+创建通道管理器（**ControllerChannelManager**），该管理器维护了Controller和集群所有Broker节点之间的网络连接，并向Broker发送控制类请求及接收响应。
 
-##### **2.2.3.3.2 初始化事件管理器**
+##### 2.2.3.3.2 初始化事件管理器
 
-创建事件管理器（***\*ControllerEventManager\****）维护了Controller和集群所有Broker节点之间的网络连接，并向Broker发送控制类请求及接收响应。
+创建事件管理器（**ControllerEventManager**）维护了Controller和集群所有Broker节点之间的网络连接，并向Broker发送控制类请求及接收响应。
 
-##### **2.2.3.3.3 初始化状态管理器**
+##### 2.2.3.3.3 初始化状态管理器
 
-创建状态管理器（***\*ControllerChangeHandler\****）可以监听 /controller 节点的操作，一旦节点创建（ControllerChange），删除（Reelect），数据发生变化（ControllerChange），那么监听后执行相应的处理。
+创建状态管理器（**ControllerChangeHandler**）可以监听 /controller 节点的操作，一旦节点创建（ControllerChange），删除（Reelect），数据发生变化（ControllerChange），那么监听后执行相应的处理。
 
-##### **2.2.3.3.4 启动控制器**
+##### 2.2.3.3.4 启动控制器
 
 控制器对象启动后，会向事件管理器发送Startup事件，事件处理线程接收到事件后会通过ZK客户端向ZK申请 /controller 节点，申请成功后，执行当前节点成为Controller的一些列操作。主要是注册各类 ZooKeeper 监听器、删除日志路径变更和 ISR 副本变更通知事件、启动 Controller 通道管理器，以及启动副本状态机和分区状态机。
 
-## **2.****3** **创建主题**
+## 2.3 创建主题
 
 Topic主题是Kafka中消息的逻辑分类，但是这个分类不应该是固定的，而是应该由外部的业务场景进行定义（注意：Kafka中其实是有两个固定的，用于记录消费者偏移量和事务处理的主题），所以Kafka提供了相应的指令和客户端进行主题操作。
 
-### **2****.****3****.1** **相关概念**
+### 2.3.1 相关概念
 
-#### **2.3.1.1 主题：Topic**
+#### 2.3.1.1 主题：Topic
 
-Kafka是分布式消息传输系统，采用的数据传输方式为发布，订阅模式，也就是说由消息的生产者发布消息，消费者订阅消息后获取数据。为了对消费者订阅的消息进行区分，所以对消息在逻辑上进行了分类，这个分类我们称之为主题：***\*Topic\****。消息的生产者必须将消息数据发送到某一个主题，而消费者必须从某一个主题中获取消息，并且消费者可以同时消费一个或多个主题的数据。Kafka集群中可以存放多个主题的消息数据。
+Kafka是分布式消息传输系统，采用的数据传输方式为发布，订阅模式，也就是说由消息的生产者发布消息，消费者订阅消息后获取数据。为了对消费者订阅的消息进行区分，所以对消息在逻辑上进行了分类，这个分类我们称之为主题：**Topic**。消息的生产者必须将消息数据发送到某一个主题，而消费者必须从某一个主题中获取消息，并且消费者可以同时消费一个或多个主题的数据。Kafka集群中可以存放多个主题的消息数据。
 
 为了防止主题的名称和监控指标的名称产生冲突，官方推荐主题的名称中不要同时包含下划线和点。
 
 ![image-20240428231241702](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231241702.png)
 
- 
-
-#### **2.3.1.2 分区：Partition**
+#### 2.3.1.2 分区：Partition
 
 Kafka消息传输采用发布、订阅模式，所以消息生产者必须将数据发送到一个主题，假如发送给这个主题的数据非常多，那么主题所在broker节点的负载和吞吐量就会受到极大的考验，甚至有可能因为热点问题引起broker节点故障，导致服务不可用。一个好的方案就是将一个主题从物理上分成几块，然后将不同的数据块均匀地分配到不同的broker节点上，这样就可以缓解单节点的负载问题。这个主题的分块我们称之为：分区partition。默认情况下，topic主题创建时分区数量为1，也就是一块分区，可以指定参数--partitions改变。Kafka的分区解决了单一主题topic线性扩展的问题，也解决了负载均衡的问题。
 
@@ -319,7 +280,7 @@ topic主题的每个分区都会用一个编号进行标记，一般是从0开�
 
 ![image-20240428231306815](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231306815.png) 
 
-#### **2.3.1.3 副本：Replication**
+#### 2.3.1.3 副本：Replication
 
 分布式系统出现错误是比较常见的，只要保证集群内部依然存在可用的服务节点即可，当然效率会有所降低，不过只要能保证系统可用就可以了。咱们Kafka的topic也存在类似的问题，也就是说，如果一个topic划分了多个分区partition，那么这些分区就会均匀地分布在不同的broker节点上，一旦某一个broker节点出现了问题，那么在这个节点上的分区就会出现问题，那么Topic的数据就不完整了。所以一般情况下，为了防止出现数据丢失的情况，我们会给分区数据设定多个备份，这里的备份，我们称之为：副本Replication。
 
@@ -327,9 +288,9 @@ Kafka支持多副本，使得主题topic可以做到更多容错性，牺牲性�
 
 ![image-20240428231327573](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231327573.png) 
 
-***\*注意：\****这里不能将多个备份放置在同一个broker中，因为一旦出现故障，多个副本就都不能用了，那么副本的意义就没有了。
+注意：这里不能将多个备份放置在同一个broker中，因为一旦出现故障，多个副本就都不能用了，那么副本的意义就没有了。
 
-#### **2.3.1.4 副本类型：Leader & Follower**
+#### 2.3.1.4 副本类型：Leader & Follower
 
 假设我们有一份文件，一般情况下，我们对副本的理解应该是有一个正式的完整文件，然后这个文件的备份，我们称之为副本。但是在Kafka中，不是这样的，所有的文件都称之为副本，只不过会选择其中的一个文件作为主文件，称之为：Leader(主导)副本，其他的文件作为备份文件，称之为：Follower（追随）副本。在Kafka中，这里的文件就是分区，每一个分区都可以存在1个或多个副本，只有Leader副本才能进行数据的读写，Follower副本只做备份使用。
 
@@ -337,39 +298,38 @@ Kafka支持多副本，使得主题topic可以做到更多容错性，牺牲性�
 
 
 
-#### **2.3.1.5 日志：Log**
+#### 2.3.1.5 日志：Log
 
 Kafka最开始的应用场景就是日志场景或MQ场景，更多的扮演着一个日志传输和存储系统，这是Kafka立家之本。所以Kafka接收到的消息数据最终都是存储在log日志文件中的，底层存储数据的文件的扩展名就是log。
 
 主题创建后，会创建对应的分区数据Log日志。并打开文件连接通道，随时准备写入数据。
 
-### **2.3.2 创建第一个主题**
+### 2.3.2 创建第一个主题
 
 创建主题Topic的方式有很多种：命令行，工具，客户端API，自动创建。在server.properties文件中配置参数auto.create.topics.enable=true时，如果访问的主题不存在，那么Kafka就会自动创建主题，这个操作不在我们的讨论范围内。由于我们学习的重点在于学习原理和基础概念，所以这里我们选择比较基础的命令行方式即可。
 
 我们首先创建的主题，仅仅指明主题的名称即可，其他参数暂时无需设定。
 
-#### **2.3.2.1 执行指令**
+#### 2.3.2.1 执行指令
 
 ![image-20240428231411267](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231411267.png) 
-
-[atguigu@kafka-broker1 ~]$ cd /opt/module/kafka
-
-[atguigu@kafka-broker1 kafka]$ bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic first-topic
-
-#### **2.3.2.2 ZooKeeper节点变化**
+```
+ cd /opt/module/kafka
+ bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic first-topic
+```
+#### 2.3.2.2 ZooKeeper节点变化
 
 指令执行后，当前Kafka会增加一个主题，因为指令中没有配置分区和副本参数，所以当前主题分区数量为默认值1，编号为0，副本为1，编号为所在broker的ID值。为了方便集群的管理，创建topic时，会同时在ZK中增加子节点，记录主题相关配置信息：
 
-Ø /config/topics节点中会增加first-topic节点。
+/config/topics节点中会增加first-topic节点。
 
 ![image-20240428231432153](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231432153.png) 
 
-Ø /brokers/topics节点中会增加first-topic节点以及相应的子节点。
+/brokers/topics节点中会增加first-topic节点以及相应的子节点。
 
 ![image-20240428231447776](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231447776.png) 
 
-| ***\*节点\****                         | ***\*节点类型\**** | ***\*数据名称\****                                           | ***\*数据值\**** | ***\*说明\****                                          |
+| **节点**                         | **节点类型** | **数据名称**                                           | **数据值** | **说明**                                          |
 | -------------------------------------- | ------------------ | ------------------------------------------------------------ | ---------------- | ------------------------------------------------------- |
 | /topics/first-topic                    | 持久类型           | removing_replicas                                            | 无               |                                                         |
 | partitions                             | {"0":[3]}          | 分区配置                                                     |                  |                                                         |
@@ -384,53 +344,47 @@ Kafka最开始的应用场景就是日志场景或MQ场景，更多的扮演着�
 | leader_epoch                           | 0                  |                                                              |                  |                                                         |
 | isr                                    | [3]                | 副本同步列表，因为当前只有一个副本，所以副本中只有一个副本编号 |                  |                                                         |
 
-#### **2.3.2.3 数据存储位置**
+#### 2.3.2.3 数据存储位置
 
 主题创建后，需要找到一个用于存储分区数据的位置，根据上面ZooKeeper存储的节点配置信息可以知道，当前主题的分区数量为1，副本数量为1，那么数据存储的位置就是副本所在的broker节点，从当前数据来看，数据存储在我们的第三台broker上。
-
-[atguigu@kafka-broker3 ~]$ cd /opt/module/kafka/datas
-
-[atguigu@kafka-broker3 datas]$ ll
-
+```
+cd /opt/module/kafka/datas
+ll
+```
 ![image-20240428231504895](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231504895.png) 
-
-[atguigu@kafka-broker3 datas]$ cd first-topic-0
-
-[atguigu@kafka-broker3 first-topic-0]$ ll
+```
+cd first-topic-0
+ll
+```
 
 ![image-20240428231523049](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231523049.png) 
 
 路径中的00000000000000000000.log文件就是真正存储消息数据的文件，文件名称中的0表示当前文件的起始偏移量为0，index文件和timeindex文件都是数据索引文件，用于快速定位数据。只不过index文件采用偏移量的方式进行定位，而timeindex是采用时间戳的方式。
 
-### **2.3.3 创建第二个主题**
+### 2.3.3 创建第二个主题
 
 接下来我们创建第二个主题，不过创建时，我们需要设定分区参数 --partitions，参数值为3，表示创建3个分区
 
-#### **2.3.3.1 执行指令**
+#### 2.3.3.1 执行指令
 
 ![image-20240428231533708](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231533708.png)
-
- 
-
-[atguigu@kafka-broker1 ~]$ cd /opt/module/kafka
-
-[atguigu@kafka-broker1 kafka]$ bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic second-topic ***\*--partitions 3\****
-
-#### **2.3.3.2 ZooKeeper节点变化**
+```
+cd /opt/module/kafk
+bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic second-topic --partitions 3
+```
+#### 2.3.3.2 ZooKeeper节点变化
 
 指令执行后，当前Kafka会增加一个主题，因为指令中指定了分区数量（--partitions 3），所以当前主题分区数量为3，编号为[0、1、2]，副本为1，编号为所在broker的ID值。为了方便集群的管理，创建Topic时，会同时在ZK中增加子节点，记录主题相关配置信息：
-
-Ø /config/topics节点中会增加second-topic节点。
-
+/config/topics节点中会增加second-topic节点。
 ![image-20240428231551653](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231551653.png) 
 
-Ø /brokers/topics节点中会增加second-topic节点以及相应的子节点。
+ /brokers/topics节点中会增加second-topic节点以及相应的子节点。
 
 ![image-20240428231605723](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231605723.png)
 
  
 
-| ***\*节点\****                          | ***\*节点类型\****        | ***\*数据名称\****                                           | ***\*数据值\**** | ***\*说明\****                                               |
+| **节点**                          | **节点类型**        | **数据名称**                                           | **数据值** | **说明**                                               |
 | --------------------------------------- | ------------------------- | ------------------------------------------------------------ | ---------------- | ------------------------------------------------------------ |
 | /topics/second-topic                    | 持久类型                  | removing_replicas                                            | 无               |                                                              |
 | partitions                              | {"2":[3],"1":[2],"0":[1]} | 分区配置                                                     |                  |                                                              |
@@ -457,63 +411,42 @@ Kafka最开始的应用场景就是日志场景或MQ场景，更多的扮演着�
 | leader_epoch                            | 0                         |                                                              |                  |                                                              |
 | isr                                     | [3]                       | 副本同步列表，因为当前只有一个副本，所以副本中只有一个副本编号 |                  |                                                              |
 
-#### **2.3.3.3 数据存储位置**
+#### 2.3.3.3 数据存储位置
 
 主题创建后，需要找到一个用于存储分区数据的位置，根据上面ZooKeeper存储的节点配置信息可以知道，当前主题的分区数量为3，副本数量为1，那么数据存储的位置就是每个分区Leader副本所在的broker节点。
-
-[atguigu@kafka-broker1 ~]$ cd /opt/module/kafka/datas
-
-[atguigu@kafka-broker1 datas]$ ll
+```
+ cd /opt/module/kafka/datas
+ ll
+```
 
 ![image-20240428231629017](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231629017.png) 
-
-[atguigu@kafka-broker1 datas]$ cd second-topic-0
-
-[atguigu@kafka-broker1 second-topic-0]$ ll
-
+```
+cd second-topic-0
+ll
+```
 ![image-20240428231736243](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231736243.png) 
-
-[atguigu@kafka-broker2 ~]$ cd /opt/module/kafka/datas
-
-[atguigu@kafka-broker2 datas]$ ll
-
+```
+cd /opt/module/kafka/datas
+ll
+```
 ![image-20240428231751032](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231751032.png) 
-
-[atguigu@kafka-broker2 datas]$ cd second-topic-1
-
-[atguigu@kafka-broker2 second-topic-1]$ ll
-
+```
+cd second-topic-1
+ll
+```
 ![image-20240428231806602](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231806602.png)
 
- 
 
-[atguigu@kafka-broker3 ~]$ cd /opt/module/kafka/datas
-
-[atguigu@kafka-broker3 datas]$ ll
-
-![image-20240428231827245](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231827245.png) 
-
-[atguigu@kafka-broker3 datas]$ cd second-topic-2
-
-[atguigu@kafka-broker3 second-topic-2]$ ll
-
-![image-20240428231844594](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231844594.png)
-
- 
-
-### **2.3.4 创建第三个主题**
+### 2.3.4 创建第三个主题
 
 接下来我们创建第三个主题，不过创建时，我们需要设定副本参数 --replication-factor，参数值为3，表示每个分区创建3个副本。
 
-#### **2.3.4.1 执行指令**
-
-![image-20240428231929631](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/image-20240428231929631.png) 
-
-[atguigu@kafka-broker1 ~]$ cd /opt/module/kafka
-
-[atguigu@kafka-broker1 kafka]$ bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic third-topic --partitions 3 ***\*--replication-factor 3\****
-
-#### **2.3.4.2 ZooKeeper节点变化**
+#### 2.3.4.1 执行指令
+```
+cd /opt/module/kafka
+bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic third-topic --partitions 3 --replication-factor 3
+```
+#### 2.3.4.2 ZooKeeper节点变化
 
 指令执行后，当前Kafka会增加一个主题，因为指令中指定了分区数量和副本数量（--replication-factor 3），所以当前主题分区数量为3，编号为[0、1、2]，副本为3，编号为[1、2、3]。为了方便集群的管理，创建Topic时，会同时在ZK中增加子节点，记录主题相关配置信息：
 
@@ -525,7 +458,7 @@ Kafka最开始的应用场景就是日志场景或MQ场景，更多的扮演着�
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps40.jpg) 
 
-| ***\*节点\****                         | ***\*节点类型\****                    | ***\*数据名称\****                                           | ***\*数据值\**** | ***\*说明\****                                               |
+| **节点**                         | **节点类型**                    | **数据名称**                                           | **数据值** | **说明**                                               |
 | -------------------------------------- | ------------------------------------- | ------------------------------------------------------------ | ---------------- | ------------------------------------------------------------ |
 | /topics/third-topic                    | 持久类型                              | removing_replicas                                            | 无               |                                                              |
 | partitions                             | {"2":[1,2,3],"1":[3,1,2],"0":[2,3,1]} | 分区配置                                                     |                  |                                                              |
@@ -552,7 +485,7 @@ Kafka最开始的应用场景就是日志场景或MQ场景，更多的扮演着�
 | leader_epoch                           | 0                                     |                                                              |                  |                                                              |
 | isr                                    | [1,2,3]                               | 副本同步列表，因为当前有3个副本，所以列表中的第一个副本就是Leader副本，其他副本均为follower副本 |                  |                                                              |
 
-#### **2.3.4.3 数据存储位置**
+#### 2.3.4.3 数据存储位置
 
 主题创建后，需要找到一个用于存储分区数据的位置，根据上面ZooKeeper存储的节点配置信息可以知道，当前主题的分区数量为3，副本数量为3，那么数据存储的位置就是每个分区副本所在的broker节点。
 
@@ -592,15 +525,15 @@ Kafka最开始的应用场景就是日志场景或MQ场景，更多的扮演着�
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps46.jpg) 
 
-### **2.3.5 创建主题流程**
+### 2.3.5 创建主题流程
 
 Kafka中主题、分区以及副本的概念都和数据存储相关，所以是非常重要的。前面咱们演示了一下创建主题的具体操作和现象，那么接下来，我们就通过图解来了解一下Kafka是如何创建主题，并进行分区副本分配的。
 
-#### **2.3.5.1 命令行提交创建指令**
+#### 2.3.5.1 命令行提交创建指令
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps47.jpg) 
 
-1) 通过命令行提交指令，指令中会包含操作类型（***\*--create\****）、topic的名称（***\*--topic\****）、主题分区数量（***\*--partitions\****）、主题分区副本数量（***\*--replication-facotr\****）、副本分配策略（***\*--replica-assignment\****）等参数。
+1) 通过命令行提交指令，指令中会包含操作类型（**--create**）、topic的名称（**--topic**）、主题分区数量（**--partitions**）、主题分区副本数量（**--replication-facotr**）、副本分配策略（**--replica-assignment**）等参数。
 2) 指令会提交到客户端进行处理，客户端获取指令后，会首先对指令参数进行校验。
 
 a. 操作类型取值：create、list、alter、describe、delete，只能存在一个。
@@ -614,7 +547,7 @@ d. 分区副本数量大于1且小于Short.MaxValue，一般取值小于等于Br
 3) 将参数封装主题对象（NewTopic）。
 4) 创建通信对象，设定请求标记（CREATE_TOPICS），查找Controller，通过通信对象向Controller发起创建主题的网络请求。
 
-#### **2.3.5.2 Controller接收创建主题请求**
+#### 2.3.5.2 Controller接收创建主题请求
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps48.jpg) 
 
@@ -624,27 +557,28 @@ d. 分区副本数量大于1且小于Short.MaxValue，一般取值小于等于Br
 
 (3) 将请求对象转发给请求处理器（KafkaApis），根据请求对象的类型调用创建主题的方法。
 
-#### **2.3.5.3 创建主题**
+#### 2.3.5.3 创建主题
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps49.jpg) 
 
 (1) 请求处理器（KafkaApis）校验主题参数。
 
-Ø 如果分区数量没有设置，那么会采用Kafka启动时加载的配置项：***\*num.partitions\*******\*（默认值为1）\****
+如果分区数量没有设置，那么会采用Kafka启动时加载的配置项：**num.partitions**（默认值为1）
 
-Ø 如果副本数量没有设置，那么会采用Kafka启动时记载的配置项：
+如果副本数量没有设置，那么会采用Kafka启动时记载的配置项：
 
-***\*default.replication.factor\*******\*（默认值为1）\****
+**default.replication.factor**（默认值为1）
 
 (2) 在创建主题时，如果使用了replica-assignment参数，那么就按照指定的方案来进行分区副本的创建；如果没有指定replica-assignment参数，那么就按照Kafka内部逻辑来分配，内部逻辑按照机架信息分为两种策略：【未指定机架信息】和【指定机架信息】。当前课程中采用的是【未指定机架信息】副本分配策略：
 
-Ø 分区起始索引设置0
+分区起始索引设置0
 
-Ø 轮询所有分区，计算每一个分区的所有副本位置：
+轮询所有分区，计算每一个分区的所有副本位置：
 
 副本起始索引 = （分区编号 + 随机值） %  BrokerID列表长度。
 
 其他副本索引 = 。。。随机值（基本算法为使用随机值执行多次模运算）
+
 
 ***\*##################################################################\****
 
@@ -734,9 +668,9 @@ Topic主题已经创建好了，接下来我们就可以向该主题生产消息
 
 ### **2****.****4****.1** **生产消息的基本步骤**
 
-**（一）*****\*创建Map类型的配置对象，根据场景增加相应的配置属性：\****
+**（一）创建Map类型的配置对象，根据场景增加相应的配置属性：**
 
-| ***\*参数名\****                      | ***\*参数作用\****                                           | ***\*类型\**** | ***\*默认值\**** | ***\*推荐值\****                            |
+| **参数名***                      | **参数作用**                                           | **类型** | **默认值** | **推荐值**                            |
 | ------------------------------------- | ------------------------------------------------------------ | -------------- | ---------------- | ------------------------------------------- |
 | bootstrap.servers                     | 集群地址，格式为：brokerIP1:端口号,brokerIP2:端口号          | 必须           |                  |                                             |
 | key.serializer                        | 对生产数据Key进行序列化的类完整名称                          | 必须           |                  | Kafka提供的字符串序列化类：StringSerializer |
@@ -754,7 +688,7 @@ Topic主题已经创建好了，接下来我们就可以向该主题生产消息
 | partitioner.ignore.keys               | 是否放弃使用数据key选择分区                                  | 可选           | false            |                                             |
 | partitioner.class                     | 分区器类名                                                   | 可选           | null             |                                             |
 
-**（二）*****\*创建待发送数据\****
+**（二）创建待发送数据**
 
 在kafka中传递的数据我们称之为消息（message）或记录(record)，所以Kafka发送数据前，需要将待发送的数据封装为指定的数据模型：
 
@@ -764,13 +698,13 @@ Topic主题已经创建好了，接下来我们就可以向该主题生产消息
 
 相关属性必须在构建数据模型时指定，其中主题和value的值是必须要传递的。如果配置中开启了自动创建主题，那么Topic主题可以不存在。value就是我们需要真正传递的数据了，而Key可以用于数据的分区定位。
 
-**（三）*****\*创建生产者对象，发送生产的数据：\****
+**（三）创建生产者对象，发送生产的数据：**
 
 根据前面提供的配置信息创建生产者对象，通过这个生产者对象向Kafka服务器节点发送数据，而具体的发送是由生产者对象创建时，内部构建的多个组件实现的，多个组件的关系有点类似于生产者消费者模式。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps52.jpg) 
 
-(1) 数据生产者（***\*KafkaProducer\****）：生产者对象，用于对我们的数据进行必要的转换和处理，将处理后的数据放入到数据收集器中，类似于生产者消费者模式下的生产者。这里我们简单介绍一下内部的数据转换处理：
+(1) 数据生产者（**KafkaProducer**）：生产者对象，用于对我们的数据进行必要的转换和处理，将处理后的数据放入到数据收集器中，类似于生产者消费者模式下的生产者。这里我们简单介绍一下内部的数据转换处理：
 
 l 如果配置拦截器栈（interceptor.classes），那么将数据进行拦截处理。某一个拦截器出现异常并不会影响后续的拦截器处理。
 
@@ -780,7 +714,7 @@ l 计算数据所发送的分区位置。
 
 l 将数据追加到数据收集器中。
 
-(2) 数据收集器（***\*RecordAccumulator\****）：用于收集，转换我们产生的数据，类似于生产者消费者模式下的缓冲区。为了优化数据的传输，Kafka并不是生产一条数据就向Broker发送一条数据，而是通过合并单条消息，进行批量（批次）发送，提高吞吐量，减少带宽消耗。
+(2) 数据收集器（**RecordAccumulator**）：用于收集，转换我们产生的数据，类似于生产者消费者模式下的缓冲区。为了优化数据的传输，Kafka并不是生产一条数据就向Broker发送一条数据，而是通过合并单条消息，进行批量（批次）发送，提高吞吐量，减少带宽消耗。
 
 l 默认情况下，一个发送批次的数据容量为16K，这个可以通过参数batch.size进行改善。
 
@@ -788,7 +722,7 @@ l 批次是和分区进行绑定的。也就是说发往同一个分区的数据
 
 l 如果当前批次能容纳数据，那么直接将数据追加到批次中即可，如果不能容纳数据，那么会产生新的批次放入到当前分区的批次队列中，这个队列使用的是Java的双端队列Deque。旧的批次关闭不再接收新的数据，等待发送
 
-(3) 数据发送器（***\*Sender\****）：线程对象，用于从收集器对象中获取数据，向服务节点发送。类似于生产者消费者模式下的消费者。因为是线程对象，所以启动后会不断轮询获取数据收集器中已经关闭的批次数据。对批次进行整合后再发送到Broker节点中
+(3) 数据发送器（**Sender**）：线程对象，用于从收集器对象中获取数据，向服务节点发送。类似于生产者消费者模式下的消费者。因为是线程对象，所以启动后会不断轮询获取数据收集器中已经关闭的批次数据。对批次进行整合后再发送到Broker节点中
 
 l 因为数据真正发送的地方是Broker节点，不是分区。所以需要将从数据收集器中收集到的批次数据按照可用Broker节点重新组合成List集合。
 
@@ -798,10 +732,10 @@ l Broker节点获取客户端请求，并根据请求键进行后续的数据处
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps53.jpg) 
 
-### **2****.****4****.****2** **生产消息的基本代码**
+### 2.4.2 生产消息的基本代码
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps54.jpg) 
-
+```
 // TODO 配置属性集合
 
 Map<String, Object> configMap = new HashMap<>();
@@ -847,10 +781,11 @@ producer.send(record);
 // TODO 关闭生产者连接
 
 producer.close();
+```
 
-### **2****.****4****.****3** **发送消息**
+### 2.4.3 发送消息
 
-#### **2.4.3.1拦截器**
+#### 2.4.3.1拦截器
 
 生产者API在数据准备好发送给Kafka服务器之前，允许我们对生产的数据进行统一的处理，比如校验，整合数据等等。这些处理我们是可以通过Kafka提供的拦截器完成。因为拦截器不是生产者必须配置的功能，所以大家可以根据实际的情况自行选择使用。
 
@@ -860,10 +795,10 @@ producer.close();
 
 接下来，我们来演示一下拦截器的操作：
 
-##### **2.4.3.1.1 增加拦截器类**
+##### 2.4.3.1.1 增加拦截器类
 
 (1) 实现生产者拦截器接口ProducerInterceptor
-
+```
 package com.atguigu.test;
 
  
@@ -935,18 +870,18 @@ public class KafkaInterceptorMock implements ProducerInterceptor<String, String>
   }
 
 }
-
+```
 (2) 实现接口中的方法，根据业务功能重写具体的方法
 
-| ***\*方法名\****  | ***\*作用\****                                               |
+| **方法名**  | **作用**                                               |
 | ----------------- | ------------------------------------------------------------ |
 | onSend            | 数据发送前，会执行此方法，进行数据发送前的预处理             |
 | onAcknowledgement | 数据发送后，获取应答时，会执行此方法                         |
 | close             | 生产者关闭时，会执行此方法，完成一些资源回收和释放的操作     |
 | configure         | 创建生产者对象的时候，会执行此方法，可以根据场景对生产者对象的配置进行统一修改或转换。 |
 
-##### **2.4.3.1.2 配置拦截器**
-
+##### 2.4.3.1.2 配置拦截器
+```
 package com.atguigu.test;
 
  
@@ -1016,13 +951,13 @@ public class ProducerInterceptorTest {
   }
 
 }
-
-#### **2.4.3.2回调方法**
+```
+#### 2.4.3.2 回调方法
 
 Kafka发送数据时，可以同时传递回调对象（Callback）用于对数据的发送结果进行对应处理，具体代码实现采用匿名类或Lambda表达式都可以。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps56.jpg) 
-
+```
 package com.atguigu.kafka.test;
 
  
@@ -1090,10 +1025,10 @@ public class KafkaProducerASynTest {
   }
 
 }
-
+```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps57.jpg) 
 
-#### **2.4.3.3异步发送**
+#### 2.4.3.3异步发送
 
 Kafka发送数据时，底层的实现类似于生产者消费者模式。对应的，底层会由主线程代码作为生产者向缓冲区中放数据，而数据发送线程会从缓冲区中获取数据进行发送。Broker接收到数据后进行后续处理。
 
@@ -1102,6 +1037,7 @@ Kafka发送数据时，底层的实现类似于生产者消费者模式。对应
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps58.jpg) 
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps59.jpg) 
+```
 
 package com.atguigu.kafka.test;
 
@@ -1174,10 +1110,10 @@ public class KafkaProducerASynTest {
   }
 
 }
-
+```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps60.jpg)![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps61.jpg) 
 
-#### **2.4.3.4同步发送**
+#### 2.4.3.4同步发送
 
 Kafka发送数据时，底层的实现类似于生产者消费者模式。对应的，底层会由主线程代码作为生产者向缓冲区中放数据，而数据发送线程会从缓冲区中获取数据进行发送。Broker接收到数据后进行后续处理。
 
@@ -1188,6 +1124,7 @@ Kafka发送数据时，底层的实现类似于生产者消费者模式。对应
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps62.jpg) 
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps63.jpg) 
+```
 
 package com.atguigu.kafka.test;
 
@@ -1260,17 +1197,17 @@ public class KafkaProducerASynTest {
   }
 
 }
-
+```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps64.jpg) 
 
-### **2****.****4****.****4** **消息分区**
+### 2.4.4 *息分区**
 
-#### **2.4.4.1指定分区**
+#### 2.4.4.1指定分区
 
 Kafka中Topic是对数据逻辑上的分类，而Partition才是数据真正存储的物理位置。所以在生产数据时，如果只是指定Topic的名称，其实Kafka是不知道将数据发送到哪一个Broker节点的。我们可以在构建数据传递Topic参数的同时，也可以指定数据存储的分区编号。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps65.jpg) 
-
+```
 for ( int i = 0; i < 1; i++ ) {
 
   ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", ***\*0\****, "key" + i, "value" + i);
@@ -1294,8 +1231,8 @@ for ( int i = 0; i < 1; i++ ) {
   });
 
 }
-
-#### **2.4.4.2未指定分区**
+```
+#### 2.4.4.2未指定分
 
 指定分区传递数据是没有任何问题的。Kafka会进行基本简单的校验，比如是否为空，是否小于0之类的，但是你的分区是否存在就无法判断了，所以需要从Kafka中获取集群元数据信息，此时会因为长时间获取不到元数据信息而出现超时异常。所以如果不能确定分区编号范围的情况，不指定分区还是一个不错的选择。
 
@@ -1329,7 +1266,7 @@ for ( int i = 0; i < 1; i++ ) {
 
 增加数据后，会根据当前粘性分区中生产的数据量进行判断，是不是需要切换其他的分区。判断地标准就是大于等于批次大小（16K）的2倍，或大于一个批次大小（16K）且需要切换。如果满足条件，下一条数据就会放置到其他分区。
 
-#### **2.4.4.3分区器**
+#### 2.4.4.3分区器
 
 在某些场合中，指定的数据我们是需要根据自身的业务逻辑发往指定的分区的。所以需要自己定义分区编号规则，而不是采用Kafka自动设置就显得尤其必要了。Kafka早期版本中提供了两个分区器，不过在当前kafka版本中已经不推荐使用了。
 
@@ -1337,10 +1274,10 @@ for ( int i = 0; i < 1; i++ ) {
 
 接下来我们就说一下当前版本Kafka中如何定义我们自己的分区规则：分区器
 
-##### **2.4.4.3.1 增加分区器类**
+##### 2.4.4.3.1 增加分区器类
 
 首先我们需要创建一个类，然后实现Kafka提供的分区类接口Partitioner，接下来重写方法。这里我们只关注partition方法即可，因为此方法的返回结果就是需要的分区编号。
-
+```
 package com.atguigu.test;
 
  
@@ -1508,8 +1445,8 @@ public class ProducerPartitionTest {
   }
 
 }
-
-### **2****.****4****.****5** **消息可靠性**
+```
+### 2.4.5 消息可靠性
 
 对于生产者发送的数据，我们有的时候是不关心数据是否已经发送成功的，我们只要发送就可以了。在这种场景中，消息可能会因为某些故障或问题导致丢失，我们将这种情况称之为消息不可靠。虽然消息数据可能会丢失，但是在某些需要高吞吐，低可靠的系统场景中，这种方式也是可以接受的，甚至是必须的。
 
@@ -1519,7 +1456,7 @@ public class ProducerPartitionTest {
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps72.jpg) 
 
-#### **2.4.5.1ACK = 0**
+#### 2.4.5.1ACK = 0
 
 当生产数据时，生产者对象将数据通过网络客户端将数据发送到网络数据流中的时候，Kafka就对当前的数据请求进行了响应（确认应答），如果是同步发送数据，此时就可以发送下一条数据了。如果是异步发送数据，回调方法就会被触发。
 
@@ -1527,7 +1464,7 @@ public class ProducerPartitionTest {
 
 通过图形，明显可以看出，这种应答方式，数据已经走网络给Kafka发送了，但这其实并不能保证Kafka能正确地接收到数据，在传输过程中如果网络出现了问题，那么数据就丢失了。也就是说这种应答确认的方式，数据的可靠性是无法保证的。不过相反，因为无需等待Kafka服务节点的确认，通信效率倒是比较高的，也就是系统吞吐量会非常高。
 
-#### **2.4.5.2ACK = 1**
+#### 2.4.5.2ACK = 1
 
 当生产数据时，Kafka Leader副本将数据接收到并写入到了日志文件后，就会对当前的数据请求进行响应（确认应答），如果是同步发送数据，此时就可以发送下一条数据了。如果是异步发送数据，回调方法就会被触发。
 
