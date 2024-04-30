@@ -831,7 +831,7 @@ redis-cli -p 7002 shutdown
 
 效果：
 
-![image-20210727161152065](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%95%B0%E6%8D%AE%E5%BA%93/Redis/Redis%E7%BC%93%E5%AD%98%E4%B8%8E%E5%8E%9F%E7%90%86/assets/image-20210727161152065.png)
+![image-20240430171212017](https://raw.githubusercontent.com/PeipengWang/picture/master/redis/image-20240430171212017.png)
 
 
 
