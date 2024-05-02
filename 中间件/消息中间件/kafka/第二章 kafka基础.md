@@ -21,7 +21,19 @@ Kafka借鉴了JMS规范的思想，但是却并没有完全遵循JMS规范，因
 将文件内容中的broker.id=1分别改为broker.id=2，broker.id=3
 将文件内容中的9091分别改为9092，9093（如果端口冲突，请重新设置）
 
-这个过程可以生成脚本
+这里包括两个地方：
+
+listeners=PLAINTEXT://:9093
+
+advertised.listeners=PLAINTEXT://43.143.251.77:9093
+
+修改日志位置
+
+```
+log.dirs=/home/kafka/kafka_2.13-3.6.2_2/data
+```
+
+这个过程可以生成脚本（需要完善）
 ```
 #!/bin/bash
 
@@ -35,8 +47,8 @@ copy_and_modify_config() {
     echo "Copied $original_file to $copy_file"
 
     # 修改配置文件中的 broker.id 和端口号
-    sed -i 's/^broker.id=1$/broker.id=2/g' "$copy_file"
-    sed -i 's/^broker.id=3$/broker.id=3/g' "$copy_file"
+    sed -i 's/^broker.id=0$/broker.id=2/g' "$copy_file"
+    sed -i 's/^broker.id=0$/broker.id=3/g' "$copy_file"
     sed -i 's/^9091$/9092/g' "$copy_file"
     sed -i 's/^9091$/9093/g' "$copy_file"
 }
@@ -57,13 +69,24 @@ echo "Modified server3.properties successfully!"
 这个脚本首先定义了一个名为 copy_and_modify_config 的函数，该函数接受两个参数：原始配置文件和要复制到的新文件路径。在函数中，首先使用 cp 命令复制原始配置文件到新文件，然后使用 sed 命令修改新文件中的内容。最后，我们分别调用该函数来复制和修改 server.properties 到 server1.properties、server2.properties 和 server3.properties 文件。
 
 要使用此脚本，只需将其保存为 .sh 文件，例如 copy-and-modify-config-files.sh，然后确保具有执行权限 (chmod +x copy-and-modify-config-files.sh)，最后运行它 (./copy-and-modify-config-files.sh)。执行完毕后，您将得到三个修改后的配置文件副本。
+
+
+
+需要额外注意
+
+```
+zookeeper.connect=localhost:2181
+```
+
+这个参数是加入的zk集群，这个集群的位置就是将要连接的集群
+
 ### 2.1.4 封装启动脚本
 启动 Kafka 集群需要多个步骤，包括启动 ZooKeeper 实例和 Kafka 服务器实例。以下是一个简单的示例脚本，可以用来启动 Kafka 集群。假设您的 Kafka 集群由3个 Kafka 服务器实例和1个 ZooKeeper 实例组成。
 ```
 #!/bin/bash
 # 启动 ZooKeeper
 echo "Starting ZooKeeper..."
-bin/zookeeper-server-start.sh config/zookeeper.properties > /dev/null 2>&1 &
+nohup sh bin/zookeeper-server-start.sh config/zookeeper.properties > /dev/null 2>&1 &
 ZK_PID=$!
 echo "ZooKeeper started with PID $ZK_PID"
 # 等待一段时间以确保 ZooKeeper 启动完成
@@ -71,7 +94,7 @@ sleep 5
 # 启动 Kafka 服务器实例
 for i in {1..3}; do
     echo "Starting Kafka server $i..."
-    bin/kafka-server-start.sh config/server$i.properties > /dev/null 2>&1 &
+    nohup sh bin/kafka-server-start.sh config/server$i.properties > /dev/null 2>&1 &
     KAFKA_PID=$!
     echo "Kafka server $i started with PID $KAFKA_PID"
 done
@@ -82,6 +105,18 @@ echo "Kafka cluster started successfully!"
 在此脚本中，假设您的 Kafka 服务器配置文件为 server1.properties、server2.properties 和 server3.properties，而 ZooKeeper 的配置文件为 zookeeper.properties。您需要根据实际情况调整这些文件的路径和内容。
 
 要运行此脚本，只需将其保存为 .sh 文件，例如 start-kafka-cluster.sh，然后确保具有执行权限 (chmod +x start-kafka-cluster.sh)，最后运行它 (./start-kafka-cluster.sh)。
+
+```
+Starting ZooKeeper...
+ZooKeeper started with PID 12075
+Starting Kafka server 1...
+Kafka server 1 started with PID 12201
+Starting Kafka server 2...
+Kafka server 2 started with PID 12202
+Starting Kafka server 3...
+Kafka server 3 started with PID 12203
+Kafka cluster started successfully!
+```
 
 ## 2.2 集群启动
 
@@ -210,7 +245,7 @@ Kafka Broker中有很多的服务对象，用于实现内部管理和外部通�
 
 每一个Broker在启动时都会创建数据管理器（**LogManager**），用于接收到消息后，完成后续的数据创建，查询，清理等处理。
 
-##### 2.2.3.2.3 创建远程数据管理器**
+##### 2.2.3.2.3 创建远程数据管理器
 
 每一个Broker在启动时都会创建远程数据管理器（RemoteLogManager），用于和其他Broker节点进行数据状态同步。
 
@@ -2161,7 +2196,7 @@ Kafka的分区副本中只有Leader副本具有数据写入的功能，而Follow
 
 在Broker节点中，有一个副本管理器组件（ReplicaManager），除了读写副本、管理分区和副本的功能之外，还有一个重要的功能，那就是管理ISR。这里的管理主要体现在两个方面：
 
-Ø 周期性地查看 ISR 中的副本集合是否需要收缩。这里的收缩是指，把ISR副本集合中那些与Leader差距过大的副本移除的过程。
+周期性地查看 ISR 中的副本集合是否需要收缩。这里的收缩是指，把ISR副本集合中那些与Leader差距过大的副本移除的过程。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps127.jpg) 
 
@@ -2216,81 +2251,50 @@ Kafka会根据消费者发送的参数，返回数据对象ConsumerRecord。返�
 
 消费者消费完数据后，需要将对象关闭用以释放资源。一般情况下，消费者无需关闭。
 
-### **2****.****6****.****2** **消费消息的基本代码**
+### 2.6.2 消费消息的基本代码
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps130.jpg) 
 
+```
 package com.atguigu.test;
-
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-
 import org.apache.kafka.common.TopicPartition;
-
 import org.apache.kafka.common.serialization.StringDeserializer;
-
 import java.time.Duration;
-
 import java.util.Collections;
-
 import java.util.HashMap;
-
 import java.util.Map;
-
 import java.util.Set;
-
 public class KafkaConsumerTest {
-
   public static void main(String[] args) {
-
-​    // TODO 创建消费者配置参数集合
-
-​    Map<String, Object> paramMap = new HashMap<>();
-
-​    paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-
-​    paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-
-​    paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-
-​    paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
-
- 
-
-​    // TODO 通过配置，创建消费者对象
-
-​    KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(paramMap);
-
-​    // TODO 订阅主题
-
-​    consumer.subscribe(Collections.singletonList("test"));
-
-​    // TODO 消费数据
-
-​    final ConsumerRecords<String, String> poll = consumer.poll(Duration.ofMillis(100));
-
-​    // TODO 遍历数据
-
-​    for (ConsumerRecord<String, String> record : poll) {
-
-​      System.out.println( record.value() );
-
-​    }
-
-​    // TODO 关闭消费者
-
-​    consumer.close();
-
+ // TODO 创建消费者配置参数集合
+  Map<String, Object> paramMap = new HashMap<>();
+  paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+  paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
+  // TODO 通过配置，创建消费者对象
+ KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(paramMap);
+ // TODO 订阅主题
+ consumer.subscribe(Collections.singletonList("test"));
+ // TODO 消费数据
+ final ConsumerRecords<String, String> poll = consumer.poll(Duration.ofMillis(100));
+ // TODO 遍历数据
+  for (ConsumerRecord<String, String> record : poll) {
+    System.out.println( record.value() );
+ }
+ // TODO 关闭消费者
+   consumer.close();
   }
-
 }
+```
 
-### **2****.****6****.****3** **消费消息的基本原理**
+
+
+### 2.6.3 消费消息的基本原理
 
 从数据处理的角度来讲，消费者和生产者的处理逻辑都相对比较简单。
 
@@ -2322,7 +2326,7 @@ l 如果kafka的分区数据在内部可以存储的时间更长一些，再由�
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps135.jpg) 
 
-##### **2.6.3.1.2 消费者组****Consumer Group**
+##### 2.6.3.1.2 消费者组Consumer Group
 
 消费者可以根据自身的消费能力主动拉取Kafka的数据，但是毕竟自身的消费能力有限，如果主题分区的数据过多，那么消费的时间就会很长。对于kafka来讲，数据就需要长时间的进行存储，那么对Kafka集群资源的压力就非常大。
 
@@ -2396,7 +2400,7 @@ Group Coordinator是Broker上的一个组件，用于管理和调度消费者组
 
 Kafka提供的分区分配策略常用的有4个：
 
-**Ø** RoundRobinAssignor（轮询分配策略）
+RoundRobinAssignor（轮询分配策略）
 
 每个消费者组中的消费者都会含有一个自动生产的UUID作为memberid。
 

@@ -198,16 +198,14 @@ $ bin/kafka-server-start.sh config/server.properties
 #### 1.2.2.2 查询主题
 
 DOS窗口输入指令，查看所有主题
-Kafka是通过***kafka-topics.sh**文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
+Kafka是通过**kafka-topics.sh**文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
 **--bootstrap-server** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
  **list** : 表示对所有主题的查询操作，是个操作参数，后面无需增加参数值
 
 指令
 ```
-kafka-topics.sh --bootstrap-server localhost:9092 --list
+/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
 ```
-![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps15.jpg) 
-
  DOS窗口输入指令，查看指定主题信息
 
 ***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
@@ -216,7 +214,7 @@ kafka-topics.sh --bootstrap-server localhost:9092 --list
 
 指令
 ```
-kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic test
+bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic test
 ```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps16.jpg) 
 
