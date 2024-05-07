@@ -347,10 +347,8 @@ Kafka最开始的应用场景就是日志场景或MQ场景，更多的扮演着�
 
 #### 2.3.2.1 执行指令
 
-![image-20240428231411267](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231411267.png) 
 ```
- cd /opt/module/kafka
- bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic first-topic
+bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic first-topic
 ```
 #### 2.3.2.2 ZooKeeper节点变化
 
@@ -384,12 +382,10 @@ Kafka最开始的应用场景就是日志场景或MQ场景，更多的扮演着�
 主题创建后，需要找到一个用于存储分区数据的位置，根据上面ZooKeeper存储的节点配置信息可以知道，当前主题的分区数量为1，副本数量为1，那么数据存储的位置就是副本所在的broker节点，从当前数据来看，数据存储在我们的第三台broker上。
 ```
 cd /opt/module/kafka/datas
-ll
 ```
 ![image-20240428231504895](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231504895.png) 
 ```
 cd first-topic-0
-ll
 ```
 
 ![image-20240428231523049](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231523049.png) 
@@ -404,7 +400,6 @@ ll
 
 ![image-20240428231533708](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231533708.png)
 ```
-cd /opt/module/kafk
 bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic second-topic --partitions 3
 ```
 #### 2.3.3.2 ZooKeeper节点变化
@@ -451,7 +446,6 @@ bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic secon
 主题创建后，需要找到一个用于存储分区数据的位置，根据上面ZooKeeper存储的节点配置信息可以知道，当前主题的分区数量为3，副本数量为1，那么数据存储的位置就是每个分区Leader副本所在的broker节点。
 ```
  cd /opt/module/kafka/datas
- ll
 ```
 
 ![image-20240428231629017](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240428231629017.png) 
@@ -478,7 +472,6 @@ ll
 
 #### 2.3.4.1 执行指令
 ```
-cd /opt/module/kafka
 bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic third-topic --partitions 3 --replication-factor 3
 ```
 #### 2.3.4.2 ZooKeeper节点变化
@@ -524,39 +517,39 @@ bin/kafka-topics.sh --bootstrap-server kafka-broker1:9092 --create --topic third
 
 主题创建后，需要找到一个用于存储分区数据的位置，根据上面ZooKeeper存储的节点配置信息可以知道，当前主题的分区数量为3，副本数量为3，那么数据存储的位置就是每个分区副本所在的broker节点。
 
-[atguigu@kafka-broker1 ~]$ cd /opt/module/kafka/datas
-
-[atguigu@kafka-broker1 datas]$ ll
+```
+cd /opt/module/kafka/datas
+```
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps41.jpg) 
 
-[atguigu@kafka-broker1 datas]$ cd third-topic-2
-
-[atguigu@kafka-broker1 third-topic-2]$ ll
+```
+cd third-topic-2
+```
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps42.jpg) 
 
-[atguigu@kafka-broker2 ~]$ cd /opt/module/kafka/datas
-
-[atguigu@kafka-broker2 datas]$ ll
+```
+ cd /opt/module/kafka/datas
+```
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps43.jpg) 
 
-[atguigu@kafka-broker2 datas]$ cd third-topic-0
-
-[atguigu@kafka-broker2 third-topic-0]$ ll
+```
+ cd third-topic-0
+```
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps44.jpg) 
 
-[atguigu@kafka-broker3 ~]$ cd /opt/module/kafka/datas
-
-[atguigu@kafka-broker3 datas]$ ll
+```
+cd /opt/module/kafka/datas
+```
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps45.jpg) 
 
-[atguigu@kafka-broker3 datas]$ cd third-topic-1
-
-[atguigu@kafka-broker3 third-topic-1]$ ll
+```
+ cd third-topic-1
+```
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps46.jpg) 
 
@@ -604,7 +597,7 @@ d. 分区副本数量大于1且小于Short.MaxValue，一般取值小于等于Br
 
 **default.replication.factor**（默认值为1）
 
-(2) 在创建主题时，如果使用了replica-assignment参数，那么就按照指定的方案来进行分区副本的创建；如果没有指定replica-assignment参数，那么就按照Kafka内部逻辑来分配，内部逻辑按照机架信息分为两种策略：【未指定机架信息】和【指定机架信息】。当前课程中采用的是【未指定机架信息】副本分配策略：
+(2) 在创建主题时，如果使用了replica-assignment参数，那么就按照指定的方案来进行分区副本的创建；如果没有指定replica-assignment参数，那么就按照Kafka内部逻辑来分配，内部逻辑按照机架信息分为两种策略：【未指定机架信息】和【指定机架信息】。**当前课程中采用的是【未指定机架信息】副本分配策略：**
 
 分区起始索引设置0
 
@@ -612,82 +605,58 @@ d. 分区副本数量大于1且小于Short.MaxValue，一般取值小于等于Br
 
 副本起始索引 = （分区编号 + 随机值） %  BrokerID列表长度。
 
-其他副本索引 = 。。。随机值（基本算法为使用随机值执行多次模运算）
+其他副本索引 =  随机值（基本算法为使用随机值执行多次模运算）
 
+**实例：**
 
-##################################################################\
+```
+假设 当前分区编号 : 0
+BrokerID列表 :【1，2，3，4】
+副本数量 : 4
+随机值（BrokerID列表长度）: 2
+副本分配间隔随机值（BrokerID列表长度）: 2
+第一个副本索引：（分区编号 + 随机值）% BrokerID列表长度 =（0 + 2）% 4 = 2
+第一个副本所在BrokerID : 3
+第二个副本索引（第一个副本索引 + （1 +（副本分配间隔 + 0）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+0）%3））% 4 = 1
+第二个副本所在BrokerID：2
+ 第三个副本索引：（第一个副本索引 + （1 +（副本分配间隔 + 1）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+1）%3））% 4 = 3
+ 第三个副本所在BrokerID：4
+ 第四个副本索引：（第一个副本索引 + （1 +（副本分配间隔 + 2）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+2）%3））% 4 = 0\
+第四个副本所在BrokerID：1
+ 最终分区0的副本所在的Broker节点列表为【3，2，4，1】
+```
 
-#\ 假设\ 
+ **其他分区采用同样算法**
 
-   当前分区编号 : 0\
+通过索引位置获取副本节点ID
 
-   BrokerID列表 :【1，2，3，4】\
-
-   副本数量 : 4\
-
- 随机值（BrokerID列表长度）: 2\
-
-   副本分配间隔随机值（BrokerID列表长度）: 2\
-
-##################################################################\
-
-\# 第一个副本索引：（分区编号 + 随机值）% BrokerID列表长度 =（0 + 2）% 4 = 2\
-
-\# 第一个副本所在BrokerID : 3
-
- 
-
-\# 第二个副本索引（第一个副本索引 + （1 +（副本分配间隔 + 0）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+0）%3））% 4 = 1\
-
-\# 第二个副本所在BrokerID：2
-
- 
-
-\# 第三个副本索引：（第一个副本索引 + （1 +（副本分配间隔 + 1）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+1）%3））% 4 = 3\
-
-\# 第三个副本所在BrokerID：4
-
- 
-
-\# 第四个副本索引：（第一个副本索引 + （1 +（副本分配间隔 + 2）% （BrokerID列表长度 - 1））） % BrokerID列表长度 = （2 +（1+（2+2）%3））% 4 = 0\
-
-\# 第四个副本所在BrokerID：1
-
- 
-
-\# 最终分区0的副本所在的Broker节点列表为【3，2，4，1】
-
-\# 其他分区采用同样算法
-
-Ø 通过索引位置获取副本节点ID
-
-Ø 保存分区以及对应的副本ID列表。
+保存分区以及对应的副本ID列表。
 
 (3) 通过ZK客户端在ZK端创建节点：
 
-Ø 在 /config/topics节点下，增加当前主题节点，节点类型为持久类型。
+在 /config/topics节点下，增加当前主题节点，节点类型为持久类型。
 
-Ø 在 /brokers/topics节点下，增加当前主题及相关节点，节点类型为持久类型。
+在 /brokers/topics节点下，增加当前主题及相关节点，节点类型为持久类型。
 
 (4) Controller节点启动后，会在/brokers/topics节点增加监听器，一旦节点发生变化，会触发相应的功能：
 
-Ø 获取需要新增的主题信息
+获取需要新增的主题信息
 
-Ø 更新当前Controller节点保存的主题状态数据
+更新当前Controller节点保存的主题状态数据
 
-Ø 更新分区状态机的状态为：NewPartition
+更新分区状态机的状态为：NewPartition
 
-Ø 更新副本状态机的状态：NewReplica
+更新副本状态机的状态：NewReplica
 
-Ø 更新分区状态机的状态为：OnlinePartition，从正常的副本列表中的获取第一个作为分区的**Leader副本**，所有的副本作为分区的同步副本列表，我们称之为**ISR( In-Sync Replica)。**在ZK路径brokers/topics/主题名**上增加分区节点**partitions，**及状态**state**节点。
+更新分区状态机的状态为：OnlinePartition，从正常的副本列表中的获取第一个作为分区的**Leader副本**，所有的副本作为分区的同步副本列表，我们称之为**ISR( In-Sync Replica)。**在ZK路径brokers/topics/主题名**上增加分区节点**partitions，**及状态**state**节点。
 
-Ø 更新副本状态机的状态：OnlineReplica
+更新副本状态机的状态：OnlineReplica
 
 (5) Controller节点向主题的各个分区副本所属Broker节点发送LeaderAndIsrRequest请求，向所有的Broker发送UPDATE_METADATA请求，更新自身的缓存。
 
-Ø Controller向分区所属的Broker发送请求
+Controller向分区所属的Broker发送请求
 
-Ø Broker节点接收到请求后，根据分区状态信息，设定当前的副本为Leader或Follower，并创建底层的数据存储文件目录和空的数据文件。
+Broker节点接收到请求后，根据分区状态信息，设定当前的副本为Leader或Follower，并创建底层的数据存储文件目录和空的数据文件。
 
 文件目录名：主题名 + 分区编号
 
@@ -2346,7 +2315,7 @@ Group Coordinator是Broker上的一个组件，用于管理和调度消费者组
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps138.jpg) 
 
-#### **2.6.3.3消费****者分配****策略Assignor**
+#### 2.6.3.3消费者分配策略Assignor
 
 消费者想要拉取主题分区的数据，首先必须要加入到一个组中。
 
