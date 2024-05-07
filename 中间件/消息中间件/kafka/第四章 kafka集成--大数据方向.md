@@ -1,16 +1,16 @@
-# **第1章** ***\*Kafka集成\****
+# **第1章** Kafka集成
 
-## **4****.****1** **大数据应用场景**
+## **4.1** **大数据应用场景**
 
-### **4****.****1****.****1** **Flume集成**
+### **4.1.1** **Flume集成**
 
 Flume也是日志采集器，类似于ELK中的LogStash软件功能。早期设计的功能就是通过Flume采集过来数据，然后将数据写入HDFS分布式文件存储系统，不过，随着功能的扩展，现在也可以把采集的数据写入到kafka当中，作为实时数据使用。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/wps42.jpg) 
 
-#### **4.1.1.1****安装Flume**
+#### **4.1.1.1安装Flume**
 
-##### **4.1.1.1****.1****安装地址**
+##### **4.1.1.1.1安装地址**
 
 Flume官网地址：http://flume.apache.org/
 
@@ -18,7 +18,7 @@ Flume官网地址：http://flume.apache.org/
 
 下载地址：http://archive.apache.org/dist/flume/
 
-##### **4.1.1.****1.****2安装部署**
+##### **4.1.1.1.2安装部署**
 
 1) 将压缩包apache-flume-1.10.1-bin.tar.gz上传到linux系统的/opt/software目录下
 2) 将软件压缩包解压缩到/opt/module目录中，并修改名称
@@ -41,7 +41,7 @@ export JAVA_OPTS="-Xms4096m -Xmx4096m -Dcom.sun.management.jmxremote"
 
 #### **4.1.1.2 增加集成配置**
 
-##### **4.1.****1.****2.1 flume采集数据到Kafka的配置**
+##### **4.1.1.2.1 flume采集数据到Kafka的配置**
 
 1) 在linux系统解压缩后的flume软件目录中，创建job目录
 
@@ -107,11 +107,11 @@ a1.sources.r1.channels = c1
 
 ### **4.1.1.3 集成测试**
 
-##### **4.1.****1.****3.1 启动Zookeeper、Kafka集群**
+##### **4.1.1.3.1 启动Zookeeper、Kafka集群**
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/wps43.jpg) 
 
-##### **4.1.****1.****3.2 执行flume操作采集数据到Kafka**
+##### **4.1.1.3.2 执行flume操作采集数据到Kafka**
 
 \# 进入flume
 
@@ -121,7 +121,7 @@ cd /opt/module/flume
 
 bin/flume-ng agent -n a1 -c conf/ -f job/file_to_kafka.conf
 
-### **4.****1.****2 SparkStreaming集成**
+### **4.1.2 SparkStreaming集成**
 
 Spark是分布式计算引擎，是一款非常强大的离线分布式计算框架，其中的SparkStreaming模块用于准实时数据处理，其中就可以将Kafka作为数据源进行处理。
 
@@ -129,7 +129,7 @@ Spark是分布式计算引擎，是一款非常强大的离线分布式计算框
 
 #### **4.1.2.1 编写功能代码**
 
-##### **4.****1.****2.1.1 修改pom.xml文件，增加依赖**
+##### **4.1.2.1.1 修改pom.xml文件，增加依赖**
 
 <dependency>
 
@@ -161,7 +161,7 @@ Spark是分布式计算引擎，是一款非常强大的离线分布式计算框
 
 </dependency>
 
-##### **4.****1.****2.1.2 编写功能代码**
+##### **4.1.2.1.2 编写功能代码**
 
 package com.atguigu.kafka.test;
 
@@ -287,15 +287,15 @@ public class Kafka4SparkStreamingTest {
 
 #### **4.1.2.2 集成测试**
 
-##### **4.****1.****2.2.1 启动Zookeeper、Kafka集群**
+##### **4.1.2.2.1 启动Zookeeper、Kafka集群**
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/wps45.jpg) 
 
-##### **4.****1.****2.2.2 执行Spark程序**
+##### **4.1.2.2.2 执行Spark程序**
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/wps46.jpg) 
 
-### **4.****1.****3 Flink集成**
+### **4.1.3 Flink集成**
 
 Flink是分布式计算引擎，是一款非常强大的实时分布式计算框架，可以将Kafka作为数据源进行处理。
 
@@ -303,7 +303,7 @@ Flink是分布式计算引擎，是一款非常强大的实时分布式计算框
 
 #### **4.1.3.1 编写功能代码**
 
-##### **4.****1.****3.1.1 修改pom.xml文件，增加相关依赖**
+##### **4.1.3.1.1 修改pom.xml文件，增加相关依赖**
 
 <dependency>
 
@@ -345,7 +345,7 @@ Flink是分布式计算引擎，是一款非常强大的实时分布式计算框
 
 </dependency>
 
-##### **4.****1.****3.1.2 编写功能代码**
+##### **4.1.3.1.2 编写功能代码**
 
 package com.atguigu.kafka;
 
@@ -407,17 +407,17 @@ public class Kafka4FlinkTest {
 
 #### **4.1.3.2 集成测试**
 
-##### **4.****1.****3.2.1 启动Zookeeper、Kafka集群**
+##### **4.1.3.2.1 启动Zookeeper、Kafka集群**
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/wps48.jpg) 
 
-##### **4.****1.****3.2.2 执行Flink程序**
+##### **4.1.3.2.2 执行Flink程序**
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/wps49.jpg) 
 
-## **4****.****2** **Java****应用场景**
+## **4.2** **Java应用场景**
 
-### **4.****2.1** **SpringBoot集成**
+### **4.2.1** **SpringBoot集成**
 
 Spring Boot帮助您创建可以运行的、独立的、生产级的基于Spring的应用程序。您可以使用Spring Boot创建Java应用程序，这些应用程序可以通过使用java-jar或更传统的war部署启动。
 
@@ -435,11 +435,11 @@ Spring Boot帮助您创建可以运行的、独立的、生产级的基于Spring
 
 #### **4.2.1.1 创建SpringBoot项目**
 
-##### **4.****2****.1.1****.1** **创建SpringBoot项目**
+##### **4.2.1.1.1** **创建SpringBoot项目**
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/wps51.jpg) 
 
-##### **4.****2.1****.1.2 修改pom.xml文件**
+##### **4.2.1.1.2 修改pom.xml文件**
 
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -595,7 +595,7 @@ Spring Boot帮助您创建可以运行的、独立的、生产级的基于Spring
 
 </project>
 
-##### **4.****2.1****.1.3 在resources中增加application.yml文件**
+##### **4.2.1.1.3 在resources中增加application.yml文件**
 
 spring:
 
@@ -699,7 +699,7 @@ server:
 
 #### **4.2.1.2 编写功能代码**
 
-##### **4.2.1****.2.1** **创建配置类：SpringBootKafkaConfig**
+##### **4.2.1.2.1** **创建配置类：SpringBootKafkaConfig**
 
 package com.atguigu.springkafka.config;
 
@@ -713,7 +713,7 @@ public class SpringBootKafkaConfig {
 
 }
 
-##### **4.2.****1.****2****.2** **创建生产者控制器：KafkaProducerController**
+##### **4.2.1.2.2** **创建生产者控制器：KafkaProducerController**
 
 package com.atguigu.springkafka.controller;
 
@@ -787,7 +787,7 @@ public class KafkaProducerController {
 
 }
 
-##### **4.****2****.****1.****2.3 创建消费者：KafkaDataConsumer**
+##### **4.2.1.2.3 创建消费者：KafkaDataConsumer**
 
 package com.atguigu.springkafka.component;
 
@@ -845,17 +845,17 @@ public class KafkaDataConsumer {
 
 #### **4.2.1.3 集成测试**
 
-##### **4.****2****.****1****.****3.****1 启动ZooKeeper**
+##### **4.2.1.3.1 启动ZooKeeper**
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/wps52.jpg) 
 
-##### **4.****2****.****1****.****3.2** **启动Kafka**
+##### **4.2.1.3.2** **启动Kafka**
 
-##### **4.****2****.****1****.****3.3** **启动应用程序**
+##### **4.2.1.3.3** **启动应用程序**
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/wps53.jpg) 
 
-##### **4.****2****.****1****.****3.4** **生产数据测试**
+##### **4.2.1.3.4** **生产数据测试**
 
 可以采用任何的工具进行测试，我们这里采用postman发送POST数据
 

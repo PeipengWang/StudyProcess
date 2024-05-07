@@ -473,9 +473,9 @@ chmod 777 xsync
 
 
 
-#### **3.10.****2****.****5** **SSH无密登录配置**
+#### **3.10.2.5** **SSH无密登录配置**
 
-分发文件时，需要通过脚本切换主机进行指令操作，切换主机时，是需要输入密码的，每一次都输入就显得有点麻烦，所以这里以虚拟机kafka-broker1为例配置SSH免密登录(***\*其他节点执行同样步骤即可\****)，配置完成后，脚本执行时就不需要输入密码了。
+分发文件时，需要通过脚本切换主机进行指令操作，切换主机时，是需要输入密码的，每一次都输入就显得有点麻烦，所以这里以虚拟机kafka-broker1为例配置SSH免密登录(其他节点执行同样步骤即可\)，配置完成后，脚本执行时就不需要输入密码了。
 
 a. 生成公钥和私钥
 
@@ -495,11 +495,11 @@ ssh-copy-id kafka-broker2
 
 ssh-copy-id kafka-broker3
 
-### **3****.****10****.****3** **安装JDK1.8**
+### **3.10.3** **安装JDK1.8**
 
 #### **3.10.3.1卸载现有JDK**
 
-***\*# 不同节点都要执行操作\****
+# 不同节点都要执行操作\
 
 rpm -qa | grep -i java | xargs -n1 sudo rpm -e --nodeps
 
@@ -551,7 +551,7 @@ java -version
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps23.jpg) 
 
-#### **3.10.3.****6分发软件**
+#### **3.10.3.6分发软件**
 
 \# 分发环境变量文件
 
@@ -565,9 +565,9 @@ cd /opt/module
 
 xsync java
 
-***\*# 在每个节点让环境变量生效\****
+# 在每个节点让环境变量生效\
 
-### **3****.****10****.****4** **安装ZooKeeper**
+### **3.10.4** **安装ZooKeeper**
 
 #### **3.10.4.1上传ZooKeeper压缩包**
 
@@ -637,13 +637,13 @@ vim zoo.cfg
 
 (2) 修改zoo.cfg文件
 
-***\*# 以下内容为修改内容\****
+# 以下内容为修改内容\
 
 dataDir=/opt/module/zookeeper/zkData
 
  
 
-***\*# 以下内容为新增内容\****
+# 以下内容为新增内容\
 
 \####################### cluster ##########################
 
@@ -669,7 +669,7 @@ server.3=kafka-broker3:2888:3888
 
 #### **3.10.4.5启动ZooKeeper**
 
-***\*# 在每个节点下执行如下操作\****
+# 在每个节点下执行如下操作\
 
 \# 进入zookeeper目录
 
@@ -681,7 +681,7 @@ bin/zkServer.sh start
 
 #### **3.10.4.6关闭ZooKeeper**
 
-***\*# 在每个节点下执行如下操作\****
+# 在每个节点下执行如下操作\
 
 \# 进入zookeeper目录
 
@@ -693,7 +693,7 @@ bin/zkServer.sh stop
 
 #### **3.10.4.7查看ZooKeeper状态**
 
-***\*# 在每个节点下执行如下操作\****
+# 在每个节点下执行如下操作\
 
 \# 进入zookeeper目录
 
@@ -703,7 +703,7 @@ cd /opt/module/zookeeper
 
 bin/zkServer.sh status
 
-#### **3.10.****4****.****8分发软件**
+#### **3.10.4.8分发软件**
 
 \# 进入/opt/module路径
 
@@ -715,19 +715,19 @@ xsync zookeeper
 
  
 
-***\*# 分别将不同虚拟机\*******\*/opt/module/zookeeper/zkData目录\*******\*下\*******\*myid\*******\*文件进行修改\****
+# 分别将不同虚拟机/opt/module/zookeeper/zkData目录下myid文件进行修改\
 
 vim /opt/module/zookeeper/zkData/myid
 
  
 
-***\*# kafka-broker1:1\****
+# kafka-broker1:1\
 
-***\*# kafka-broker2:2\****
+# kafka-broker2:2\
 
-***\*# kafka-broker3:3\****
+# kafka-broker3:3\
 
-#### **3.10.4.****9****启停脚本**
+#### **3.10.4.9启停脚本**
 
 ZooKeeper软件的启动和停止比较简单，但是每一次如果都在不同服务器节点执行相应指令，也会有点麻烦，所以我们这里将指令封装成脚本文件，方便我们的调用。
 
@@ -815,7 +815,7 @@ zk.sh status
 
 zk.sh stop
 
-#### **3.10.4.****10****客户端工具安装**
+#### **3.10.4.10客户端工具安装**
 
 我们可以通过ZooKeeper软件自带命令行客户端对保存的信息进行访问，也可以采用一些工具软件进行访问，这里我们给大家介绍一个ZooKeeper的客户端工具prettyZoo。
 
@@ -833,7 +833,7 @@ zk.sh stop
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps27.jpg) 
 
-### **3****.****10****.****5** **安装Kafka**
+### **3.10.5** **安装Kafka**
 
 #### **3.10.5.1上传Kafka压缩包**
 
@@ -879,13 +879,13 @@ vim server.properties
 
 \#broker的全局唯一编号，每个服务节点不能重复，只能是数字。
 
-***\*broker.id=1\****
+broker.id=1\
 
  
 
 \#broker对外暴露的IP和端口 （每个节点单独配置）
 
-advertised.listeners=PLAINTEXT://***\*kafka-broker1\****:9092
+advertised.listeners=PLAINTEXT://kafka-broker1\:9092
 
 \#处理网络请求的线程数量
 
@@ -909,7 +909,7 @@ socket.request.max.bytes=104857600
 
 \#kafka运行日志(数据)存放的路径，路径不需要提前创建，kafka自动帮你创建，可以配置多个磁盘路径，路径与路径之间可以用"，"分隔
 
-***\*log.dirs=/opt/module/kafka/datas\****
+log.dirs=/opt/module/kafka/datas\
 
 \#topic在当前broker上的分区个数
 
@@ -937,7 +937,7 @@ log.retention.check.interval.ms=300000
 
 \#配置连接Zookeeper集群地址（在zk根目录下创建/kafka，方便管理）
 
-***\*zookeeper.connect=kafka-broker1:2181,kafka-broker2:2181,kafka-broker3:2181/kafka\****
+zookeeper.connect=kafka-broker1:2181,kafka-broker2:2181,kafka-broker3:2181/kafka\
 
 #### **3.10.5.4分发kafka软件**
 
@@ -953,7 +953,7 @@ xsync kafka
 
  
 
-***\*# 按照上面的配置文件内容，在每一个Kafka节点进行配置，请注意\*******\*配置文件中\*******\*红色字体内容\****
+# 按照上面的配置文件内容，在每一个Kafka节点进行配置，请注意配置文件中红色字体内容\
 
 vim /opt/module/kafka/config/server.properties
 
@@ -981,7 +981,7 @@ xsync /etc/profile.d/my_env.sh
 
  
 
-***\*#\**** ***\*每个节点执行刷新操作\****
+#\ 每个节点执行刷新操作\
 
 source /etc/profile.d/my_env.sh
 
@@ -1073,7 +1073,7 @@ kfk.sh start
 
 kfk.sh stop
 
-***\*注意\****：停止Kafka集群时，一定要等Kafka所有节点进程全部停止后再停止ZooKeeper集群。因为Zookeeper集群当中记录着Kafka集群相关信息，Zookeeper集群一旦先停止，Kafka集群就没有办法再获取停止进程的信息，只能手动杀死Kafka进程了。
+注意\：停止Kafka集群时，一定要等Kafka所有节点进程全部停止后再停止ZooKeeper集群。因为Zookeeper集群当中记录着Kafka集群相关信息，Zookeeper集群一旦先停止，Kafka集群就没有办法再获取停止进程的信息，只能手动杀死Kafka进程了。
 
 (4) 联合脚本
 
@@ -1217,7 +1217,7 @@ cluster.sh start
 
 cluster.sh stop
 
-### **3****.****10****.****6** **测试集群**
+### **3.10.6** **测试集群**
 
 #### **3.10.6.1启动Kafka集群**
 
@@ -1261,11 +1261,11 @@ xcall jps
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps34.jpg) 
 
-## **3****.****11** **Kafka-Eagle监控**
+## **3.11** **Kafka-Eagle监控**
 
 Kafka-Eagle框架可以监控Kafka集群的整体运行情况，在生产环境中经常使用。
 
-### **3****.****11****.****1** **MySQL环境准备**
+### **3.11.1** **MySQL环境准备**
 
 Kafka-Eagle的安装依赖于MySQL，MySQL主要用来存储可视化展示的数据。如果集群中之前安装过MySQL可以跳过该步骤。
 
@@ -1303,9 +1303,9 @@ cd /opt/software/mysql
 
 sh install_mysql.sh 
 
-***\*# 安装得过程略慢，请耐心等候\****
+# 安装得过程略慢，请耐心等候\
 
-#### **3.11.1.****3** **mysql的基本配置**
+#### **3.11.1.3** **mysql的基本配置**
 
 \#!/bin/bash
 
@@ -1393,9 +1393,9 @@ flush privileges;
 
 exit;
 
-***\*# 退出后，请重新登录后进行确认\****
+# 退出后，请重新登录后进行确认\
 
-### **3****.****11****.****2** **修改Kafka集群配置**
+### **3.11.2** **修改Kafka集群配置**
 
 修改/opt/module/kafka/bin/kafka-server-start.sh脚本文件中的内容
 
@@ -1409,13 +1409,13 @@ if [ "x$KAFKA_HEAP_OPTS" = "x" ]; then
 
 fi
 
-***\*注意：每个节点都要进行修改。\****
+注意：每个节点都要进行修改。\
 
 \# 分发修改后得文件
 
 xsync /opt/module/kafka/bin/kafka-server-start.sh
 
-### **3****.****11****.****3** **Kafka-Eagle安装**
+### **3.11.3** **Kafka-Eagle安装**
 
 #### **3.11.3.1安装包准备**
 
@@ -1457,9 +1457,9 @@ mv efak-web-3.0.1 efak
 
 \######################################
 
-***\*efak.zk.cluster.alias=cluster1\****
+efak.zk.cluster.alias=cluster1\
 
-***\*cluster1.zk.list=kafka-broker1:2181,kafka-broker2:2181,kafka-broker3:2181/kafka\****
+cluster1.zk.list=kafka-broker1:2181,kafka-broker2:2181,kafka-broker3:2181/kafka\
 
  
 
@@ -1659,13 +1659,13 @@ cluster3.efak.ssl.cgroup.topics=
 
 \# 配置mysql连接
 
-***\*efak.driver=com.mysql.jdbc.Driver\****
+efak.driver=com.mysql.jdbc.Driver\
 
-***\*efak.url=jdbc:mysql://kafka-broker1:3306/ke?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull\****
+efak.url=jdbc:mysql://kafka-broker1:3306/ke?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull\
 
-***\*efak.username=root\****
+efak.username=root\
 
-***\*efak.password=000000\****
+efak.password=000000\
 
 \######################################
 
@@ -1739,13 +1739,13 @@ http://kafka-broker1:8048/
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/wps40.jpg) 
 
-## **3****.****12** **KRaft模式**
+## **3.12** **KRaft模式**
 
 Kafka作为一种高吞吐量的分布式发布订阅消息系统，在消息应用中广泛使用，尤其在需要实时数据处理和应用程序活动跟踪的场景，kafka已成为首选服务。在Kafka2.8之前，Kafka强依赖zookeeper来负责集群元数据的管理，这也导致当Zookeeper集群性能发生抖动时，Kafka的性能也会收到很大的影响。2.8版本之后，kafka开始提供KRaft（Kafka Raft，依赖Java 8+ ）模式，开始去除对zookeeper的依赖。最新的3.6.1版本中，Kafka依然兼容zookeeper Controller，但Kafka Raft元数据模式，已经可以在不依赖zookeeper的情况下独立启动Kafka了。官方预计会在Kafka 4.0中移除ZooKeeper，让我们拭目以待。
 
 ![img](C:/Users/wangp/AppData/Local/Temp/ksohtml2916/wps41.jpg) 
 
-### **3****.****12****.****1** **kraft模式的优势**
+### **3.12.1** **kraft模式的优势**
 
 Ø 更简单的部署和管理——通过只安装和管理一个应用程序，无需安装更多的软件，简化软件的安装部署。这也使得在边缘的小型设备中更容易利用 Kafka。
 
@@ -1757,7 +1757,7 @@ Kafka作为一种高吞吐量的分布式发布订阅消息系统，在消息应
 
 Ø controller不再动态选举，而是由配置文件规定。这样我们可以有针对性的加强controller节点的配置，而不是像以前一样对随机controller节点的高负载束手无策。
 
-### **3****.****12****.****2** **Kafka-KRaft集群部署**
+### **3.12.2** **Kafka-KRaft集群部署**
 
 #### **3.12.2.1在三个节点解压kafka压缩包**
 
@@ -1773,7 +1773,7 @@ tar -zxvf kafka_2.12-3.6.1.tgz -C /opt/module/
 
 mv /opt/module/kafka_2.12-3.6.1/ /opt/module/kafka-kraft
 
-#### **3.12.2.2修改conf****ig****/kraft/server.properties配置文件**
+#### **3.12.2.2修改config/kraft/server.properties配置文件**
 
 \#kafka的角色（controller相当于主机、broker节点相当于从机，主机类似zk功能）
 
@@ -1833,11 +1833,11 @@ cd /opt/module/kafka-kraft
 
 bin/kafka-storage.sh random-uuid
 
-***\*J7s9e8PPTKOO47PxzI39VA\****
+J7s9e8PPTKOO47PxzI39VA\
 
 Ø 用生成的ID格式化每一个kafka数据存储目录
 
-bin/kafka-storage.sh format -t ***\*J7s9e8PPTKOO47PxzI39VA\**** -c /opt/module/kafka-kraft/config/kraft/server.properties
+bin/kafka-storage.sh format -t J7s9e8PPTKOO47PxzI39VA\ -c /opt/module/kafka-kraft/config/kraft/server.properties
 
 #### **3.12.2.5启停Kafka集群**
 
@@ -1847,11 +1847,11 @@ cd /opt/module/kafka-kraft
 
  
 
-\# ***\*执行\*******\*启动脚本\****
+\# 执行启动脚本\
 
 bin/kafka-server-start.sh -daemon config/kraft/server.properties
 
-\# ***\*执行停止命令\****
+\# 执行停止命令\
 
 bin/kafka-server-stop.sh
 
