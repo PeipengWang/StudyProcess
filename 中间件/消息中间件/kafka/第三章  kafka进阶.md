@@ -1,6 +1,6 @@
-# **第1章** Kafka进阶
+# 第三章 Kafka进阶
 
-## 3.1 **Controller选举**
+## 3.1 **Controller选举**与脑裂现象
 
 Controller，是Apache Kafka的核心组件。它的主要作用是在Apache Zookeeper的帮助下管理和协调控制整个Kafka集群。
 
@@ -12,7 +12,7 @@ Controller，是Apache Kafka的核心组件。它的主要作用是在Apache Zoo
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps2.jpg) 
 
-有一种特殊的情况，就是Controller节点并没有宕掉，而是因为网络的抖动，不稳定，导致和ZooKeeper之间的会话超时，那么此时，整个Kafka集群就会认为之前的Controller已经下线（退出）从而选举出新的Controller，而之前的Controller的网络又恢复了，以为自己还是Controller了，继续管理整个集群，那么此时，整个Kafka集群就有两个controller进行管理，那么其他的broker就懵了，不知道听谁的了，这种情况，我们称之为脑裂现象，为了解决这个问题，Kafka通过一个任期（epoch:纪元）的概念来解决，也就是说，每一个Broker当选Controller时，会告诉当前Broker是第几任Controller，一旦重新选举时，这个任期会自动增1，那么不同任期的Controller的epoch值是不同的，那么旧的controller一旦发现集群中有新任controller的时候，那么它就会完成退出操作（清空缓存，中断和broker的连接，并重新加载最新的缓存），让自己重新变成一个普通的Broker。
+有一种特殊的情况，就是Controller节点并没有宕掉，而是因为网络的抖动，不稳定，导致和ZooKeeper之间的会话超时，那么此时，整个Kafka集群就会认为之前的Controller已经下线（退出）从而选举出新的Controller，而之前的Controller的网络又恢复了，以为自己还是Controller了，继续管理整个集群，那么此时，整个Kafka集群就有两个controller进行管理，那么其他的broker就懵了，不知道听谁的了，这种情况，我们称之为**脑裂现象**，为了解决这个问题，Kafka通过一个任期（epoch:纪元）的概念来解决，也就是说，每一个Broker当选Controller时，会告诉当前Broker是第几任Controller，一旦重新选举时，这个任期会自动增1，那么不同任期的Controller的epoch值是不同的，那么旧的controller一旦发现集群中有新任controller的时候，那么它就会完成退出操作（清空缓存，中断和broker的连接，并重新加载最新的缓存），让自己重新变成一个普通的Broker。
 
 ## 3.2 **Broker上线下线**
 
@@ -133,7 +133,7 @@ ompact：日志压缩
 
 注意：因为数据会丢失，所以这种策略只适用保存数据最新状态的特殊场景。
 
-## **3.7** **页缓存**
+## **3.7** 页缓存
 
 页缓存是操作系统实现的一种主要的磁盘缓存，以此用来减少对磁盘I/O的操作。具体来说，就是把磁盘中的数据缓存到内存中，把对磁盘的访问变为对内存的访问。为了弥补性能上的差异 ，现代操作系统越来越多地将内存作为磁盘缓存，甚至会将所有可用的内存用于磁盘缓存，这样当内存回收时也几乎没有性能损失，所有对于磁盘的读写也将经由统一的缓存。
 
@@ -146,6 +146,10 @@ Kafka中大量使用了页缓存，这是Kafka实现高吞吐的重要因此之�
 ## **3.8 **零拷贝
 
 kafka的高性能是多方面协同的结果，包括宏观架构、分布式partition存储、ISR数据同步、以及“无所不用其极”的高效利用磁盘/操作系统特性。其中零拷贝并不是不需要拷贝，通常是说在IO读写过程中减少不必要的拷贝次数。
+
+在操作系统中分为页缓存和块缓存，页缓存一般是为硬件想要读取数据提供的，块缓存面向向硬件写入数据，图示如下。kafka消费者会从PageCache中读取数据，写入到BufferCache中，最后到硬件。在这个过程中，kafka是一个非特权指令，在操作系统里是一个特区性能指令，因此需要从用户态转换到内核态。
+
+![image-20240512225959012](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/image-20240512225959012.png)
 
 这里我们要说明是，内核在执行操作时同一时间点只会做一件事，比如Java写文件这个操作，为了提高效率，这个操作是分为3步：第一步java将数据写入自己的缓冲区，第二步java需要写入数据的磁盘页可能就在当前的页缓存（Page Cache）中，所以java需要将自己的缓冲区的数据写入操作系统的页缓存（Page Cache）中。第三步操作系统会在页缓存数据满了后，将数据实际刷写到磁盘文件中。
 

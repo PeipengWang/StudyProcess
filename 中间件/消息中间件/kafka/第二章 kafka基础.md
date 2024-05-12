@@ -2901,3 +2901,7 @@ Kafka的底层读取数据是采用日志段LogSegment对象进行操作的。
 (5) 零拷贝
 
 为了提高数据读取效率，Kafka的底层采用nio提供的FileChannel零拷贝技术，直接从操作系统内核中进行数据传输，提高数据拉取的效率。
+
+消费者加入总体流程
+
+![image-20240512224446753](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/image-20240512224446753.png)
