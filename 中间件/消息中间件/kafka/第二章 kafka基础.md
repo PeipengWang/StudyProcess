@@ -1465,6 +1465,8 @@ public class ProducerPartitionTest {
 
 为了解决Kafka传输数据时，所产生的数据重复和乱序问题，Kafka引入了幂等性操作，所谓的幂等性，就是Producer同样的一条数据，无论向Kafka发送多少次，kafka都只会存储一条。注意，这里的同样的一条数据，指的不是内容一致的数据，而是指的不断重试的数据。
 
+当然kafka的幂等性智能保证一个分区的数据不重复
+
 默认幂等性是不起作用的，所以如果想要使用幂等性操作，只需要在生产者对象的配置中开启幂等性配置即可
 
 | **配置项**                                | **配置值** | **说明**                                   |
@@ -1537,14 +1539,14 @@ Kafka中的事务是分布式事务，所以采用的也是二阶段提交
 
 但是不同的Broker可能无法全部同时接收到marker信息，此时有的Broker上的数据还是无法访问，这也是正常的，因为kafka的事务不能保证强一致性，只能保证最终数据的一致性，无法保证中间的数据是一致的。不过对于常规的场景这里已经够用了，事务协调器会不遗余力的重试，直至成功。
 
-##### 2.4.6.4.4 事务操作代码
+总体
 
-![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps95.jpg) 
+![image-20240512211107622](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/image-20240512211107622.png)
+
+##### 2.4.6.4.4 事务操作代码 
+
 ```
 
-package com.atguigu.test;
-
- 
 
 import org.apache.kafka.clients.producer.*;
 
@@ -1564,67 +1566,67 @@ public class ProducerTransactionTest {
 
   public static void main(String[] args) {
 
-​    Map<String, Object> configMap = new HashMap<>();
+   Map<String, Object> configMap = new HashMap<>();
 
-​    configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+  configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 
-​    configMap.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+   configMap.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
-​    configMap.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+  configMap.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
-​    // TODO 配置幂等性
+  // TODO 配置幂等性
 
-​    configMap.put( ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+  configMap.put( ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
 
-​    // TODO 配置事务ID
+  // TODO 配置事务ID
 
-​    configMap.put( ProducerConfig.TRANSACTIONAL_ID_CONFIG, "my-tx-id");
+  configMap.put( ProducerConfig.TRANSACTIONAL_ID_CONFIG, "my-tx-id");
 
-​    // TODO 配置事务超时时间
+  // TODO 配置事务超时时间
 
-​    configMap.put( ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, 5);
+   configMap.put( ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, 5);
 
-​    // TODO 创建生产者对象
+   // TODO 创建生产者对象
 
-​    KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
+   KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
 
-​    // TODO 初始化事务
+   // TODO 初始化事务
 
-​    producer.initTransactions();
+   producer.initTransactions();
 
-​    try {
+   try {
 
-​      // TODO 启动事务
+     // TODO 启动事务
 
-​      producer.beginTransaction();
+     producer.beginTransaction();
 
-​      // TODO 生产数据
+     // TODO 生产数据
 
-​      for ( int i = 0; i < 10; i++ ) {
+     for ( int i = 0; i < 10; i++ ) {
 
-​        ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", "key" + i, "value" + i);
+       ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", "key" + i, "value" + i);
 
-​        final Future<RecordMetadata> send = producer.send(record);
+       final Future<RecordMetadata> send = producer.send(record);
 
-​      }
+    }
 
-​      // TODO 提交事务
+    // TODO 提交事务
 
-​      producer.commitTransaction();
+     producer.commitTransaction();
 
-​    } catch ( Exception e ) {
+  } catch ( Exception e ) {
 
-​      e.printStackTrace();
+     e.printStackTrace();
 
-​      // TODO 终止事务
+    // TODO 终止事务
 
-​      producer.abortTransaction();
+    producer.abortTransaction();
 
-​    }
+  }
 
-​    // TODO 关闭生产者对象
+  // TODO 关闭生产者对象
 
-​    producer.close();
+  producer.close();
 
  
 
@@ -1738,7 +1740,7 @@ Kafka为了数据可靠性更高一些，需要分区的所有副本都能够存
 
 我们已经将数据存储到了日志文件中，当然除了日志文件还有其他的一些文件，所以接下来我们就了解一下这些文件：
 
-#### 2.5.3.1 数据日志文件
+#### 2.5.3.1 数据日志文件（log文件）
 
 Kafka系统早期设计的目的就是日志数据的采集和传输，所以数据是使用log文件进行保存的。我们所说的数据文件就是以.log作为扩展名的日志文件。文件名长度为20位长度的数字字符串，数字含义为当前日志文件的第一批数据的基础偏移量，也就是文件中保存的第一条数据偏移量。字符串数字位数不够的，前面补0。
 
@@ -1748,13 +1750,13 @@ Kafka系统早期设计的目的就是日志数据的采集和传输，所以数
 
 ##### 2.5.3.1.1 批次头
 
-| 数据项                      | 含义       | 长度\ |
+| 数据项                      | 含义       | 长度 |
 | --------------------------------------- | --------------------- | -------------- |
-| BASE_OFFSET_OFFSET\            | 基础偏移量偏移量      | 8              |
-| LENGTH_OFFSET\                 | 长度偏移量            | 4              |
-| PARTITION_LEADER_EPOCH_OFFSET\ | Leaader分区纪元偏移量 | 4              |
-| MAGIC_OFFSET\                  | 魔数偏移量            | 1              |
-| ATTRIBUTES_OFFSET\             | 属性偏移量            | 2              |
+| BASE_OFFSET_OFFSET            | 基础偏移量偏移量      | 8              |
+| LENGTH_OFFSET                 | 长度偏移量            | 4              |
+| PARTITION_LEADER_EPOCH_OFFSET | Leaader分区纪元偏移量 | 4              |
+| MAGIC_OFFSET                  | 魔数偏移量            | 1              |
+| ATTRIBUTES_OFFSET             | 属性偏移量            | 2              |
 | BASE_TIMESTAMP_OFFSET         | 基础时间戳偏移量      | 8              |
 | MAX_TIMESTAMP_OFFSET          | 最大时间戳偏移量      | 8              |
 | LAST_OFFSET_DELTA_OFFSET      | 最后偏移量偏移量      | 4              |
@@ -1784,39 +1786,36 @@ Kafka系统早期设计的目的就是日志数据的采集和传输，所以数
 
 压缩长度算法：
 
+```
 中间值1 = (算法参数 << 1) ^ (算法参数 >> 31));
-
 中间值2 = Integer.numberOfLeadingZeros(中间值1);
-
 结果   = (38 - 中间值2) / 7 + 中间值2 / 32;
+```
 
- 
+例如：
 
+```
 假设当前key为：key1，调用算法时，参数为key.length = 4
-
 中间值1 = (4<<1) ^ (4>>31) = 8
-
 中间值2 = Integer.numberOfLeadingZeros(8) = 28
-
 结果   = (38-28)/7 + 28/32 = 1 + 0 = 1
-
 所以如果key取值为key1,那么key的变长长度就是1
-
 按照上面的计算公式可以计算出，如果我们发送的数据是一条为（key1，value1）的数据， 那么Kafka当前会向日志文件增加的数据大小为：
+```
 
-\# 追加数据字节计算
+**追加数据字节计算**
 
+```
 批次头 = 61
-
 数据体 = 1 + 1 + 1 + 4 + 1 + 6 + 1 + 1 + 1 = 17
-
 总的字节大小为61 + 17 = 78
+```
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps98.jpg) 
 
-如果我们发送的数据是两条为（key1，value1），（key2，value2）的数据， 那么Kafka当前会向日志文件增加的数据大小为：
+**如果我们发送的数据是两条为（key1，value1），（key2，value2）的数据**， 那么Kafka当前会向日志文件增加的数据大小为：
 
-\# 追加数据字节计算
+**追加数据字节计算**
 
 第一条数据：
 
@@ -1826,7 +1825,7 @@ Kafka系统早期设计的目的就是日志数据的采集和传输，所以数
 
 第二条数据：
 
-\# 因为字节少，没有满足批次要求，所以两条数据是在一批中的，那么批次头不会重新计算，直接增加数据体即可
+**因为字节少，没有满足批次要求，所以两条数据是在一批中的，那么批次头不会重新计算，直接增加数据体即可**
 
 数据体 = 1 + 1 + 1 + 4 + 1 + 6 + 1 + 1 + 1 = 17
 
@@ -1862,7 +1861,9 @@ Kafka系统早期设计的目的就是日志数据的采集和传输，所以数
 | sequence             | 当前批次中数据的序列号                                       |
 | CreateTime（header） | 当前批次中最后一条数据的创建时间戳                           |
 
-#### 2.5.3.2 数据索引文件
+#### 2.5.3.2 数据索引文件（index结尾的文件）
+
+
 
 Kafka的基础设置中，数据日志文件到达1G才会滚动生产新的文件。那么从1G文件中想要快速获取我们想要的数据，效率还是比较低的。通过前面的介绍，如果我们能知道数据在文件中的位置（position），那么定位数据就会快很多，问题在于我们如何才能在知道这个位置呢。
 
@@ -1884,7 +1885,23 @@ Kafka的数据索引文件都保存了什么呢？咱们来看一下：
 
 不过，为什么Kafka的索引文件是不连续的呢，那是因为如果每条数据如果都把偏移量的定位保存下来，数据量也不小，还有就是，如果索引数据丢了几条，其实并不会太影响查询效率，比如咱们之前举得offset等于3的定位过程。因为Kafka底层实现时，采用的是虚拟内存映射技术mmap，将内存和文件进行双向映射，操作内存数据就等同于操作文件，所以效率是非常高的，但是因为是基于内存的操作，所以并不稳定，容易丢数据，因此Kafka的索引文件中的索引信息是不连续的，而且为了效率，kafka默认情况下，4kb的日志数据才会记录一次索引，但是这个是可以进行配置修改的，参数为log.index.interval.bytes，默认值为4096。所以我们有的时候会将kafka的不连续索引数据称之为稀疏索引。
 
-#### 2.5.3.3 数据时间索引文件
+##### 简述索引文件的查找过程
+
+首先会通过一个跳跃map来寻找对应的索引段，即找到对应的index文件，文件有跳跃的时候会利用floorEntry方法找到左边的段。
+
+![image-20240512162121058](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/image-20240512162121058.png)
+
+通过索引文件的内容找到具体的内容，使用的是二分查找法，具体看上面，同时，由于每个数据的批次与数据都是固定的，可以通过字节计算的方式定位到具体的数据。
+
+![image-20240512162434948](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/image-20240512162434948.png)
+
+索引文件的段是一种稀疏索引，由于kafka一般不会去查找一条数据，通常是批量查找，因此kafka通过稀疏索引查找数据方式是合理的。
+
+
+
+
+
+#### 2.5.3.3 数据时间索引文件（timeindex文件）
 
 某些场景中，我们不想根据顺序（偏移量）获取Kafka的数据，而是想根据时间来获取的数据。这个时候，可没有对应的偏移量来定位数据，那么查找的效率就非常低了，因为kafka还提供了时间索引文件，咱们来看看它的内容是什么
 
@@ -1892,7 +1909,7 @@ Kafka的数据索引文件都保存了什么呢？咱们来看一下：
 
 通过图片，大家可以看到，这个时间索引文件起始就是将时间戳和偏移量对应起来了，那么此时通过时间戳就可以找到偏移量，再通过偏移量找到定位信息，再通过定位信息找到数据不就非常方便了吗。
 
-#### 2.5.3.*4 查看文件内容
+#### 2.5.3.4 查看文件内容
 
 如果我们想要查看文件的内容，直接看是看不了，需要采用特殊的之类
 
@@ -1908,11 +1925,11 @@ kafka-run-class.bat kafka.tools.DumpLogSegments --files ../../data/kafka/test-0/
 
 在Linux系统中，当我们把数据写入文件系统之后，其实数据在操作系统的PageCache（页缓冲）里面，并没有刷到磁盘上。如果操作系统挂了，数据就丢失了。一方面，应用程序可以调用fsync这个系统调用来强制刷盘，另一方面，操作系统有后台线程，定时刷盘。频繁调用fsync会影响性能，需要在性能和可靠性之间进行权衡。实际上，Kafka提供了参数进行数据的刷写
 
-Ø log.flush.interval.messages ：达到消息数量时，会将数据flush到日志文件中。
+ log.flush.interval.messages ：达到消息数量时，会将数据flush到日志文件中。
 
-Ø log.flush.interval.ms ：间隔多少时间(ms)，执行一次强制的flush操作。
+ log.flush.interval.ms ：间隔多少时间(ms)，执行一次强制的flush操作。
 
-Ø flush.scheduler.interval.ms：所有日志刷新到磁盘的频率
+flush.scheduler.interval.ms：所有日志刷新到磁盘的频率
 
 log.flush.interval.messages和log.flush.interval.ms无论哪个达到，都会flush。官方不建议通过上述的三个参数来强制写盘，数据的可靠性应该通过replica来保证，而强制flush数据到磁盘会对整体性能产生影响。
 
@@ -1928,9 +1945,15 @@ Kafka创建主题时，会根据副本分配策略向指定的Broker节点发出
 
 线程运行后，会不断重复两个操作：截断（truncate）和抓取（fetch）。
 
-Ø 截断：为了保证分区副本的数据一致性，当分区存在Leader Epoch值时，会将副本的本地日志截断到Leader Epoch对应的最新位移处.如果分区不存在对应的 Leader Epoch 记录，那么依然使用原来的高水位机制，将日志调整到高水位值处。
+ 截断：为了保证分区副本的数据一致性，当分区存在Leader Epoch值时，会将副本的本地日志截断到Leader Epoch对应的最新位移处.如果分区不存在对应的 Leader Epoch 记录，那么依然使用原来的高水位机制，将日志调整到高水位值处。
 
-Ø 抓取：向Leader同步最新的数据。
+
+
+抓取：向Leader同步最新的数据。
+
+
+
+
 
 #### 2.5.6.2 生成数据同步请求
 
@@ -1966,11 +1989,21 @@ LSO一般情况下是无需更新的，但是如果数据过期，或用户手�
 
 ##### 2.5.6.4.3 LEO
 
-日志末端位移（Log End Offset），表示下一条待写入消息的offset，每个分区副本都会记录自己的LEO。对于Follower副本而言，它能读取到Leader副本 LEO 值以下的所有消息。
+日志末端位移（Log End Offset），**表示下一条待写入消息的offset**，每个分区副本都会记录自己的LEO。对于Follower副本而言，它能读取到Leader副本 LEO 值以下的所有消息。
+
+对比所有副本的LEO来确定水位线
 
 ##### 2.5.6.4.1 HW
 
 高水位值（High Watermark），定义了消息可见性，标识了一个特定的消息偏移量（offset），消费者只能拉取到这个水位offset之前的消息，同时这个偏移量还可以帮助Kafka完成副本数据同步操作。
+
+需要注意水位线的含义：
+
+![image-20240512170758479](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka3/image-20240512170758479.png)
+
+水位线以下的数据是已经在所有副本同步的数据，消费者能看到的就是低于水位线的数据。
+
+水位线随着flower的不断同步而不断上涨。
 
 ### 2.5.6 数据一致性
 
@@ -2098,6 +2131,8 @@ HW = Math.min[LeaderHW, LEO]=1
 
 #### 2.5.6.3 ISR（In-Sync Replicas）伸缩
 
+**ISR存储着集群kafka的brokid列表，第一个代表着leader**
+
 在Kafka中，一个Topic（主题）包含多个Partition（分区），Topic是逻辑概念，而Partition是物理分组。一个Partition包含多个Replica（副本），副本有两种类型Leader Replica/Follower Replica，Replica之间是一个Leader副本对应多个Follower副本。注意：分区数可以大于节点数，但副本数不能大于节点数。因为副本需要分布在不同的节点上，才能达到备份的目的。
 
 Kafka的分区副本中只有Leader副本具有数据写入的功能，而Follower副本需要不断向Leader发出申请，进行数据的同步。这里所有同步的副本会形成一个列表，我们称之为同步副本列表（**In-Sync Replicas**），也可以简称ISR，除了ISR以外，还有已分配的副本列表（Assigned Replicas），简称AR。这里的AR其实不仅仅包含ISR，还包含了没有同步的副本列表（Out-of-Sync Replicas），简称OSR
@@ -2114,7 +2149,7 @@ Kafka的分区副本中只有Leader副本具有数据写入的功能，而Follow
 
 相对的，有收缩，就会有扩大，在Follower抓取数据时，判断副本状态，满足扩大ISR条件后，就可以提交分区变更请求。完成ISR列表的变更。
 
-Ø 向集群Broker传播ISR的变更。ISR发生变化（包含Shrink和Expand）都会执行传播逻辑。ReplicaManager每间隔2500毫秒就会根据条件，将ISR变化的结果传递给集群的其他Broker。
+向集群Broker传播ISR的变更。ISR发生变化（包含Shrink和Expand）都会执行传播逻辑。ReplicaManager每间隔2500毫秒就会根据条件，将ISR变化的结果传递给集群的其他Broker。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps128.jpg) 
 
@@ -2140,11 +2175,11 @@ Kafka的分区副本中只有Leader副本具有数据写入的功能，而Follow
 | fetch.max.bytes               | 消费者获取服务器端一批消息最大的字节数。如果服务器端一批次的数据大于该值（50m）仍然可以拉取回来这批数据，因此，这不是一个绝对最大值。一批次的大小受message.max.bytes （broker config）or max.message.bytes （topic config）影响 | 可选           | 52428800（50 m） |                                               |
 | offsets.topic.num.partitions  | 偏移量消费主题分区数                                         | 可选           | 50               |                                               |
 
-**（二）**创建消费者对象
+（二）创建消费者对象
 
 根据配置创建消费者对象KafkaConsumer，向Kafka订阅（subscribe）主题消息，并向Kafka发送请求（poll）获取数据。
 
-**（三）**获取数据
+（三）获取数据
 
 Kafka会根据消费者发送的参数，返回数据对象ConsumerRecord。返回的数据对象中包括指定的数据。
 
@@ -2155,11 +2190,9 @@ Kafka会根据消费者发送的参数，返回数据对象ConsumerRecord。返�
 | offset           | 偏移量             |
 | timestamp        | 数据时间戳         |
 | key              | 数据key            |
-| value            | 数据value          |
+| value            | 数据value         |
 
-![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps129.jpg) 
-
-**（四）**关闭消费者
+（四）关闭消费者
 
 消费者消费完数据后，需要将对象关闭用以释放资源。一般情况下，消费者无需关闭。
 
@@ -2203,6 +2236,18 @@ public class KafkaConsumerTest {
   }
 }
 ```
+
+需要注意：消费者消费数据默认的偏移量是LEO + 1的数据，如果消费消费者在开启之前就有数据了，默认是消费不到的，只能消费到在消费者开启之后的数据。
+
+为了解决这个问题，需要设置消费之的参数
+
+```
+    paramMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+```
+
+这个参数加上后能够使得数据从头到尾进行消费。
+
+如果从中间开始消费也是可以的，后面会具体讲解。
 
 
 
@@ -2380,29 +2425,15 @@ Kafka消费者默认的分区分配就是RangeAssignor，CooperativeStickyAssign
 
 ##### **2.6.3.4.1 起始偏移量**
 
-在消费者的配置中，我们可以增加偏移量相关参数auto.offset.reset，用于从最开始获取主题数据，
+在消费者的配置中，我们可以增加偏移量相关参数auto.offset.reset，用于从最开始获取主题数据， 
 
-![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps159.jpg) 
-
-package com.atguigu.test;
-
- 
-
+```
 import org.apache.kafka.clients.consumer.*;
-
 import org.apache.kafka.common.serialization.StringDeserializer;
-
- 
-
 import java.time.Duration;
-
 import java.util.Arrays;
-
 import java.util.HashMap;
-
 import java.util.Map;
-
- 
 
 public class KafkaConsumerTest {
 
@@ -2410,268 +2441,189 @@ public class KafkaConsumerTest {
 
  
 
-​    // TODO 创建消费者配置参数集合
+   // TODO 创建消费者配置参数集合
+    Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 
-​    Map<String, Object> paramMap = new HashMap<>();
+   paramMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-​    paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+   paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
-​    paramMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+  paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
+   // TODO 通过配置，创建消费者对象
 
-​    paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(paramMap);
 
-​    paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   // TODO 订阅主题
 
-​    paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
+   consumer.subscribe(Arrays.asList("test"));
+  while ( true ) {
+      // TODO 消费数据
 
- 
-
-​    // TODO 通过配置，创建消费者对象
-
-​    KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(paramMap);
-
-​    // TODO 订阅主题
-
-​    consumer.subscribe(Arrays.asList("test"));
-
- 
-
-​    while ( true ) {
-
-​      // TODO 消费数据
-
-​      final ConsumerRecords<String, String> poll = consumer.poll(Duration.ofMillis(100));
-
- 
-
-​      // TODO 遍历数据
-
-​      for (ConsumerRecord<String, String> record : poll) {
-
-​        System.out.println( record );
-
-​      }
-
-​    }
+     final ConsumerRecords<String, String> poll = consumer.poll(Duration.ofMillis(100));
+     // TODO 遍历数据
+     for (ConsumerRecord<String, String> record : poll) {
+      System.out.println( record );
+    }
+   }
 
   }
 
 }
+```
 
 参数取值有3个：
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps160.jpg) 
 
-Ø earliest：对于同一个消费者组，从头开始消费。就是说如果这个topic有历史消息存在，现在新启动了一个消费者组，且auto.offset.reset=earliest，那将会从头开始消费（未提交偏移量的场合）。
+earliest：对于同一个消费者组，从头开始消费。就是说如果这个topic有历史消息存在，现在新启动了一个消费者组，且auto.offset.reset=earliest，那将会从头开始消费（未提交偏移量的场合）。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps161.jpg) 
 
-Ø latest：对于同一个消费者组，消费者只能消费到连接topic后，新产生的数据（未提交偏移量的场合）。
+latest：对于同一个消费者组，消费者只能消费到连接topic后，新产生的数据（未提交偏移量的场合）。
 
   ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps162.jpg)
 
-Ø none：生产环境不使用
+ none：生产环境不使用
 
 ##### **2.6.3.4.3 指定偏移量消费**
 
-除了从最开始的偏移量或最后的偏移量读取数据以外，Kafka还支持从指定的偏移量的位置开始消费数据。
+除了从最开始的偏移量或最后的偏移量读取数据以外，Kafka还支持从指定的偏移量的位置开始消费数据。 
 
-![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps163.jpg) 
-
-package com.atguigu.test;
-
- 
-
+```
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-
 import org.apache.kafka.common.TopicPartition;
-
 import org.apache.kafka.common.serialization.StringDeserializer;
-
- 
-
 import java.time.Duration;
-
 import java.util.Collections;
-
 import java.util.HashMap;
-
 import java.util.Map;
-
 import java.util.Set;
-
- 
 
 public class KafkaConsumerOffsetTest {
 
   public static void main(String[] args) {
 
  
+   Map<String, Object> paramMap = new HashMap<>();
 
-​    Map<String, Object> paramMap = new HashMap<>();
+   paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 
-​    paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+  paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
-​    paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
-​    paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
+   KafkaConsumer<String, String> c = new KafkaConsumer<String, String>(paramMap);
 
-​    paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
+  // TODO 订阅主题
 
- 
+   c.subscribe(Collections.singletonList("test"));
 
-​    KafkaConsumer<String, String> c = new KafkaConsumer<String, String>(paramMap);
+   // TODO 拉取数据，获取基本集群信息
 
- 
+   c.poll(Duration.ofMillis(100));
+   // TODO 根据集群的基本信息配置需要消费的主题及偏移量
 
-​    // TODO 订阅主题
+  final Set<TopicPartition> assignment = c.assignment();
+   for (TopicPartition topicPartition : assignment) {
 
-​    c.subscribe(Collections.singletonList("test"));
+    if ( topicPartition.topic().equals("test") ) {
 
-​    // TODO 拉取数据，获取基本集群信息
+      c.seek(topicPartition, 0);
 
-​    c.poll(Duration.ofMillis(100));
+   }
 
-​    // TODO 根据集群的基本信息配置需要消费的主题及偏移量
+  }
 
-​    final Set<TopicPartition> assignment = c.assignment();
+  // TODO 拉取数据
 
-​    for (TopicPartition topicPartition : assignment) {
+   while (true) {
 
-​      if ( topicPartition.topic().equals("test") ) {
+     final ConsumerRecords<String, String> poll = c.poll(Duration.ofMillis(100));
 
-​        c.seek(topicPartition, 0);
+    for (ConsumerRecord<String, String> record : poll) {
 
-​      }
+      System.out.println( record.value() );
 
-​    }
+     }
 
-​    // TODO 拉取数据
-
-​    while (true) {
-
-​      final ConsumerRecords<String, String> poll = c.poll(Duration.ofMillis(100));
-
-​      for (ConsumerRecord<String, String> record : poll) {
-
-​        System.out.println( record.value() );
-
-​      }
-
-​    }
+   }
 
   }
 
 }
+```
+
+
 
 ##### **2.6.3.4.4 偏移量提交**
 
 生产环境中，消费者可能因为某些原因或故障重新启动消费，那么如果不知道之前消费数据的位置，重启后再消费，就可能重复消费（earliest）或漏消费（latest）。所以Kafka提供了保存消费者偏移量的功能，而这个功能需要由消费者进行提交操作。这样消费者重启后就可以根据之前提交的偏移量进行消费了。注意，一旦消费者提交了偏移量，那么kafka会优先使用提交的偏移量进行消费。此时，auto.offset.reset参数是不起作用的。
 
-**Ø** 自动提交
+ 自动提交
 
 所谓的自动提交就是消费者消费完数据后，无需告知kafka当前消费数据的偏移量，而是由消费者客户端API周期性地将消费的偏移量提交到Kafka中。这个周期默认为5000ms，可以通过配置进行修改。
 
-![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps164.jpg) 
-
-package com.atguigu.test;
-
  
 
+```
 import org.apache.kafka.clients.consumer.*;
-
 import org.apache.kafka.common.serialization.StringDeserializer;
-
- 
-
 import java.time.Duration;
-
 import java.util.Arrays;
-
 import java.util.HashMap;
-
 import java.util.Map;
 
- 
 
 public class KafkaConsumerCommitAutoTest {
 
   public static void main(String[] args) {
+    // TODO 创建消费者配置参数集合
+   Map<String, Object> paramMap = new HashMap<>();
+   paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+  // TODO 启用自动提交消费偏移量，默认取值为true
+   paramMap.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+   // TODO 设置自动提交offset的时间周期为1000ms，默认5000ms
+   paramMap.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 1000);
+   paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+  paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
+   // TODO 通过配置，创建消费者对象
+   KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(paramMap);
+  // TODO 订阅主题
+    consumer.subscribe(Arrays.asList("test"));
+    while ( true ) {
+     // TODO 消费数据
 
- 
+     final ConsumerRecords<String, String> poll = consumer.poll(Duration.ofMillis(100));
 
-​    // TODO 创建消费者配置参数集合
-
-​    Map<String, Object> paramMap = new HashMap<>();
-
-​    paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-
-​    // TODO 启用自动提交消费偏移量，默认取值为true
-
-​    paramMap.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
-
-​    // TODO 设置自动提交offset的时间周期为1000ms，默认5000ms
-
-​    paramMap.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 1000);
-
-​    paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-
-​    paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-
-​    paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
-
- 
-
-​    // TODO 通过配置，创建消费者对象
-
-​    KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(paramMap);
-
-​    // TODO 订阅主题
-
-​    consumer.subscribe(Arrays.asList("test"));
-
- 
-
-​    while ( true ) {
-
-​      // TODO 消费数据
-
-​      final ConsumerRecords<String, String> poll = consumer.poll(Duration.ofMillis(100));
-
- 
-
-​      // TODO 遍历数据
-
-​      for (ConsumerRecord<String, String> record : poll) {
-
-​        System.out.println( record );
-
-​      }
-
-​    }
+     // TODO 遍历数据
+     for (ConsumerRecord<String, String> record : poll) {
+       System.out.println( record );
+     }
+   }
 
   }
 
 }
+```
 
-**Ø** 手动提交
+手动提交
 
 基于时间周期的偏移量提交，是我们无法控制的，一旦参数设置的不合理，或单位时间内数据量消费的很多，却没有来及的自动提交，那么数据就会重复消费。所以Kafka也支持消费偏移量的手动提交，也就是说当消费者消费完数据后，自行通过API进行提交。不过为了考虑效率和安全，kafka同时提供了异步提交和同步提交两种方式供我们选择。注意：需要禁用自动提交auto.offset.reset=false，才能开启手动提交
 
-**l** 异步提交：向Kafka发送偏移量offset提交请求后，就可以直接消费下一批数据，因为无需等待kafka的提交确认，所以无法知道当前的偏移量一定提交成功，所以安全性比较低，但相对，消费性能会提高
+异步提交：向Kafka发送偏移量offset提交请求后，就可以直接消费下一批数据，因为无需等待kafka的提交确认，所以无法知道当前的偏移量一定提交成功，所以安全性比较低，但相对，消费性能会提高
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps165.jpg) 
 
-package com.atguigu.test;
 
- 
 
+```
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -2699,67 +2651,66 @@ public class KafkaConsumerCommitASyncTest {
   public static void main(String[] args) {
 
  
+   // TODO 创建消费者配置参数集合
 
-​    // TODO 创建消费者配置参数集合
+   Map<String, Object> paramMap = new HashMap<>();
 
-​    Map<String, Object> paramMap = new HashMap<>();
+   paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 
-​    paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+   // TODO 禁用自动提交消费偏移量，默认取值为true
 
-​    // TODO 禁用自动提交消费偏移量，默认取值为true
+   paramMap.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 
-​    paramMap.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+   paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
-​    paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
-​    paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
 
-​    paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
+   // TODO 通过配置，创建消费者对象
 
-​    // TODO 通过配置，创建消费者对象
+   KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(paramMap);
 
-​    KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(paramMap);
+   // TODO 订阅主题
 
-​    // TODO 订阅主题
+   consumer.subscribe(Arrays.asList("test"));
 
-​    consumer.subscribe(Arrays.asList("test"));
+   while ( true ) {
 
-​    while ( true ) {
+     // TODO 消费数据
 
-​      // TODO 消费数据
+     final ConsumerRecords<String, String> poll = consumer.poll(Duration.ofMillis(100));
 
-​      final ConsumerRecords<String, String> poll = consumer.poll(Duration.ofMillis(100));
+     // TODO 遍历处理数据
 
-​      // TODO 遍历处理数据
+     for (ConsumerRecord<String, String> record : poll) {
 
-​      for (ConsumerRecord<String, String> record : poll) {
+       System.out.println( record );
 
-​        System.out.println( record );
+    }
 
-​      }
+     // TODO 异步提交偏移量
 
-​      // TODO 异步提交偏移量
+     //   此处需要注意，需要在拉取数据完成处理后再提交
 
-​      //   此处需要注意，需要在拉取数据完成处理后再提交
+     //   否则提前提交了，但数据处理失败，下一次消费数据就拉取不到了
 
-​      //   否则提前提交了，但数据处理失败，下一次消费数据就拉取不到了
+     consumer.commitAsync();
 
-​      consumer.commitAsync();
-
-​    }
+   }
 
   }
 
 }
+```
 
-**l** 同步提交：必须等待Kafka完成offset提交请求的响应后，才可以消费下一批数据，一旦提交失败，会进行重试处理，尽可能保证偏移量提交成功，但是依然可能因为以外情况导致提交请求失败。此种方式消费效率比较低，但是安全性高。
+同步提交：必须等待Kafka完成offset提交请求的响应后，才可以消费下一批数据，一旦提交失败，会进行重试处理，尽可能保证偏移量提交成功，但是依然可能因为以外情况导致提交请求失败。此种方式消费效率比较低，但是安全性高。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps166.jpg) 
 
-package com.atguigu.test;
 
- 
 
+```
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -2787,58 +2738,60 @@ public class KafkaConsumerCommitSyncTest {
   public static void main(String[] args) {
 
  
+   // TODO 创建消费者配置参数集合
 
-​    // TODO 创建消费者配置参数集合
+   Map<String, Object> paramMap = new HashMap<>();
 
-​    Map<String, Object> paramMap = new HashMap<>();
+   paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 
-​    paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+   // TODO 禁用自动提交消费偏移量，默认取值为true
 
-​    // TODO 禁用自动提交消费偏移量，默认取值为true
+   paramMap.put(ConsumerConfiENABLE_AUTO_COMMIT_CONFIG, false);
 
-​    paramMap.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+   paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
-​    paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
-​    paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+    paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
 
-​    paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
+   // TODO 通过配置，创建消费者对象
 
-​    // TODO 通过配置，创建消费者对象
+   KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(paramMap);
 
-​    KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(paramMap);
+   // TODO 订阅主题
 
-​    // TODO 订阅主题
+   consumer.subscribe(Arrays.asList("test"));
 
-​    consumer.subscribe(Arrays.asList("test"));
+   while ( true ) {
 
-​    while ( true ) {
+     // TODO 消费数据
 
-​      // TODO 消费数据
+     final ConsumerRecords<String, String> poll = consumer.poll(Duration.ofMillis(100));
 
-​      final ConsumerRecords<String, String> poll = consumer.poll(Duration.ofMillis(100));
+     // TODO 遍历处理数据
 
-​      // TODO 遍历处理数据
+     for (ConsumerRecord<String, String> record : poll) {
 
-​      for (ConsumerRecord<String, String> record : poll) {
+       System.out.println( record );
 
-​        System.out.println( record );
+     }
 
-​      }
+     // TODO 同步提交偏移量
 
-​      // TODO 同步提交偏移量
+     //   此处需要注意，需要在拉取数据完成处理后再提交
 
-​      //   此处需要注意，需要在拉取数据完成处理后再提交
+     //   否则提前提交了，但数据处理失败，下一次消费数据就拉取不到了
 
-​      //   否则提前提交了，但数据处理失败，下一次消费数据就拉取不到了
+     consumer.commitSync();
 
-​      consumer.commitSync();
-
-​    }
+   }
 
   }
 
 }
+```
+
+
 
 #### **2.6.3.5消费者事务**
 
@@ -2852,14 +2805,9 @@ public class KafkaConsumerCommitSyncTest {
 
 对于单独的Consumer来讲，事务保证会比较弱，尤其是无法保证提交的信息被精确消费，主要原因就是消费者可以通过偏移量访问信息，而不同的数据文件生命周期不同，同一事务的信息可能会因为重启导致被删除的情况。所以一般情况下，想要完成kafka消费者端的事务处理，需要将数据消费过程和偏移量提交过程进行原子性绑定，也就是说数据处理完了，必须要保证偏移量正确提交，才可以做下一步的操作，如果偏移量提交失败，那么数据就恢复成处理之前的效果。
 
-对于生产者事务而言，消费者消费的数据也会受到限制。默认情况下，消费者只能消费到生产者提交的数据，也就是未提交完成的数据，消费者是看不到的。如果想要消费到未提交的数据，需要更高消费事务隔离级别
+对于生产者事务而言，消费者消费的数据也会受到限制。默认情况下，消费者只能消费到生产者提交的数据，也就是未提交完成的数据，消费者是看不到的。如果想要消费到未提交的数据，需要更高消费事务隔离级别 1
 
-![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps169.jpg) 
-
-package com.atguigu.test;
-
- 
-
+```
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -2883,44 +2831,32 @@ import java.util.*;
 public class KafkaConsumerTransactionTest {
 
   public static void main(String[] args) {
+    Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+    paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+   paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
-​    Map<String, Object> paramMap = new HashMap<>();
+   // TODO 隔离级别：已提交读，读取已经提交事务成功的数据（默认）
+    //paramMap.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
 
-​    paramMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+   // TODO 隔离级别：未提交读，读取已经提交事务成功和未提交事务成功的数据
+   paramMap.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_uncommitted");
 
-​    paramMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-
-​    paramMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-
-​    // TODO 隔离级别：已提交读，读取已经提交事务成功的数据（默认）
-
-​    //paramMap.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
-
-​    // TODO 隔离级别：未提交读，读取已经提交事务成功和未提交事务成功的数据
-
-​    paramMap.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_uncommitted");
-
-​    paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
-
-​    KafkaConsumer<String, String> c = new KafkaConsumer<String, String>(paramMap);
-
-​    c.subscribe(Collections.singletonList("test"));
-
-​    while (true) {
-
-​      final ConsumerRecords<String, String> poll = c.poll(Duration.ofMillis(100));
-
-​      for (ConsumerRecord<String, String> record : poll) {
-
-​        System.out.println( record.value() );
-
-​      }
-
-​    }
-
+   paramMap.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
+   KafkaConsumer<String, String> c = new KafkaConsumer<String, String>(paramMap);
+   c.subscribe(Collections.singletonList("test"));
+   while (true) {
+     final ConsumerRecords<String, String> poll = c.poll(Duration.ofMillis(100));
+     for (ConsumerRecord<String, String> record : poll) {
+       System.out.println( record.value() );
+     }
+   }
   }
 
 }
+```
+
+
 
 #### **2.6.3.6偏移量的保存**
 
