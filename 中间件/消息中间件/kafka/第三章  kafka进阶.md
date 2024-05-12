@@ -499,7 +499,7 @@ ssh-copy-id kafka-broker3
 
 #### **3.10.3.1卸载现有JDK**
 
-# 不同节点都要执行操作\
+不同节点都要执行操作
 
 rpm -qa | grep -i java | xargs -n1 sudo rpm -e --nodeps
 
@@ -565,7 +565,7 @@ cd /opt/module
 
 xsync java
 
-# 在每个节点让环境变量生效\
+在每个节点让环境变量生效
 
 ### **3.10.4** **安装ZooKeeper**
 
@@ -637,13 +637,13 @@ vim zoo.cfg
 
 (2) 修改zoo.cfg文件
 
-# 以下内容为修改内容\
+以下内容为修改内容
 
 dataDir=/opt/module/zookeeper/zkData
 
  
 
-# 以下内容为新增内容\
+以下内容为新增内容
 
 \####################### cluster ##########################
 
@@ -669,7 +669,7 @@ server.3=kafka-broker3:2888:3888
 
 #### **3.10.4.5启动ZooKeeper**
 
-# 在每个节点下执行如下操作\
+在每个节点下执行如下操作
 
 \# 进入zookeeper目录
 
@@ -681,7 +681,7 @@ bin/zkServer.sh start
 
 #### **3.10.4.6关闭ZooKeeper**
 
-# 在每个节点下执行如下操作\
+在每个节点下执行如下操作
 
 \# 进入zookeeper目录
 
@@ -693,7 +693,7 @@ bin/zkServer.sh stop
 
 #### **3.10.4.7查看ZooKeeper状态**
 
-# 在每个节点下执行如下操作\
+在每个节点下执行如下操作
 
 \# 进入zookeeper目录
 
@@ -715,17 +715,17 @@ xsync zookeeper
 
  
 
-# 分别将不同虚拟机/opt/module/zookeeper/zkData目录下myid文件进行修改\
+分别将不同虚拟机/opt/module/zookeeper/zkData目录下myid文件进行修改\
 
 vim /opt/module/zookeeper/zkData/myid
 
  
 
-# kafka-broker1:1\
+kafka-broker1:1
 
-# kafka-broker2:2\
+kafka-broker2:2
 
-# kafka-broker3:3\
+kafka-broker3:3
 
 #### **3.10.4.9启停脚本**
 
@@ -953,7 +953,7 @@ xsync kafka
 
  
 
-# 按照上面的配置文件内容，在每一个Kafka节点进行配置，请注意配置文件中红色字体内容\
+按照上面的配置文件内容，在每一个Kafka节点进行配置，请注意配置文件中红色字体内容
 
 vim /opt/module/kafka/config/server.properties
 
@@ -1303,7 +1303,7 @@ cd /opt/software/mysql
 
 sh install_mysql.sh 
 
-# 安装得过程略慢，请耐心等候\
+安装得过程略慢，请耐心等候
 
 #### **3.11.1.3** **mysql的基本配置**
 
@@ -1393,7 +1393,7 @@ flush privileges;
 
 exit;
 
-# 退出后，请重新登录后进行确认\
+退出后，请重新登录后进行确认
 
 ### **3.11.2** **修改Kafka集群配置**
 
