@@ -132,6 +132,18 @@ public int hashCode() {
     return result;
 }
 ```
+**a.hashCode() 有什么用? 与 a.equals(b) 有什么关系?**
+
+简介: hashCode() 方法是相应对象整型的 hash 值。它常用于基于 hash 的集合类，如 Hashtable、HashMap、LinkedHashMap等等。它与 equals() 方法关系特别紧密。根据 Java 规范，两个使用 equals() 方法来判断相等的对象，必须具有相同的 hash code。
+
+1、hashcode的作用
+List和Set，如何保证Set不重复呢? 通过迭代使用equals方法来判断，数据量小还可以接受，数据量大怎么解决? 引入hashcode，实际上hashcode扮演的角色就是寻址，大大减少查询匹配次数。
+2、hashcode重要吗
+对于数组、List集合就是一个累赘。而对于hashmap, hashset, hashtable就异常重要了。
+**为什么在重写 equals 方法的时候需要重写 hashCode 方法?**
+
+因为有强制的规范指定需要同时重写 hashcode 与 equals 是方法，许多容器类，如 HashMap、HashSet 都依赖于 hashcode 与 equals 的规定。
+
 
 ### toString()
 
