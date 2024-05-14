@@ -1,8 +1,38 @@
-ConcurrentHashMap和HashMap的实现方式类似，不同的是他采用分段锁的思想支持并发操作，所以线程是安全的。下面介绍ConcurrentHashMap是如何采用分段锁的思想实现多线程并发下的数据安全的。
+
+
+## 为什么HashTable慢
+
+Hashtable之所以效率低下主要是因为其实现使用了synchronized关键字对put等操作进行加锁，而synchronized关键字加锁是对整个对象进行加锁，也就是说在进行put等修改Hash表的操作时，锁住了整个Hash表，从而使得其表现的效率低下。
+
+
+
 ## 减小锁粒度
 ConcurrentHashMap是线程安全的，对于HashMap而言，最重要的方法是get和set方法，如果为了线程安全对整个HashMap加锁，在效率上会大打折扣；而ConcurrentHashMap在内部使用多个Segment，在操作数据的时候会给每个Segment都分别加锁，这样就通过减小锁粒度提高了并发度。
-## ConcurrentHashMap的实现
-ConcurrentHashMap在内部细分为若干个HashMap，叫做数据段，在默认的情况下，一个ConcurrentHashMap被细分为16个数据段，对每个数据段都单独加锁操作。Segment的个数为锁的并发度。
-ConcurrentHashMap是由Segment数组和HashEntry数组组成的。Segment继承了可重入锁（ReentrantLock），它在ConcurrentHahMap里扮演锁的角色。HashEntry则用于存储键值对数据。
-在每一个ConcurrentHashMap里都包含一个Segment数组mSenment的结构和HashMap类似，是数组和链表结构。在每个Segment里都包含一个HashEntry数组，每个HashEntry都是一个链表结构的数据，每个Segment都守护一个HashEntry数组里面的元素，在对HahEntry数组进行修改时，必须首先获得他对应的Senment锁。
-在操作ConcurrentHashMap时，如果需要在其中添加一个新的数据，则并不是将整个HashMap加锁，而是先根据HashCode查询该数据放在哪个段，然后对该数据段加锁并完成put操作。在多线程环境中，如果多个线程同时进行put操作，则只要，加入数据被存放在不同的数据段中则就可以做到并性操作的线程安全。
+## ConcurrentHashMap - JDK 1.7
+
+在JDK1.5~1.7版本，Java使用了分段锁机制实现ConcurrentHashMap.
+
+简而言之，ConcurrentHashMap在对象中保存了一个Segment数组，即将整个Hash表划分为多个分段；而每个Segment元素，即每个分段则类似于一个Hashtable；这样，在执行put操作时首先根据hash算法定位到元素属于哪个Segment，然后对该Segment加锁即可。因此，ConcurrentHashMap在多线程并发编程中可是实现多线程put操作。接下来分析JDK1.7版本中ConcurrentHashMap的实现原理。
+
+### 数据结构
+
+整个 ConcurrentHashMap 由一个个 Segment 组成，Segment 代表”部分“或”一段“的意思，所以很多地方都会将其描述为分段锁。注意，行文中，我很多地方用了“槽”来代表一个 segment。
+
+简单理解就是，ConcurrentHashMap 是一个 Segment 数组，Segment 通过继承 ReentrantLock 来进行加锁，所以每次需要加锁的操作锁住的是一个 segment，这样只要保证每个 Segment 是线程安全的，也就实现了全局的线程安全。
+
+![img](https://pdai.tech/images/thread/java-thread-x-concurrent-hashmap-1.png)
+
+- Segment 数组长度为 16，不可以扩容，扩容是 segment 数组某个位置内部的数组 HashEntry<K,V>[] 进行扩容，扩容后，容量为原来的 2 倍。
+- Segment 内部是由 `数组+链表` 组成的。
+- Segment[i] 的默认大小为 2，负载因子是 0.75，得出初始阈值为 1.5，也就是以后插入第一个元素不会触发扩容，插入第二个会进行第一次扩容
+- 当前 segmentShift 的值为 32 - 4 = 28，segmentMask 为 16 - 1 = 15，姑且把它们简单翻译为移位数和掩码，这两个值马上就会用到
+
+## ConcurrentHashMap - JDK 1.8
+
+在JDK1.7之前，ConcurrentHashMap是通过分段锁机制来实现的，所以其最大并发度受Segment的个数限制。因此，在JDK1.8中，ConcurrentHashMap的实现原理摒弃了这种设计，而是选择了与HashMap类似的数组+链表+红黑树的方式实现，而加锁则采用CAS和synchronized实现。
+
+![img](https://pdai.tech/images/thread/java-thread-x-concurrent-hashmap-2.png)
+
+## 参考文章
+
+摘录自https://pdai.tech/md/java/thread/java-thread-x-juc-collection-ConcurrentHashMap.html
