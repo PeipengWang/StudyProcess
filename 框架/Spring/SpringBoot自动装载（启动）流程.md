@@ -105,17 +105,17 @@ public class Circle implements ImportSelector {
 
 }
 ```
-同样的，在启动类上会AutoConfigurationImportSelector的selectImports方法，具体如下：
+同样的，在启动类上会AutoConfigurationImportSelector的selectImports方法，具体如下：  
 
-### AutoConfigurationImportSelector.class
-Spring Boot有中一个非常重要的理念就是约定大于配置。而自动配置这一机制的核心实现就是靠@EnableAutoConfiguration注解完成的
-可以看出，在@EnableAutoConfiguration注解中，使用@Import导入了AutoConfigurationImportSelector这个类，实现了ImportSelector接口的selectImports()方法。spring中会把selectImports()方法返回的String数组中的类的全限定名实例化为bean，并交给spring容器管理
-具体执行链路如下：
+### AutoConfigurationImportSelector.class  
+Spring Boot有中一个非常重要的理念就是约定大于配置。而自动配置这一机制的核心实现就是靠@EnableAutoConfiguration注解完成的    
+可以看出，在@EnableAutoConfiguration注解中，使用@Import导入了AutoConfigurationImportSelector这个类，实现了ImportSelector接口的selectImports()方法。spring中会把selectImports()方法返回的String数组中的类的全限定名实例化为bean，并交给spring容器管理    
+具体执行链路如下：    
 AutoConfigurationImportSelector.class#getAutoConfigurationEntry--》getCandidateConfigurations--》SpringFactoriesLoader.class#loadFactoryNames--》loadSpringFactories
-在SpringFactoriesLoader.class中定义了要读取的路径
-public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
+在SpringFactoriesLoader.class中定义了要读取的路径    
+public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";   
 
-例如：首先读取../repository/org/springframework/boot/spring-boot/2.6.3/spring-boot-2.6.3.jar!/META-INF/spring.factories 目录的文件
+例如：首先读取../repository/org/springframework/boot/spring-boot/2.6.3/spring-boot-2.6.3.jar!/META-INF/spring.factories 目录的文件    
 
 
-https://blog.csdn.net/u012060033/article/details/123863011
+https://blog.csdn.net/u012060033/article/details/123863011  
