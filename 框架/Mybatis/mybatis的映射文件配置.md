@@ -158,69 +158,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 ```
 ## select、resultMap的配置及使用
 先看select的配置吧：
-```
-<select
-     <!--  1. id （必须配置）
-        id是命名空间中的唯一标识符，可被用来代表这条语句。 
-        一个命名空间（namespace） 对应一个dao接口, 
-        这个id也应该对应dao里面的某个方法（相当于方法的实现），因此id 应该与方法名一致
-     -->
-     
-     id="selectPerson"
-     
-     <!-- 2. parameterType （可选配置, 默认为mybatis自动选择处理）
-        将要传入语句的参数的完全限定类名或别名， 如果不配置，mybatis会通过ParameterHandler 根据参数类型默认选择合适的typeHandler进行处理
-        parameterType 主要指定参数类型，可以是int, short, long, string等类型，也可以是复杂类型（如对象） -->
-     parameterType="int"
-     
-     <!-- 3. resultType (resultType 与 resultMap 二选一配置)
-         resultType用以指定返回类型，指定的类型可以是基本类型，可以是java容器，也可以是javabean -->
-     resultType="hashmap"
-     
-     <!-- 4. resultMap (resultType 与 resultMap 二选一配置)
-         resultMap用于引用我们通过 resultMap标签定义的映射类型，这也是mybatis组件高级复杂映射的关键 -->
-     resultMap="personResultMap"
-     
-     <!-- 5. flushCache (可选配置)
-         将其设置为 true，任何时候只要语句被调用，都会导致本地缓存和二级缓存都会被清空，默认值：false -->
-     flushCache="false"
-     
-     <!-- 6. useCache (可选配置)
-         将其设置为 true，将会导致本条语句的结果被二级缓存，默认值：对 select 元素为 true -->
-     useCache="true"
-     
-     <!-- 7. timeout (可选配置) 
-         这个设置是在抛出异常之前，驱动程序等待数据库返回请求结果的秒数。默认值为 unset（依赖驱动）-->
-     timeout="10000"
-     
-     <!-- 8. fetchSize (可选配置) 
-         这是尝试影响驱动程序每次批量返回的结果行数和这个设置值相等。默认值为 unset（依赖驱动)-->
-     fetchSize="256"
-     
-     <!-- 9. statementType (可选配置) 
-         STATEMENT，PREPARED 或 CALLABLE 的一个。这会让 MyBatis 分别使用 Statement，PreparedStatement 或 CallableStatement，默认值：PREPARED-->
-     statementType="PREPARED"
-     
-     <!-- 10. resultSetType (可选配置) 
-         FORWARD_ONLY，SCROLL_SENSITIVE 或 SCROLL_INSENSITIVE 中的一个，默认值为 unset （依赖驱动）-->
-     resultSetType="FORWARD_ONLY">
-```
-实例
-```
-<mapper namespace="com.dy.dao.CourseDao">
-    
-    <!-- 
-         1.此处直接将resultType 设置为course, 一看就知道我设置了别名吧，如果没有设置别名，那么resultType = com.dy.entity.Course。
-         2.可能细心的你会发现：Course.java中的属性名与数据库字段名不一致，下面，我就在sql语句中用了as, 使之匹配，当然方法不止一种，在学习了resultMap之后，你能看到一种更直观优雅的方式去将javabean中的属性与数据库字段名保持一致
-         3.findCourseById 与CourseDao中findCourseById方法对应， 那么传入的参数名称以及类型也应该保持对应关系。
-         4.可以看到，在sql语句中，通过#{}表达式可以获取参数。
-         5.下面这条sql语句，实际上的形式是怎么样的？还记得之前说过，mybatis默认为preparedStatement吧，那么，用我们jdbc代码来看，它其实就是：
-             select course_id as id, course_name as name, course_delete_flg as deleteFlag from t_course where course_id=?
-     -->
-    <select id="findCourseById"  resultType="course" >
-        select course_id as id, course_name as name, course_delete_flg as deleteFlag from t_course where course_id=#{courseId}
-    </select>
-</mapper>
-```
+
+
 **在mybatis中如何处理这种一对多， 甚至于多对多，一对一的关系呢**
 就不得不提到 resultMap 这个东西， mybatis的resultMap功能可谓十分强大，能够处理复杂的关系映射
