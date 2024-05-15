@@ -106,6 +106,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
    </delete>
 </mapper>
 ```
+```
 <?xml version="1.0" encoding="UTF-8" ?>   
 <!DOCTYPE mapper   
 PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"  
