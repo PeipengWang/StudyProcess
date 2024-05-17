@@ -1,8 +1,8 @@
-# **第1章** Kafka入门
+# 第1章 Kafka入门
 
-## **1.1** 概述
+## 1.1 概述
 
-### **1.1.1** 初识Kafka
+### 1.1.1 初识Kafka
 
 Kafka是一个由Scala和Java语言开发的，经典高吞吐量的分布式消息发布和订阅系统，也是大数据技术领域中用作数据交换的核心组件之一。以高吞吐，低延迟，高伸缩，高可靠性，高并发，且社区活跃度高等特性，从而备受广大技术组织的喜爱。
 
@@ -14,7 +14,7 @@ Kafka是一个由Scala和Java语言开发的，经典高吞吐量的分布式消
 
 ![image-20240417220808196](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240417220808196.png) 
 
-### **1.1.2** **消息队列**
+### 1.1.2 消息队列
 
 Kafka软件最初的设计就是专门用于数据传输的消息系统，类似功能的软件有RabbitMQ、ActiveMQ、RocketMQ等。这些软件名称中的MQ是英文单词Message Queue的简称，也就是所谓的消息队列的意思。这些软件的核心功能是传输数据，而Java中如果想要实现数据传输功能，那么这个软件一般需要遵循Java消息服务技术规范JMS（Java Message Service）。前面提到的ActiveMQ软件就完全遵循了JMS技术规范，而RabbitMQ是遵循了类似JMS规范并兼容JMS规范的跨平台的AMQP（Advanced Message Queuing Protocol）规范。除了上面描述的JMS，AMQP外，还有一种用于物联网小型设备之间传输消息的MQTT通讯协议。
 
@@ -36,7 +36,7 @@ Kafka拥有作为一个消息系统应该具备的功能，但是却有着独特
 
 **JMS Consumer**：JMS消息消费者。所谓的消费者，就是从消息提供者（***JMS*** ***Provider***）中获取数据的客户端应用程序，这些应用通过JMS接口接收JMS消息。
 
-Ø JMS支持两种消息发送和接收模型：一种是P2P（Peer-to-Peer）点对点模型，另外一种是发布/订阅（Publish/Subscribe）模型。
+JMS支持两种消息发送和接收模型：一种是P2P（Peer-to-Peer）点对点模型，另外一种是发布/订阅（Publish/Subscribe）模型。
 
  **P2P模型 **：P2P模型是基于队列的，消息生产者将数据发送到消息队列中，消息消费者从消息队列中接收消息。因为队列的存在，消息的异步传输成为可能。P2P模型的规定就是每一个消息数据，只有一个消费者，当发送者发送消息以后，不管接收者有没有运行都不影响消息发布到队列中。接收者在成功接收消息后会向发送者发送接收成功的消息
 
@@ -54,7 +54,7 @@ Kafka拥有作为一个消息系统应该具备的功能，但是却有着独特
 
 ### **1.1.4** 息中间件对比
 
-| ** 特性 **              | ** ActiveMQ **                     | ** RabbitMQ **                     | ** RocketMQ **                   | ** Kafka **                                             |
+|  特性               |  ActiveMQ                    |  RabbitMQ                      |  RocketMQ                  | Kafka                                            |
 | ----------------------- | ---------------------------------- | ---------------------------------- | -------------------------------- | ------------------------------------------------------- |
 | 单机吞吐量              | 万级，比RocketMQ,Kafka低一个数量级 | 万级，比RocketMQ,Kafka低一个数量级 | 10万级，支持高吞吐               | 10万级，支持高吞吐                                      |
 | Topic数量对吞吐量的影响 |                                    |                                    | Topic可以达到几百/几千量级       | Topic可以达到几百量级，如果更多的话，吞吐量会大幅度下降 |
@@ -66,11 +66,11 @@ Kafka拥有作为一个消息系统应该具备的功能，但是却有着独特
 
 通过上面各种消息中间件的对比，大概可以了解，在大数据场景中我们主要采用kafka作为消息中间件，而在JaveEE开发中我们主要采用ActiveMQ、RabbitMQ、RocketMQ作为消息中间件。如果将JavaEE和大数据在项目中进行融合的话，那么Kafka其实是一个不错的选择。
 
-### **1.1.5** ZooKeeper
+### 1.1.5 ZooKeeper
 
 ZooKeeper是一个开放源码的分布式应用程序协调服务软件。在当前的Web软件开发中，多节点分布式的架构设计已经成为必然，那么如何保证架构中不同的节点所运行的环境，系统配置是相同的，就是一个非常重要的话题。一般情况下，我们会采用独立的第三方软件保存分布式系统中的全局环境信息以及系统配置信息，这样系统中的每一个节点在运行时就可以从第三方软件中获取一致的数据。也就是说通过这个第三方软件来协调分布式各个节点之间的环境以及配置信息。Kafka软件是一个分布式事件流处理平台系统，底层采用分布式的架构设计，就是说，也存在多个服务节点，多个节点之间Kafka就是采用ZooKeeper来实现协调调度的。
 
-**ZooKeeper的核心作用：**
+ZooKeeper的核心作用：
 
 l ZooKeeper的数据存储结构可以简单地理解为一个Tree结构，而Tree结构上的每一个节点可以用于存储数据，所以一般情况下，我们可以将分布式系统的元数据（环境信息以及系统配置信息）保存在ZooKeeper节点中。
 
@@ -78,7 +78,7 @@ l ZooKeeper创建数据节点时，会根据业务场景创建临时节点或永
 
 其实，Kafka作为一个独立的分布式消息传输系统，还需要第三方软件进行节点间的协调调度，不能实现自我管理，无形中就导致Kafka和其他软件之间形成了耦合性，制约了Kafka软件的发展，所以从Kafka 2.8.X版本开始，Kafka就尝试增加了Raft算法实现节点间的协调管理，来代替ZooKeeper。不过Kafka官方不推荐此方式应用在生产环境中，计划在Kafka 4.X版本中完全移除ZooKeeper，让我们拭目以待。
 
-**ZooKeeper的核心作用：**
+ZooKeeper的核心作用：
 
  ZooKeeper的数据存储结构可以简单地理解为一个Tree结构，而Tree结构上的每一个节点可以用于存储数据，所以一般情况下，我们可以将分布式系统的元数据（环境信息以及系统配置信息）保存在ZooKeeper节点中。
 
@@ -86,9 +86,9 @@ l ZooKeeper创建数据节点时，会根据业务场景创建临时节点或永
 
 其实，Kafka作为一个独立的分布式消息传输系统，还需要第三方软件进行节点间的协调调度，不能实现自我管理，无形中就导致Kafka和其他软件之间形成了耦合性，制约了Kafka软件的发展，所以从Kafka 2.8.X版本开始，Kafka就尝试增加了Raft算法实现节点间的协调管理，来代替ZooKeeper。不过Kafka官方不推荐此方式应用在生产环境中，计划在Kafka 4.X版本中完全移除ZooKeeper，让我们拭目以待。
 
-## **1.1** 快速上手
+## 1.1 快速上手
 
-### **1.1.1** 环境安装
+### 1.1.1 环境安装
 
 作为开源分布式事件流处理平台，Kafka分布式软件环境的安装相对比较复杂，不利于Kafka软件的入门学习和练习。所以我们这里先搭建相对比较简单的windows单机环境，让初学者快速掌握软件的基本原理和用法，后面的课程中，我们再深入学习Kafka软件在生产环境中的安装和使用。
 
@@ -106,7 +106,7 @@ yum install -y java-1.8.0-openjdk-devel.x86_64
 
 #### 1.2.1.2 安装Kafka
 
-***下载软件安装包***：kafka_2.12-3.6.1.tgz，下载地址：https://kafka.apache.org/downloads
+下载软件安装包：kafka_2.12-3.6.1.tgz，下载地址：https://kafka.apache.org/downloads
 
  这里的3.6.1，是Kafka软件的版本。截至到2023年12月24日，Kafka最新版本为3.6.1。
 
@@ -116,7 +116,7 @@ yum install -y java-1.8.0-openjdk-devel.x86_64
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps4.jpg) 
 
-**Ø** ***解压文件***：kafka_2.12-3.6.1.tgz，解压目录为非系统盘的根目录，比如e:/
+解压文件：kafka_2.12-3.6.1.tgz，解压目录为非系统盘的根目录，比如e:/
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps5.jpg) 
 
@@ -149,7 +149,7 @@ bin/zookeeper-server-start.sh config/zookeeper.properties
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps8.jpg) 
 
-Ø 为了操作方便，也可以在kafka解压缩后的目录中，创建脚本文件zk.cmd。
+为了操作方便，也可以在kafka解压缩后的目录中，创建脚本文件zk.cmd。
 
 调用启动命令，且同时指定配置文件。
 ```
@@ -171,7 +171,7 @@ $ bin/kafka-server-start.sh config/server.properties
 
 ```
 
-### **1.1.2** 消息主题
+### 1.1.2 消息主题
 
 在消息发布/订阅（Publish/Subscribe）模型中，为了可以让消费者对感兴趣的消息进行消费，而不是对所有的数据进行消费，包括那些不感兴趣的消息，所以定义了主题（Topic）的概念，也就是说将不同的消息进行分类，分成不同的主题（Topic），然后消息生产者在生成消息时，就会向指定的主题（Topic）中发送。而消息消费者也可以订阅自己感兴趣的主题（Topic）并从中获取消息。
 
@@ -187,11 +187,11 @@ $ bin/kafka-server-start.sh config/server.properties
 
 调用指令创建主题时，需要传递多个参数，而且参数的前缀为两个横线。因为参数比较多，为了演示方便，这里我们只说明必须传递的参数，其他参数后面课程中会进行讲解
 
-***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为***localhost:9092\**，用空格隔开
+--bootstrap-server : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为***localhost:9092\**，用空格隔开
 
-***--create*** : 表示对主题的创建操作，是个操作参数，后面无需增加参数值
+--create : 表示对主题的创建操作，是个操作参数，后面无需增加参数值
 
-***--topic*** : 主题的名称，后面接的参数值一般就是见名知意的字符串名称，类似于java中的字符串类型标识符名称，当然也可以使用数字，只不过最后还是当成数字字符串使用。
+--topic : 主题的名称，后面接的参数值一般就是见名知意的字符串名称，类似于java中的字符串类型标识符名称，当然也可以使用数字，只不过最后还是当成数字字符串使用。
 指令
 ![image-20240427230757865](https://raw.githubusercontent.com/PeipengWang/picture/master/image-20240427230757865.png)
 
@@ -208,9 +208,9 @@ Kafka是通过**kafka-topics.sh**文件进行消息主题操作的。其中包�
 ```
  DOS窗口输入指令，查看指定主题信息
 
-***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
-***--describe*** : 查看主题的详细信息
-***--topic*** : 查询的主题名称
+**--bootstrap-server** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
+**--describe** : 查看主题的详细信息
+**--topic** : 查询的主题名称
 
 指令
 ```
@@ -224,10 +224,10 @@ DOS窗口输入指令，修改指定主题的参数
 
  Kafka是通过**kafka-topics.sh**文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
 
-***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开  
- ***--alter*** : 表示对所有主题的查询操作，是个操作参数，后面无需增加参数值  
-***--topic*** : 修改的主题名称  
-***--partitions*** : 修改的配置参数：分区数量  
+**--bootstrap-server** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开  
+**--alter** : 表示对所有主题的查询操作，是个操作参数，后面无需增加参数值  
+**--topic** : 修改的主题名称  
+**--partitions**: 修改的配置参数：分区数量  
  指令
 
 ```
@@ -241,13 +241,13 @@ kafka-topics.sh --bootstrap-server localhost:9092 --topic test --alter --partiti
 
  DOS窗口输入指令，删除指定名称的主题
 
-Kafka是通过***kafka-topics.bat***文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
+Kafka是通过**kafka-topics.bat**文件进行消息主题操作的。其中包含了对主题的查询，创建，删除等功能。
 
-***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
+**--bootstrap-server** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为localhost:9092，用空格隔开
 
 **--delete**: 表示对主题的删除操作，是个操作参数，后面无需增加参数值。默认情况下，删除操作是逻辑删除，也就是说数据存储的文件依然存在，但是通过指令查询不出来。如果想要直接删除，需要在server.properties文件中设置参数delete.topic.enable=true
 
-***--topic*** : 删除的主题名称
+**--topic** : 删除的主题名称
 
 指令
 ```
@@ -255,7 +255,7 @@ kafka-topics.sh --bootstrap-server localhost:9092 --topic test --delete
 ```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps18.jpg) 
 
-***注意***：windows系统中由于权限或进程锁定的问题，删除topic会导致kafka服务节点异常关闭。
+**注意**：windows系统中由于权限或进程锁定的问题，删除topic会导致kafka服务节点异常关闭。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps19.jpg) 
 
@@ -271,7 +271,7 @@ Kafka是通过**kafka-console-producer.sh**文件进行消息生产者操作的�
 
 调用指令时，需要传递多个参数，而且参数的前缀为两个横线，因为参数比较多。为了演示方便，这里我们只说明必须传递的参数，其他参数后面课程中会进行讲解
 
-***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为***\*localhost:9092\****，用空格隔开。早期版本的Kafka也可以通过 --broker-list参数进行连接，当前版本已经不推荐使用了。
+**--bootstrap-server** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为**\*localhost:9092\***，用空格隔开。早期版本的Kafka也可以通过 --broker-list参数进行连接，当前版本已经不推荐使用了。
 
 ***--topic*** : 主题的名称，后面接的参数值就是之前已经创建好的主题名称。
 
@@ -284,7 +284,7 @@ Kafka是通过**kafka-console-producer.sh**文件进行消息生产者操作的�
 >
 ```
 
-***注意***：这里的数据需要回车后，才能真正将数据发送到Kafka服务器。
+**注意**：这里的数据需要回车后，才能真正将数据发送到Kafka服务器。
 
 
 
@@ -300,24 +300,24 @@ test 2
 #### **1.2.3.2工具操作**
 有的时候，使用命令行进行操作还是有一些麻烦，并且操作起来也不是很直观，所以我们一般会采用一些小工具进行快速访问。这里我们介绍一个kafkatool_64bit.exe工具软件。软件的安装过程比较简单，根据提示默认安装即可，这里就不进行介绍了。
 
-Ø 安装好以后，我们打开工具
+安装好以后，我们打开工具
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps23.jpg) 
 
 点击左上角按钮File -> Add New Connection...建立连接
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps24.jpg) 
 
-Ø 点击Test按钮测试
+点击Test按钮测试
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps25.jpg) 
-Ø 增加连接
+增加连接
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps26.jpg) 
 
-Ø 按照下面的步骤，生产数据
+按照下面的步骤，生产数据
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps27.jpg) 
 
-Ø 增加成功后，点击绿色箭头按钮进行查询，工具会显示当前数据
+增加成功后，点击绿色箭头按钮进行查询，工具会显示当前数据
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/wps28.jpg) 
 
@@ -392,11 +392,11 @@ Kafka是通过***kafka-console-consumer.sh***文件进行消息消费者操作�
 kafka_2.13-3.6.2]# bin/kafka-console-consumer.sh --topic quickstart-events --from-beginning --bootstrap-server localhost:9092
 ```
 
-***--bootstrap-server*** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为***localhost:9092**，用空格隔开。早期版本的Kafka也可以通过 --broker-list参数进行连接，当前版本已经不推荐使用了。
+**--bootstrap-server** : 把当前的DOS窗口当成Kafka的客户端，那么进行操作前，就需要连接服务器，这里的参数就表示服务器的连接方式，因为我们在本机启动Kafka服务进程，且Kafka默认端口为9092，所以此处，后面接的参数值为***localhost:9092**，用空格隔开。早期版本的Kafka也可以通过 --broker-list参数进行连接，当前版本已经不推荐使用了。
 
 **--topic** : 主题的名称，后面接的参数值就是之前已经创建好的主题名称。其实这个参数并不是必须传递的参数，因为如果不传递这个参数的话，那么消费者会消费所有主题的消息。如果传递这个参数，那么消费者只能消费到指定主题的消息数据。
 
-***--from-beginning*** : 从第一条数据开始消费，无参数值，是一个标记参数。默认情况下，消费者客户端连接上服务器后，是不会消费到连接之前所生产的数据的。也就意味着如果生产者客户端在消费者客户端连接前已经生产了数据，那么这部分数据消费者是无法正常消费到的。所以在实际环境中，应该是先启动消费者客户端，再启动生产者客户端，保证消费数据的完整性。增加参数后，Kafka就会从第一条数据开始消费，保证消息数据的完整性。
+**--from-beginning** : 从第一条数据开始消费，无参数值，是一个标记参数。默认情况下，消费者客户端连接上服务器后，是不会消费到连接之前所生产的数据的。也就意味着如果生产者客户端在消费者客户端连接前已经生产了数据，那么这部分数据消费者是无法正常消费到的。所以在实际环境中，应该是先启动消费者客户端，再启动生产者客户端，保证消费数据的完整性。增加参数后，Kafka就会从第一条数据开始消费，保证消息数据的完整性。
 
 #### 1.2.4.2 Java API
 
