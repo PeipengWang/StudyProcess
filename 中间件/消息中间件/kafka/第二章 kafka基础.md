@@ -802,7 +802,7 @@ producer.close();
 
 (1) 实现生产者拦截器接口ProducerInterceptor
 ```
-package com.atguigu.test;
+
 
 import org.apache.kafka.clients.producer.ProducerInterceptor;
 
@@ -872,7 +872,7 @@ public class KafkaInterceptorMock implements ProducerInterceptor<String, String>
 
 ##### 2.4.3.1.2 配置拦截器
 ```
-package com.atguigu.test;
+
 
 import org.apache.kafka.clients.producer.*;
 
@@ -939,7 +939,6 @@ public class ProducerInterceptorTest {
 Kafka发送数据时，可以同时传递回调对象（Callback）用于对数据的发送结果进行对应处理，具体代码实现采用匿名类或Lambda表达式都可以。
 
 ```
-package com.atguigu.kafka.test;
 
 import org.apache.kafka.clients.producer.*;
 
@@ -1010,8 +1009,6 @@ Kafka发送数据时，底层的实现类似于生产者消费者模式。对应
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps58.jpg)  
 
 ```
-
-package com.atguigu.kafka.test;
 
  
 
@@ -1094,8 +1091,6 @@ Kafka发送数据时，底层的实现类似于生产者消费者模式。对应
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps62.jpg)  
 
 ```
-
-package com.atguigu.kafka.test;
 
 
 import org.apache.kafka.clients.producer.*;
@@ -1237,7 +1232,7 @@ for ( int i = 0; i < 1; i++ ) {
 
 首先我们需要创建一个类，然后实现Kafka提供的分区类接口Partitioner，接下来重写方法。这里我们只关注partition方法即可，因为此方法的返回结果就是需要的分区编号。
 ```
-package com.atguigu.test;
+
 
  
 
@@ -1321,7 +1316,7 @@ public class KafkaPartitionerMock implements Partitioner {
 
 ##### **2.4.4.3.2 配置分区器**
 
-package com.atguigu.test;
+
 
 
 import org.apache.kafka.clients.producer.*;
@@ -2201,7 +2196,7 @@ Kafka会根据消费者发送的参数，返回数据对象ConsumerRecord。返�
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps130.jpg) 
 
 ```
-package com.atguigu.test;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
