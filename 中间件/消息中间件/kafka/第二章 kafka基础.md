@@ -739,131 +739,96 @@ Broker节点获取客户端请求，并根据请求键进行后续的数据处�
 ### 2.4.2 生产消息的基本代码 
 
 ```
-// TODO 配置属性集合
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import java.util.HashMap;
+import java.util.Map;
 
-Map<String, Object> configMap = new HashMap<>();
+public class KafkaProducerTest {
+    public static void main(String[] args) {
+        // 配置属性集合
+        Map<String, Object> configMap = new HashMap<>();
+        //  配置属性：Kafka服务器集群地址
+        configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.235.5.57:9092");
+        //  配置属性：Kafka生产的数据为KV对，所以在生产数据进行传输前需要分别对K,V进行对应的序列化操作
+        configMap.put(
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringSerializer");
+        configMap.put(
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringSerializer");
+        //  创建Kafka生产者对象，建立Kafka连接
+        //    构造对象时，需要传递配置参数
+        KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
+        //   准备数据,定义泛型
+        //    构造对象时需要传递 【Topic主题名称】，【Key】，【Value】三个参数
+        ProducerRecord<String, String> record = new ProducerRecord<>(
+                "quickstart-events", "key1", "value1"
+        );
+        //  生产（发送）数据
+        producer.send(record);
+        //  关闭生产者连接
+        producer.close();
 
-// TODO 配置属性：Kafka服务器集群地址
-
-configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-
-// TODO 配置属性：Kafka生产的数据为KV对，所以在生产数据进行传输前需要分别对K,V进行对应的序列化操作
-
-configMap.put(
-
- ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-
-  "org.apache.kafka.common.serialization.StringSerializer");
-
-configMap.put(
-
- ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-
- "org.apache.kafka.common.serialization.StringSerializer");
-
-// TODO 创建Kafka生产者对象，建立Kafka连接
-
-//    构造对象时，需要传递配置参数
-
-KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
-
-// TODO 准备数据,定义泛型
-
-//    构造对象时需要传递 【Topic主题名称】，【Key】，【Value】三个参数
-
-ProducerRecord<String, String> record = new ProducerRecord<String, String>(
-
- "test", "key1", "value1"
-
-);
-
-// TODO 生产（发送）数据
-
-producer.send(record);
-
-// TODO 关闭生产者连接
-
-producer.close();
+    }
+}
 ```
 
 ### 2.4.3 发送消息
-
 #### 2.4.3.1拦截器
 
 生产者API在数据准备好发送给Kafka服务器之前，允许我们对生产的数据进行统一的处理，比如校验，整合数据等等。这些处理我们是可以通过Kafka提供的拦截器完成。因为拦截器不是生产者必须配置的功能，所以大家可以根据实际的情况自行选择使用。
-
 但是要注意，这里的拦截器是可以配置多个的。执行时，会按照声明顺序执行完一个后，再执行下一个。并且某一个拦截器如果出现异常，只会跳出当前拦截器逻辑，并不会影响后续拦截器的处理。所以开发时，需要将拦截器的这种处理方法考虑进去。
-
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps55.jpg) 
 
 接下来，我们来演示一下拦截器的操作：
 
 ##### 2.4.3.1.1 增加拦截器类
-
 (1) 实现生产者拦截器接口ProducerInterceptor
 ```
-
-
 import org.apache.kafka.clients.producer.ProducerInterceptor;
-
 import org.apache.kafka.clients.producer.ProducerRecord;
-
 import org.apache.kafka.clients.producer.RecordMetadata;
-
 import java.util.Map;
 
 /**
-
- \* TODO 自定义数据拦截器
-
- \*    1. 实现Kafka提供的生产者接口ProducerInterceptor
-
- \*    2. 定义数据泛型 <K, V>
-
- \*    3. 重写方法
-
- \*     onSend
-
- \*     onAcknowledgement
-
- \*     close
-
- \*     configure
-
+ * 自定义数据拦截器
+ * 1. 实现Kafka提供的生产者接口ProducerInterceptor
+ * 2. 定义数据泛型 <K, V>
+ * 3. 重写方法
+ * onSend
+ * onAcknowledgement
+ * close
+ * configure
  */
-
 public class KafkaInterceptorMock implements ProducerInterceptor<String, String> {
 
   @Override
-
   public ProducerRecord<String, String> onSend(ProducerRecord<String, String> record) {
-  return record;
-
+    System.out.println("ProducerRecord");
+    return record;
   }
 
-  @Override	
-
+  @Override
   public void onAcknowledgement(RecordMetadata metadata, Exception exception) {
-
+    System.out.println("onAcknowledgement");
   }
 
   @Override
-
   public void close() {
-
+    System.out.println("close");
   }
 
   @Override
-
   public void configure(Map<String, ?> configs) {
-
+    System.out.println("configure");
   }
-
 }
 ```
 (2) 实现接口中的方法，根据业务功能重写具体的方法
 
-| **方法名**  | **作用**                                               |
+| 方法名 | 作用                                              |
 | ----------------- | ------------------------------------------------------------ |
 | onSend            | 数据发送前，会执行此方法，进行数据发送前的预处理             |
 | onAcknowledgement | 数据发送后，获取应答时，会执行此方法                         |
@@ -872,68 +837,42 @@ public class KafkaInterceptorMock implements ProducerInterceptor<String, String>
 
 ##### 2.4.3.1.2 配置拦截器
 ```
-
-
 import org.apache.kafka.clients.producer.*;
-
 import org.apache.kafka.common.serialization.StringSerializer;
-
 import java.util.HashMap;
-
 import java.util.Map;
-
 import java.util.concurrent.Future;
 
 public class ProducerInterceptorTest {
 
   public static void main(String[] args) {
-
    Map<String, Object> configMap = new HashMap<>();
-
-   configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-
-    configMap.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-
-    configMap.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-
- 
-
-  configMap.put( ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, KafkaInterceptorMock.class.getName());
-
- 
+   configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.235.5.57:9092");
+   configMap.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+   configMap.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+   // 这里加了拦截器
+   configMap.put( ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, KafkaInterceptorMock.class.getName());
 
    KafkaProducer<String, String> producer = null;
-
    try {
-
-    producer = new KafkaProducer<>(configMap);
-
-     for ( int i = 0; i < 1; i++ ) {
-
-       ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", "key" + i, "value" + i);
-
-       final Future<RecordMetadata> send = producer.send(record);
-
-    }
-
+       producer = new KafkaProducer<>(configMap);
+       for ( int i = 0; i < 10; i++ ) {
+           ProducerRecord<String, String> record = new ProducerRecord<String, String>("quickstart-events", "key" + i, "value" + i);
+           final Future<RecordMetadata> send = producer.send(record);
+       }
    } catch ( Exception e ) {
-    e.printStackTrace();
+       e.printStackTrace();
    } finally {
-
-     if ( producer != null ) {
-
-       producer.close();
-
-     }
-
+       if ( producer != null ) {
+           producer.close();
+       }
    }
-
- 
-
   }
-
 }
 ```
+这里测试流程
+![image](https://github.com/PeipengWang/StudyProcess/assets/49521385/b2fcfe1d-3c82-46a6-9ab7-f31313a9862e)
+
 #### 2.4.3.2 回调方法
 
 Kafka发送数据时，可以同时传递回调对象（Callback）用于对数据的发送结果进行对应处理，具体代码实现采用匿名类或Lambda表达式都可以。
