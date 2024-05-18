@@ -1316,93 +1316,115 @@ Kafka中的事务是分布式事务，所以采用的也是二阶段提交
 ##### 2.4.6.4.4 事务操作代码 
 
 ```
-
-
 import org.apache.kafka.clients.producer.*;
-
 import org.apache.kafka.common.serialization.StringSerializer;
-
- 
-
 import java.util.HashMap;
-
 import java.util.Map;
-
 import java.util.concurrent.Future;
 
- 
+public class ProducerTransactionTest {
+  public static void main(String[] args) {
+      Map<String, Object> configMap = new HashMap<>();
+      configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.235.5.57:9092");
+      configMap.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+      configMap.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+      //配置幂等性
+      configMap.put( ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+      //配置事务ID
+      configMap.put( ProducerConfig.TRANSACTIONAL_ID_CONFIG, "my-tx-id");
+      //配置事务超时时间
+      configMap.put( ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, 5);
+      //创建生产者对象
+      KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
+      //初始化事务
+      producer.initTransactions();
+   try {
+     //启动事务
+     producer.beginTransaction();
+     //生产数据
+     for ( int i = 0; i < 10; i++ ) {
+       ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", "key" + i, "value" + i);
+       final Future<RecordMetadata> send = producer.send(record);
+    }
+    //提交事务
+     producer.commitTransaction();
+  } catch ( Exception e ) {
+     e.printStackTrace();
+    //终止事务
+    producer.abortTransaction();
+  }
+  //关闭生产者对象
+  producer.close();
+  }
+}
+```
+这个是事务的基本提交流程，在消费者可以看到具体的数据
+```
+bin/kafka-console-consumer.sh --topic test --from-beginning --bootstrap-server localhost:9092
+value0
+value1
+value2
+value3
+value4
+value5
+value6
+value7
+value8
+value9
+```
+如果在发送数据过程中发生了异常呢，具体测试代码如下：
+```
+
+import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.common.serialization.StringSerializer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Future;
 
 public class ProducerTransactionTest {
-
   public static void main(String[] args) {
-
-   Map<String, Object> configMap = new HashMap<>();
-
-  configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-
-   configMap.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-
-  configMap.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-
-  // TODO 配置幂等性
-
-  configMap.put( ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
-
-  // TODO 配置事务ID
-
-  configMap.put( ProducerConfig.TRANSACTIONAL_ID_CONFIG, "my-tx-id");
-
-  // TODO 配置事务超时时间
-
-   configMap.put( ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, 5);
-
-   // TODO 创建生产者对象
-
-   KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
-
-   // TODO 初始化事务
-
-   producer.initTransactions();
-
+      Map<String, Object> configMap = new HashMap<>();
+      configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.235.5.57:9092");
+      configMap.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+      configMap.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+      //配置幂等性
+      configMap.put( ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+      //配置事务ID
+      configMap.put( ProducerConfig.TRANSACTIONAL_ID_CONFIG, "my-tx-id");
+      //配置事务超时时间
+      configMap.put( ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, 5);
+      //创建生产者对象
+      KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
+      //初始化事务
+      producer.initTransactions();
    try {
-
-     // TODO 启动事务
-
+     //启动事务
      producer.beginTransaction();
-
-     // TODO 生产数据
-
+     //生产数据
      for ( int i = 0; i < 10; i++ ) {
-
        ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", "key" + i, "value" + i);
-
        final Future<RecordMetadata> send = producer.send(record);
-
     }
-
-    // TODO 提交事务
-
+     //这里发生异常，会回滚
+     int i = 1/0;
+    //提交事务
      producer.commitTransaction();
-
   } catch ( Exception e ) {
-
      e.printStackTrace();
-
-    // TODO 终止事务
-
+    //终止事务
     producer.abortTransaction();
-
   }
-
-  // TODO 关闭生产者对象
-
+  //关闭生产者对象
   producer.close();
-
- 
-
   }
-
 }
+```
+此时，在消费者端看不到数据，会报错异常
+```
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+java.lang.ArithmeticException: / by zero
+	at Produc.ProducerTransactionTest.main(ProducerTransactionTest.java:33)
+
 ```
 #### 2.4.6.5数据传输语义
 
