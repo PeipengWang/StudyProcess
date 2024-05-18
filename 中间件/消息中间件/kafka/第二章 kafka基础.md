@@ -2213,11 +2213,11 @@ Kafka提供的分区分配策略常用的有4个：
 
 Kafka消费者默认的分区分配就是RangeAssignor，CooperativeStickyAssignor
 
-#### **2.6.3.4偏移量offset**
+#### 2.6.3.4偏移量offset
 
 偏移量offset是消费者消费数据的一个非常重要的属性。默认情况下，消费者如果不指定消费主题数据的偏移量，那么消费者启动消费时，无论当前主题之前存储了多少历史数据，消费者只能从连接成功后当前主题最新的数据偏移位置读取，而无法读取之前的任何数据，如果想要获取之前的数据，就需要设定配置参数或指定数据偏移量。
 
-##### **2.6.3.4.1 起始偏移量**
+##### 2.6.3.4.1 起始偏移量
 
 在消费者的配置中，我们可以增加偏移量相关参数auto.offset.reset，用于从最开始获取主题数据， 
 
@@ -2413,10 +2413,6 @@ public class KafkaConsumerCommitAutoTest {
 
 异步提交：向Kafka发送偏移量offset提交请求后，就可以直接消费下一批数据，因为无需等待kafka的提交确认，所以无法知道当前的偏移量一定提交成功，所以安全性比较低，但相对，消费性能会提高
 
-![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps165.jpg) 
-
-
-
 ```
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
@@ -2499,10 +2495,6 @@ public class KafkaConsumerCommitASyncTest {
 ```
 
 同步提交：必须等待Kafka完成offset提交请求的响应后，才可以消费下一批数据，一旦提交失败，会进行重试处理，尽可能保证偏移量提交成功，但是依然可能因为以外情况导致提交请求失败。此种方式消费效率比较低，但是安全性高。
-
-![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps166.jpg) 
-
-
 
 ```
 import org.apache.kafka.clients.consumer.ConsumerConfig;
