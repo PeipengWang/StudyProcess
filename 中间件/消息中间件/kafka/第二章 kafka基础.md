@@ -660,21 +660,21 @@ Broker节点接收到请求后，根据分区状态信息，设定当前的副�
 
 文件目录名：主题名 + 分区编号
 
-| **文件名**           | **说明**               |
+| 文件名           | 说明              |
 | -------------------------- | ---------------------------- |
 | 0000000000000000.log       | 数据文件，用于存储传输的小心 |
 | 0000000000000000.index     | 索引文件，用于定位数据       |
 | 0000000000000000.timeindex | 时间索引文件，用于定位数据   |
 
-## **2.4** **生产消息**
+## 2.4 生产消息
 
 Topic主题已经创建好了，接下来我们就可以向该主题生产消息了，这里我们采用Java代码通过Kafka Producer API的方式生产数据。
 
-### **2.4.1** **生产消息的基本步骤**
+### 2.4.1 生产消息的基本步骤
 
-**（一）创建Map类型的配置对象，根据场景增加相应的配置属性：**
+（一）创建Map类型的配置对象，根据场景增加相应的配置属性：
 
-| **参数名***                      | **参数作用**                                           | **类型** | **默认值** | **推荐值**                            |
+| 参数名                    | 参数作用                                           | 类型 | 默认值 | 推荐值                            |
 | ------------------------------------- | ------------------------------------------------------------ | -------------- | ---------------- | ------------------------------------------- |
 | bootstrap.servers                     | 集群地址，格式为：brokerIP1:端口号,brokerIP2:端口号          | 必须           |                  |                                             |
 | key.serializer                        | 对生产数据Key进行序列化的类完整名称                          | 必须           |                  | Kafka提供的字符串序列化类：StringSerializer |
@@ -692,7 +692,7 @@ Topic主题已经创建好了，接下来我们就可以向该主题生产消息
 | partitioner.ignore.keys               | 是否放弃使用数据key选择分区                                  | 可选           | false            |                                             |
 | partitioner.class                     | 分区器类名                                                   | 可选           | null             |                                             |
 
-**（二）创建待发送数据**
+（二）创建待发送数据
 
 在kafka中传递的数据我们称之为消息（message）或记录(record)，所以Kafka发送数据前，需要将待发送的数据封装为指定的数据模型：
 
@@ -702,13 +702,13 @@ Topic主题已经创建好了，接下来我们就可以向该主题生产消息
 
 相关属性必须在构建数据模型时指定，其中主题和value的值是必须要传递的。如果配置中开启了自动创建主题，那么Topic主题可以不存在。value就是我们需要真正传递的数据了，而Key可以用于数据的分区定位。
 
-**（三）创建生产者对象，发送生产的数据：**
+（三）创建生产者对象，发送生产的数据：
 
 根据前面提供的配置信息创建生产者对象，通过这个生产者对象向Kafka服务器节点发送数据，而具体的发送是由生产者对象创建时，内部构建的多个组件实现的，多个组件的关系有点类似于生产者消费者模式。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps52.jpg) 
 
-(1) 数据生产者（**KafkaProducer**）：生产者对象，用于对我们的数据进行必要的转换和处理，将处理后的数据放入到数据收集器中，类似于生产者消费者模式下的生产者。这里我们简单介绍一下内部的数据转换处理：
+(1) 数据生产者（KafkaProducer）：生产者对象，用于对我们的数据进行必要的转换和处理，将处理后的数据放入到数据收集器中，类似于生产者消费者模式下的生产者。这里我们简单介绍一下内部的数据转换处理：
 
  如果配置拦截器栈（interceptor.classes），那么将数据进行拦截处理。某一个拦截器出现异常并不会影响后续的拦截器处理。
 
@@ -718,7 +718,7 @@ Topic主题已经创建好了，接下来我们就可以向该主题生产消息
 
 将数据追加到数据收集器中。
 
-(2) 数据收集器（**RecordAccumulator**）：用于收集，转换我们产生的数据，类似于生产者消费者模式下的缓冲区。为了优化数据的传输，Kafka并不是生产一条数据就向Broker发送一条数据，而是通过合并单条消息，进行批量（批次）发送，提高吞吐量，减少带宽消耗。
+(2) 数据收集器（RecordAccumulator）：用于收集，转换我们产生的数据，类似于生产者消费者模式下的缓冲区。为了优化数据的传输，Kafka并不是生产一条数据就向Broker发送一条数据，而是通过合并单条消息，进行批量（批次）发送，提高吞吐量，减少带宽消耗。
 
 默认情况下，一个发送批次的数据容量为16K，这个可以通过参数batch.size进行改善。
 
@@ -844,97 +844,71 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 public class ProducerInterceptorTest {
-
   public static void main(String[] args) {
    Map<String, Object> configMap = new HashMap<>();
    configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.235.5.57:9092");
-   configMap.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-   configMap.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+   configMap.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+   configMap.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
    // 这里加了拦截器
-   configMap.put( ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, KafkaInterceptorMock.class.getName());
-
+   configMap.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, KafkaInterceptorMock.class.getName());
    KafkaProducer<String, String> producer = null;
+
    try {
        producer = new KafkaProducer<>(configMap);
+       System.out.println("end new kafka producer");
        for ( int i = 0; i < 10; i++ ) {
            ProducerRecord<String, String> record = new ProducerRecord<String, String>("quickstart-events", "key" + i, "value" + i);
+           System.out.println("end new new producer record");
            final Future<RecordMetadata> send = producer.send(record);
+           System.out.println("end send");
        }
    } catch ( Exception e ) {
        e.printStackTrace();
    } finally {
        if ( producer != null ) {
            producer.close();
+           System.out.println("edn close");
        }
    }
   }
 }
+
 ```
-这里测试流程
+这里加上注释之后能体验到拦截器与生产者回调的基本流程
 ![image](https://github.com/PeipengWang/StudyProcess/assets/49521385/b2fcfe1d-3c82-46a6-9ab7-f31313a9862e)
 
 #### 2.4.3.2 回调方法
 
 Kafka发送数据时，可以同时传递回调对象（Callback）用于对数据的发送结果进行对应处理，具体代码实现采用匿名类或Lambda表达式都可以。
-
+注意这个是数据发送成功之后的回调函数，类似于上述拦截器的onAcknowledgement
 ```
-
 import org.apache.kafka.clients.producer.*;
 
 import java.util.HashMap;
 
 import java.util.Map;
-
 public class KafkaProducerASynTest {
-
   public static void main(String[] args) {
-
-  Map<String, Object> configMap = new HashMap<>();
-
-    configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-
-   configMap.put(
-
-       ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-       "org.apache.kafka.common.serialization.StringSerializer");
-   configMap.put(
-
-       ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-
-       "org.apache.kafka.common.serialization.StringSerializer");
-
-   KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
-
-   //  循环生产数据
-
-   for ( int i = 0; i < 1; i++ ) {
-
-     //  创建数据
-
+      Map<String, Object> configMap = new HashMap<>();
+      configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.235.5.57:9092");
+      configMap.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+      configMap.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+      KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
+      //循环生产数据
+      for ( int i = 0; i < 1; i++ ) {
+     //创建数据
      ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", "key" + i, "value" + i);
-
-     //  发送数据
-
+     //发送数据
      producer.send(record, new Callback() {
-
        //  回调对象
-
        public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-
          //  当数据发送成功后，会回调此方法
-
          System.out.println("数据发送成功：" + recordMetadata.timestamp());
-
        }
-
      });
-
    }
-
    producer.close();
-
   }
-
 }
 ```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps57.jpg) 
@@ -942,71 +916,33 @@ public class KafkaProducerASynTest {
 #### 2.4.3.3异步发送
 
 Kafka发送数据时，底层的实现类似于生产者消费者模式。对应的，底层会由主线程代码作为生产者向缓冲区中放数据，而数据发送线程会从缓冲区中获取数据进行发送。Broker接收到数据后进行后续处理。
-
 如果Kafka通过主线程代码将一条数据放入到缓冲区后，无需等待数据的后续发送过程，就直接发送一下条数据的场合，我们就称之为异步发送。
-
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps58.jpg)  
-
 ```
-
- 
-
 import org.apache.kafka.clients.producer.*;
-
- 
-
 import java.util.HashMap;
-
 import java.util.Map;
 
-
 public class KafkaProducerASynTest {
-
   public static void main(String[] args) {
-
-   Map<String, Object> configMap = new HashMap<>();
-
-  configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-
-   configMap.put(
-
-      ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-
-      "org.apache.kafka.common.serialization.StringSerializer");
-
-   configMap.put(
-
-       ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-
-       "org.apache.kafka.common.serialization.StringSerializer");
-
-   KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
-    //  循环生产数据
-
-   for ( int i = 0; i < 10; i++ ) {
-
-     //  创建数据
-
-     ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", "key" + i, "value" + i);
-
-    //  发送数据
-
-    producer.send(record, new Callback() {
-
-      //  回调对象
-
-      public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-
+      Map<String, Object> configMap = new HashMap<>();
+      configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.235.5.57:9092");
+      configMap.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+      configMap.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+      KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
+      //  循环生产数据
+      for ( int i = 0; i < 10; i++ ) {
+          //创建数据
+          ProducerRecord<String, String> record = new ProducerRecord<>("test", "key" + i, "value" + i);
+          //发送数据
+          producer.send(record, new Callback() {
+          //回调对象
+        public void onCompletion(RecordMetadata recordMetadata, Exception e) {
         //  当数据发送成功后，会回调此方法
-
-        System.out.println("数据发送成功：" + recordMetadata.timestamp());
-
+            System.out.println("数据发送成功：" + recordMetadata.timestamp());
       }
-
     });
-
-    //  发送当前数据
-
+    //  发送当前数
     System.out.println("发送数据");
 
   }
@@ -1015,7 +951,6 @@ public class KafkaProducerASynTest {
 
   }
 
-}
 ```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps60.jpg)![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps61.jpg) 
 
