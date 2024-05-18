@@ -965,103 +965,61 @@ Kafka发送数据时，底层的实现类似于生产者消费者模式。对应
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps62.jpg)  
 
 ```
-
-
+package Producer
 import org.apache.kafka.clients.producer.*;
 import java.util.HashMap;
 
 import java.util.Map;
+
 public class KafkaProducerASynTest {
-
-  public static void main(String[] args) throws Exception {
-
-   Map<String, Object> configMap = new HashMap<>();
-
-   configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-
-   configMap.put(
-
-       ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-
-       "org.apache.kafka.common.serialization.StringSerializer");
-
-   configMap.put(
-
-       ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-
-       "org.apache.kafka.common.serialization.StringSerializer");
-
-   KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
-
-   //  循环生产数据
-
-   for ( int i = 0; i < 10; i++ ) {
-
-     //  创建数据
-
-     ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", "key" + i, "value" + i);
-
-    //  发送数据
-
-    producer.send(record, new Callback() {
-
-       // 回调对象
-
-       public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-
-         // 当数据发送成功后，会回调此方法
-
-        System.out.println("数据发送成功：" + recordMetadata.timestamp());
+  public static void main(String[] args) throws Exception { 
+      Map<String, Object> configMap = new HashMap<>();
+      configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+      configMap.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+      configMap.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+      KafkaProducer<String, String> producer = new KafkaProducer<>(configMap);
+     //循环生产数据
+      for ( int i = 0; i < 10; i++ ) { 
+          ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", "key" + i, "value" + i);
+          //发送数据
+          producer.send(record, new Callback() {
+              // 回调对象
+            public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                //当数据发送成功后，会回调此方法
+                System.out.println("数据发送成功：" + recordMetadata.timestamp());
        }
-
      }).get(); //这个get就是堵塞在这里，直到得到响应
      //  发送当前数据
-
      System.out.println("发送数据");
-
    }
-
    producer.close();
-
   }
-
 }
 ```
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps64.jpg) 
 
 ### 2.4.4 消息分区
-
 #### 2.4.4.1指定分区
 
 Kafka中Topic是对数据逻辑上的分类，而Partition才是数据真正存储的物理位置。所以在生产数据时，如果只是指定Topic的名称，其实Kafka是不知道将数据发送到哪一个Broker节点的。我们可以在构建数据传递Topic参数的同时，也可以指定数据存储的分区编号。
 
 ![img](https://raw.githubusercontent.com/PeipengWang/picture/master/kafka/wps65.jpg) 
 ```
-for ( int i = 0; i < 1; i++ ) {
-
-  ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", 0, "key" + i, "value" + i);
-
-  final Future<RecordMetadata> send = producer.send(record, new Callback() {
-
-   public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-
-    if ( e != null ) {
-       e.printStackTrace();
-
-     } else {
-
-     System.out.println("数据发送成功：" + record.key() + "," + record.value());
-
-     }
-
-   }
-
-  });
-
-}
+     //循环生产数据
+      for ( int i = 0; i < 1; i++ ) {
+          ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", 0, "key" + i, "value" + i);
+          final Future<RecordMetadata> send = producer.send(record, new Callback() {
+              public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                  if ( e != null ) {
+                      e.printStackTrace();
+                  } else {
+                      System.out.println("数据发送成功：" + record.key() + "," + record.value());
+                  }
+              }
+          });
+      }
 ```
 #### 2.4.4.2未指定分
-
 指定分区传递数据是没有任何问题的。Kafka会进行基本简单的校验，比如是否为空，是否小于0之类的，但是你的分区是否存在就无法判断了，所以需要从Kafka中获取集群元数据信息，此时会因为长时间获取不到元数据信息而出现超时异常。所以如果不能确定分区编号范围的情况，不指定分区还是一个不错的选择。
 
 如果不指定分区，Kafka会根据集群元数据中的主题分区来通过算法来计算分区编号并设定：
@@ -1106,150 +1064,93 @@ for ( int i = 0; i < 1; i++ ) {
 
 首先我们需要创建一个类，然后实现Kafka提供的分区类接口Partitioner，接下来重写方法。这里我们只关注partition方法即可，因为此方法的返回结果就是需要的分区编号。
 ```
-
-
- 
-
 import org.apache.kafka.clients.producer.Partitioner;
-
 import org.apache.kafka.common.Cluster;
-
- 
-
 import java.util.Map;
 
- 
-
 /**
-
- \* TODO 自定义分区器实现步骤：
-
- \*    1. 实现Partitioner接口
-
- \*    2. 重写方法
-
- \*     partition : 返回分区编号，从0开始
-
- \*     close
-
- \*     configure
-
+ 自定义分区器实现步骤：
+ 1. 实现Partitioner接口
+ 2. 重写方法
+ partition : 返回分区编号，从0开始
+ close
+ configure
  */
 
 public class KafkaPartitionerMock implements Partitioner {
-
   /**
-
-   \* 分区算法 - 根据业务自行定义即可
-
-   \* @param topic The topic name
-
-   \* @param key The key to partition on (or null if no key)
-
-   \* @param keyBytes The serialized key to partition on( or null if no key)
-
-   \* @param value The value to partition on or null
-
-   \* @param valueBytes The serialized value to partition on or null
-
-   \* @param cluster The current cluster metadata
-
-   \* @return 分区编号，从0开始
-
+    分区算法 - 根据业务自行定义即可
+    @param topic 要发送的主题名称
+    @param key The key to partition on (or null if no key)
+    @param keyBytes The serialized key to partition on( or null if no key)
+    @param value The value to partition on or null
+    @param valueBytes The serialized value to partition on or null
+    @param cluster The current cluster metadata
+    @return 分区编号，从0开始
    */
 
   @Override
-
   public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
-
-   return 0;
-
+    System.out.println("patition");
+    System.out.println(topic);
+    return 0;
   }
 
- 
-
   @Override
-
   public void close() {
-
- 
-
+    System.out.println("close");
   }
 
- 
-
   @Override
-
   public void configure(Map<String, ?> configs) {
-
- 
-
+    System.out.println("configure");
   }
 
 }
-
-##### **2.4.4.3.2 配置分区器**
-
-
-
-
+```
+这里将上面定义的分区拦截器加入生产者的配置，在发送之前会调用partition方法来完成分区解析
+```
 import org.apache.kafka.clients.producer.*;
-
 import org.apache.kafka.common.serialization.StringSerializer;
-
 import java.util.HashMap;
-
 import java.util.Map;
-
 import java.util.concurrent.Future;
 
-
 public class ProducerPartitionTest {
-
   public static void main(String[] args) {
-
-   Map<String, Object> configMap = new HashMap<>();
-
-    configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-
-   configMap.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-
-    configMap.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-
-   configMap.put( ProducerConfig.PARTITIONER_CLASS_CONFIG, KafkaPartitionerMock.class.getName());
-//自定义分区器
-
-   KafkaProducer<String, String> producer = null;
-   try {
-     producer = new KafkaProducer<>(configMap);
-
-     for ( int i = 0; i < 1; i++ ) {
-       ProducerRecord<String, String> record = new ProducerRecord<String, String>("test", "key" + i, "value" + i);
-       final Future<RecordMetadata> send = producer.send(record, new Callback() {
-         public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-           if ( e != null ) {
-             e.printStackTrace();
-           } else {
-             System.out.println("数据发送成功：" + record.key() + "," + record.value());
-           }
-         }
-       });
-     }
-
-   } catch ( Exception e ) {
-
-     e.printStackTrace();
-
-   } finally {
-
-     if ( producer != null ) {
-       producer.close();
-     }
-
-   }
+      Map<String, Object> configMap = new HashMap<>();
+      configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.235.5.82:9092");
+      configMap.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+      configMap.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+     //加入partition分区拦截器
+      configMap.put( ProducerConfig.PARTITIONER_CLASS_CONFIG, KafkaPartitionerMock.class.getName());
+      //自定义分区器
+      KafkaProducer<String, String> producer = null;
+      try {
+          producer = new KafkaProducer<>(configMap);
+          for ( int i = 0; i < 1; i++ ) {
+              ProducerRecord<String, String> record = new ProducerRecord<String, String>("quickstart-events", "key" + i, "value" + i);
+              final Future<RecordMetadata> send = producer.send(record, new Callback() {
+                  public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                      if ( e != null ) {
+                          e.printStackTrace();
+                      } else {
+                          System.out.println("数据发送成功：" + record.key() + "," + record.value());
+                      }
+                  }
+              });
+          }
+      } catch ( Exception e ) {
+          e.printStackTrace();
+      } finally {
+          if ( producer != null ) {
+              producer.close();
+          }
+      }
   }
 }
 ```
+
 ### 2.4.5 消息可靠性
 
 对于生产者发送的数据，我们有的时候是不关心数据是否已经发送成功的，我们只要发送就可以了。在这种场景中，消息可能会因为某些故障或问题导致丢失，我们将这种情况称之为消息不可靠。虽然消息数据可能会丢失，但是在某些需要高吞吐，低可靠的系统场景中，这种方式也是可以接受的，甚至是必须的。
