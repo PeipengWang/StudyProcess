@@ -3,3 +3,6 @@ https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html
 
 对AQS的简单理解及自定义锁的实现
 https://juejin.cn/post/6844904163382411278
+
+ReentrantLock源码分析
+https://pdai.tech/md/java/thread/java-thread-x-lock-ReentrantLock.html
