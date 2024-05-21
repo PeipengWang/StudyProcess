@@ -106,6 +106,59 @@ zookeeper中的节点有两种，分别为临时节点和永久节点。节点�
 
 ## 3.zookeeper**常用**Shell命令
 
+所有命令
+
+```
+help
+ZooKeeper -server host:port cmd args
+        stat path [watch]
+        set path data [version]
+        ls path [watch]
+        delquota [-n|-b] path
+        ls2 path [watch]
+        setAcl path acl
+        setquota -n|-b val path
+        history 
+        redo cmdno
+        printwatches on|off
+        delete path [version]
+        sync path
+        listquota path
+        rmr path
+        get path [watch]
+        create [-s] [-e] path data acl
+        addauth scheme auth
+        quit 
+        getAcl path
+        close 
+        connect host:port
+
+```
+
+
+
+### 3.0 启动
+
+```
+
+//启动：zkServer.sh start
+//停止：zkServer.sh stop
+//查看状态：zkServer.sh status
+./zkCli.sh  -server localhost:2181
+```
+
+客户端   对节点的操作
+
+get/ls 获取
+
+set 修改
+
+create 创建
+
+delete 删除
+
+
+
 ### 3.1新增节点
 
 ```shell
@@ -115,7 +168,24 @@ create [-s][-e] path data#其中-s为有序节点，-e临时节
 创建持久化节点并写入数据：
 
 ```
-create /hadoop "123456"
+[zk: localhost:2181(CONNECTED) 8] create /app1 "123456"
+Created /app1
+[zk: localhost:2181(CONNECTED) 9] get /                
+
+cZxid = 0x0
+ctime = Thu Jan 01 08:00:00 CST 1970
+mZxid = 0x0
+mtime = Thu Jan 01 08:00:00 CST 1970
+pZxid = 0x4
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x0
+dataLength = 0
+numChildren = 2
+[zk: localhost:2181(CONNECTED) 10] ls / 
+[zookeeper, app1]
+
 ```
 
 创建持久化有序节点，此时创建的节点名为指定节点名+自增序号
@@ -126,7 +196,7 @@ create /hadoop "123456"
 [zk:localhost:2181(CONNECTED)4]create -s /c "ccc" Created /c0000000002
 ```
 
-创建临时节点，临时节点会在会话过期后被删除：
+创建临时节点，临时节点会在会话断开后被删除，也就是，客户端开着就有，关了再打开就没了。
 
 ```
 zk:localhost:2181(CONNECTED)5]create -e /tmp "tmp"
@@ -173,3 +243,35 @@ zk:localhost:2181(CONNECTED)1]get /hadoop
 节点各个属性如下表。其中一个重要的概念是Zxid(ZooKeeperTransaction Id)，ZooKeeper节点的每一次更改都具有唯一的Zxid，如果Zxid1小于Zxid2，则Zxid1的更改发生在Zxid2更改之前。
 
 ![image-20240520235751862](https://raw.githubusercontent.com/PeipengWang/picture/master/zk/image-20240520235751862.png)
+
+```
+get /path watch
+```
+
+册的监听器能够在节点内容发生改变的时候，向客
+
+### 3.5 查看当前节点下的子节点
+
+```
+ls  路径
+[zk: localhost:2181(CONNECTED) 5] ls /          
+[zookeeper]
+[zk: localhost:2181(CONNECTED) 6] ls /zookeeper
+[aa, quota]
+
+```
+
+
+
+### 3.6 监听器**ls\ls2path[watch]**
+
+```
+[zk:localhost:2181(CONNECTED)9]ls /hadoop watch
+[]
+[zk:localhost:2181(CONNECTED)10]create /hadoop/yarn "aaa"
+```
+
+注册的监听器能够监听该节点下所有子节点的增加和删除操作。
+
+## 4、Java API
+

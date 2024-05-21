@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/k8s/yaml实例/kube-prometheus" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/计算机网络/Computer-Network-Notes" vcs="Git" />
   </component>
 </project>
