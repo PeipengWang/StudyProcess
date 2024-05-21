@@ -275,3 +275,95 @@ ls  路径
 
 ## 4、Java API
 
+引入依赖
+
+```html
+<dependency>
+            <groupId>com.101tec</groupId>
+            <artifactId>zkclient</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>zookeeper</artifactId>
+                    <groupId>org.apache.zookeeper</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+            <version>0.9</version>
+        </dependency>
+        <dependency>
+            <artifactId>zookeeper</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+            <groupId>org.apache.zookeeper</groupId>
+            <version>3.4.10</version>
+        </dependency>
+```
+
+`zonde `是 `zookeeper `集合的核心组件，` zookeeper API` 提供了一小组使用 `zookeeper `集群来操作`znode `的所有细节
+
+客户端应该遵循以下步骤，与`zookeeper`服务器进行清晰和干净的交互
+
+- 连接到`zookeeper`服务器。`zookeeper`服务器为客户端分配会话`ID`
+- 定期向服务器发送心跳。否则，`zookeeper `服务器将过期会话`ID`，客户端需要重新连接
+- 只要会话`Id`处于活动状态，就可以获取/设置`znode`
+- 所有任务完成后，断开与`zookeeper`服务器连接，如果客户端长时间不活动，则`zookeeper`服务器将自动断开客户端
+
+直接写代码
+
+```
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooKeeper;
+
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+
+public class Test {
+    public static void main(String[] args) throws IOException, InterruptedException {
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        ZooKeeper zookeeper = new ZooKeeper("159.75.251.138:2181", 5000, (WatchedEvent x) -> {
+            if (x.getState() == Watcher.Event.KeeperState.SyncConnected) {
+                System.out.println("连接成功");
+                countDownLatch.countDown();
+            }
+        });
+        countDownLatch.await();
+        System.out.println(zookeeper.getSessionId());
+        zookeeper.close();
+    }
+}
+
+```
+
+```
+
+连接成功
+112479687956365317
+
+Process finished with exit code 0
+
+```
+
+或者
+
+![image-20240521235444155](https://raw.githubusercontent.com/PeipengWang/picture/master/zk/image-20240521235444155.png)
