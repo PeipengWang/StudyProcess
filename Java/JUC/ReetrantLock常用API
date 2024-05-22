@@ -1,359 +1,517 @@
+# ReetrantLock
 
+## 1、基本使用
 
-## 方法getHoldCount()
-
-- 该方法的作用是查询当前被这个锁锁定的线程个数, 也就是这个锁执行lock的次数
-
-```java
-public class Demo1 {
-
-    public static void main(String[] args) {
-        ReentrantLock reentrantLock = new ReentrantLock();
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                method1();
-            }
-
-            public void method1() {
-                reentrantLock.lock();
-                System.out.println(Thread.currentThread().getName() + " " +
-                        reentrantLock.getHoldCount());
-                method2();
-                reentrantLock.unlock();
-            }
-
-            public void method2() {
-                reentrantLock.lock();
-                System.out.println(Thread.currentThread().getName() + " " +
-                        reentrantLock.getHoldCount());
-                reentrantLock.unlock();
-            }
-        };
-        thread.start();
-    }
-}
+1、定义锁住的代码
 
 ```
+package lock.ReetrantTest;
 
-## 方法getQueueLength()
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-该方法返回的是想要获取这个锁的线程个数
-比如有5个线程，1个线程首先执行await()方法，那么在调用getQueueLength()方法后返回值是4，说明有4个线程同时在等待lock 的释放。
-
-```java
-public class Demo2 {
-public static void main(String[] args) throws InterruptedException {
-    ReentrantLock reentrantLock = new ReentrantLock();
-    Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            reentrantLock.lock();
-            try {
-                Thread.sleep(Integer.MAX_VALUE);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                reentrantLock.unlock();
-            }
-        }
-    };
-    Thread[] threads = new Thread[5];
-    for (int i = 0; i < 5; i++) {
-        threads[i] = new Thread(runnable);
-    }
-    for (int i = 0; i < 5; i++) {
-        threads[i].start();
-    }
-    Thread.sleep(100);
-    System.out.println(reentrantLock.getQueueLength());
-}
-```
-## 方法getWaitQueueLength()
-
-方法int getWaitfQueueI engh(Condition condition)的作用是返回等待与此锁定相关的给定条件Condition的线程估计数，比如有5个线程，每个线程都执行了同一个condition对象的await()方法，则调用getWaitQueueLengh(Condition condition)方法时返回的int值是5。
-也就是同一个condition执行await的次数, 也就是目前有多少个线程处于某一个condition的await下
-
-```java
-public class Demo3 {
-
-    public static void main(String[] args) {
-        ReentrantLock reentrantLock = new ReentrantLock();
-        Condition condition = reentrantLock.newCondition();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                reentrantLock.lock();
-                try {
-                    System.out.println(reentrantLock.getWaitQueueLength(condition));
-                    condition.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread[] threads = new Thread[5];
+public class MyService {
+    Lock lock = new ReentrantLock();
+    public void testMethod(){
+        lock.lock();
         for (int i = 0; i < 5; i++) {
-            threads[i] = new Thread(runnable);
+            System.out.println(Thread.currentThread() + ":" + i);
         }
+        lock.unlock();
+    }
+}
+
+```
+
+2、定义线程
+
+```
+package lock.ReetrantTest;
+
+public class MyThread extends Thread{
+    private MyService service;
+
+    public MyThread(MyService service) {
+        this.service = service;
+    }
+
+    @Override
+    public void run() {
+       service.testMethod();
+    }
+}
+
+```
+
+3、执行测试代码
+
+```
+package lock.ReetrantTest;
+
+public class Test01 {
+    public static void main(String[] args) {
+        MyService service = new MyService();
+        new MyThread(service).start();
+        new MyThread(service).start();
+        new MyThread(service).start();
+        new MyThread(service).start();
+    }
+
+}
+```
+
+输出为：
+
+```
+Thread[Thread-0,5,main]:0
+Thread[Thread-0,5,main]:1
+Thread[Thread-0,5,main]:2
+Thread[Thread-0,5,main]:3
+Thread[Thread-0,5,main]:4
+Thread[Thread-2,5,main]:0
+Thread[Thread-2,5,main]:1
+Thread[Thread-2,5,main]:2
+Thread[Thread-2,5,main]:3
+Thread[Thread-2,5,main]:4
+Thread[Thread-1,5,main]:0
+Thread[Thread-1,5,main]:1
+Thread[Thread-1,5,main]:2
+Thread[Thread-1,5,main]:3
+Thread[Thread-1,5,main]:4
+Thread[Thread-3,5,main]:0
+Thread[Thread-3,5,main]:1
+Thread[Thread-3,5,main]:2
+Thread[Thread-3,5,main]:3
+Thread[Thread-3,5,main]:4
+
+Process finished with exit code 0
+
+```
+
+可以看到，数据都是顺序输出的，但是线程是哪个先开启并不一定先执行，这个是非公平锁
+
+可以改成公平锁
+
+```
+package lock.ReetrantTest;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class MyService {
+    Lock lock = new ReentrantLock(true);
+    public void testMethod(){
+        lock.lock();
         for (int i = 0; i < 5; i++) {
-            threads[i].start();
+            System.out.println(Thread.currentThread() + ":" + i);
         }
-
-    }
-}
-
-```
-
-## 方法hasQueuedThread()和方法hasQueuedThreads()
-
-方法boolean hasQueuedThread(Thread thread) 的作用是查询指定的线程是否正在等待获取此锁定。 也就是查看指定线程想要获取锁.
-方法boolean hasQueuedThreads()的作用是查询是否有线程正在等待获取此锁定。也就是这个不指定了, 而是只要有想要这把锁的就返回true
-
-```java
-public class Demo4 {
-
-    public static void main(String[] args) throws InterruptedException {
-        ReentrantLock reentrantLock = new ReentrantLock();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                reentrantLock.lock();
-                try {
-                    Thread.sleep(Integer.MAX_VALUE);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    reentrantLock.unlock();
-                }
-            }
-        };
-        Thread a = new Thread(runnable);
-        a.start();
-        Thread.sleep(100);
-        Thread b = new Thread(runnable);
-        b.start();
-        Thread.sleep(100);
-        System.out.println("a需要吗? " + reentrantLock.hasQueuedThread(a));
-        System.out.println("b需要吗? " + reentrantLock.hasQueuedThread(b));
-        System.out.println("有需要吗? " + reentrantLock.hasQueuedThreads());
+        lock.unlock();
     }
 }
 ```
 
-## 方法hasWaiters()
+## 2、ReentrantLock  +  Condition实现选择性通知
 
-方法boolean hasWaiters(Condition condition)的作用是查询是否有线程正在等待与此锁定有关的condition条件。
-也就是在这个condition下有没有线程执行了await还没有唤醒
-这个方法必须在加锁的情况下使用不然没有对象监视器的所有权, 从而抛出IllegalMonitorStateException
+通过Condition进行选择性通知
 
-```java
-public class Demo5 {
-
-    public static void main(String[] args) throws InterruptedException {
-        ReentrantLock reentrantLock = new ReentrantLock();
-        Condition condition = reentrantLock.newCondition();
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                reentrantLock.lock();
-                try {
-                    condition.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    reentrantLock.unlock();
-                }
-            }
-        };
-
-        thread.start();
-        Thread.sleep(100);
-        //注意使用这个方法必须在lock下使用, 不然会没有这个对象监视器的所有权而抛出异常
-        reentrantLock.lock();
-        System.out.println("有没有等待signal的线程 " + reentrantLock.hasWaiters(condition));
-        reentrantLock.unlock();
-    }
-}
-```
-
-## 方法isFair()
-
-方法boolean isFair()的作用是判断是不是公平锁。
-
-## 方法isHeldByCurrentThread()
-
-- 方法boolean isHeldByCurrentThread()的作用是查询当前线程是否保持此锁定。
-
-## 方法isLocked()
-
-- 方法boolean isLocked()的作用是查询此锁定是否由任意线程保持。
-
-## 方法lockInterruptibly()、tryLock()和tryLock(long timeout,TimeUnit unit)
-
-这三个方法大同小异
-方法void locklnterruptibly()的作用是:如果当前线程未被中断，则获取锁定，如果已经被中断则出现异常。 也就是我们在普通使用lock方法加锁时, 如果这个线程被中断了是不会抛出异常的, 而使用locklnterruptibly方法加锁如果这个线程中断了是会抛出异常的
-方法boolean tryLock()的作用是，仅在调用时锁定未被另一个线程保持的情况下，才获取该锁定。 本意就是我尝试去获取锁, 如果没人拿我就拿, 如果有人拿我就不要这把锁了
-方法boolean tryLock(long timeout, TimeUnit unit)的作用是，如果锁定在给定等待时间内没有被另一个线程保持，且当前线程未被中断，则获取该锁定。 也就是我会支持一段时间去尝试那这个把锁, 在这个时间段里, 我没拿到我就不要了
-
-```java
-public class Service1 {
-
-    private ReentrantLock reentrantLock = new ReentrantLock();
-
-    public void method() {
-        try {
-            if (reentrantLock.tryLock(3, TimeUnit.SECONDS)) {
-                System.out.println(Thread.currentThread().getName() + " " +
-                        "获取锁的时间:" + System.currentTimeMillis());
-                Thread.sleep(10000);
-            } else {
-                System.out.println(Thread.currentThread().getName() + " 没有获得锁");
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            if (reentrantLock.isHeldByCurrentThread()) {
-                reentrantLock.unlock();
-            }
-        }
-    }
-}
+首先编写逻辑代码，里面又饿await和single
 
 ```
+package lock.ReetrantTest;
 
-```java
-public class Demo1 {
-
-    public static void main(String[] args) throws InterruptedException {
-        Service1 service1 = new Service1();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                System.out.println(Thread.currentThread().getName() + " 执行method时间" +
-                        System.currentTimeMillis());
-                service1.method();
-            }
-        };
-        Thread a = new Thread(runnable, "A");
-        a.start();
-        Thread b = new Thread(runnable, "B");
-        b.start();
-    }
-}
-
-```
-
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201010181237812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1NoYW5neGluZ3lh,size_16,color_FFFFFF,t_70#pic_center)
-
-## 方法awaitUninterruptibly()
-
-- 我没在普通使用await的时候, 如果这个线程中断了, 就会抛出异常, 但是使用awaitUninterruptibly()即使在等待中的线程被打断了, 也不会抛出异常
-
-## 方法await(time) 和 awaitUntil()
-
-- 这俩个方法和synchronized的wait(long)和相似, 就是wait等待一段时间, 可以提前唤醒, 也可以等时间到了自动唤醒.
-
-## 使用Condition实现多线程的顺序执行
-
-```java
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Run {
+public class MyService {
+    private ReentrantLock lock = new ReentrantLock(true);
+    private Condition condition1 = lock.newCondition();
+    private Condition condition2 = lock.newCondition();
 
-    private static ReentrantLock reentrantLock = new ReentrantLock();
-    //关键变量
-    volatile private static int key = 1;
-    //三个condition保证三种线程 挨个运行
-    private static Condition conditionA = reentrantLock.newCondition();
-    private static Condition conditionB = reentrantLock.newCondition();
-    private static Condition conditionC = reentrantLock.newCondition();
 
+    public void await(){
+
+        try {
+            lock.lock();
+            System.out.println("awit Time start : " + System.currentTimeMillis());
+            condition1.await();
+            System.out.println("awit Time end : " + System.currentTimeMillis());
+        } catch (InterruptedException e) {
+           e.printStackTrace();
+        }finally {
+            System.out.println("release lock");
+            lock.unlock();;
+        }
+    }
+
+    public void signal(){
+        try {
+            lock.lock();
+            System.out.println("single:"+System.currentTimeMillis());
+            condition1.signal();
+        }finally {
+            lock.unlock();
+        }
+
+    }
+}
+
+```
+
+线程代码
+
+```
+package lock.ReetrantTest;
+
+public class MyThread extends Thread{
+    private MyService service;
+
+    public MyThread(MyService service) {
+        this.service = service;
+    }
+
+    @Override
+    public void run() {
+       service.await();
+    }
+}
+
+```
+
+测试方法
+
+```
+package lock.ReetrantTest;
+
+public class Test01 {
     public static void main(String[] args) {
-        //实现三个runnable任务
-        Runnable runnableA = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    reentrantLock.lock();
-                    while (key != 1) {
-                        conditionA.await();
-                    }
-                    for (int i = 0; i < 3; i++) {
-                        System.out.println(Thread.currentThread().getName() + " " + i);
-                    }
-                    key = 2;
-                    //唤醒所有B线程
-                    conditionB.signalAll();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    reentrantLock.unlock();
-                }
-            }
-        };
-        Runnable runnableB = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    reentrantLock.lock();
-                    while (key != 2) {
-                        conditionB.await();
-                    }
-                    for (int i = 0; i < 3; i++) {
-                        System.out.println(Thread.currentThread().getName() + " " + i);
-                    }
-                    key = 3;
-                    //唤醒所有C线程
-                    conditionC.signalAll();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    reentrantLock.unlock();
-                }
-            }
-        };
-        Runnable runnableC = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    reentrantLock.lock();
-                    while (key != 3) {
-                        conditionC.await();
-                    }
-                    for (int i = 0; i < 3; i++) {
-                        System.out.println(Thread.currentThread().getName() + " " + i);
-                    }
-                    key = 1;
-                    //唤醒所有A线程
-                    conditionA.signalAll();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    reentrantLock.unlock();
-                }
-            }
-        };
+        MyService service = new MyService();
+        new MyThread(service).start();
+        new MyThread(service).start();
+        new MyThread(service).start();
+        new MyThread(service).start();
+        service.signal();
+        service.signal();
+        service.signal();
+    }
+}
 
-        //创建多个线程
-        Thread[] threadsA = new Thread[5];
-        Thread[] threadsB = new Thread[5];
-        Thread[] threadsC = new Thread[5];
-        for (int i = 0; i < 5; i++) {
-            threadsA[i] = new Thread(runnableA, "ThreadA");
-            threadsB[i] = new Thread(runnableB, "ThreadB");
-            threadsC[i] = new Thread(runnableC, "ThreadC");
+```
+
+输出
+
+```
+awit Time start : 1716344465163
+awit Time start : 1716344465164
+awit Time start : 1716344465165
+single:1716344465165
+awit Time end : 1716344465165
+release lock
+awit Time start : 1716344465166
+single:1716344465166
+awit Time end : 1716344465166
+release lock
+single:1716344465166
+awit Time end : 1716344465166
+release lock
+```
+
+可以看到，single执行了三次，线程release lock就三个，但是awit Time start有四个
+
+**await让线程暂停的原理是什么呢？**
+
+并发包内部执行了Unsafe类中的public native void park(boolean isAbsolute, long time)方法，让线程呈暂停状态，方法参数isAbsolute代表是否为绝对时间，方法参数time代表时间值。
+
+测试代码：
+
+```
+package lock.ReetrantTest;
+
+import sun.misc.Unsafe;
+
+import java.lang.reflect.Field;
+
+public class Test02 {
+    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
+        Field f = Unsafe.class.getDeclaredField("theUnsafe");
+        f.setAccessible(true);
+        Unsafe unsafe = (Unsafe) f.get(null);
+        long start = System.currentTimeMillis();
+        System.out.println("begin " + System.currentTimeMillis());
+        System.currentTimeMillis();
+        unsafe.park(true, System.currentTimeMillis() + 3000);
+        System.out.println("end " + System.currentTimeMillis());
+        System.out.println(System.currentTimeMillis() - start);
+    }
+}
+```
+
+程序运行结果如下
+
+```
+begin 1716346263026
+end 1716346266026
+3000
+```
+
+## 3、实现生产者与消费者的交替输出
+
+服务类
+
+```
+
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class MyService {
+    private ReentrantLock lock = new ReentrantLock(true);
+    private Condition condition1 = lock.newCondition();
+    private Condition condition2 = lock.newCondition();
+    private boolean hasValue = false;
+
+    public void set(){
+
+        try {
+            lock.lock();
+            if(hasValue) {
+                condition1.await();
+            }
+            hasValue = true;
+            System.out.println("1");
+            condition1.signal();
+        } catch (InterruptedException e) {
+           e.printStackTrace();
+        }finally {
+            lock.unlock();;
         }
-        //启动所有线程
-        for (int i = 0; i < 5; i++) {
-            threadsA[i].start();
-            threadsB[i].start();
-            threadsC[i].start();
+    }
+    public void get(){
+
+        try {
+            lock.lock();
+            if(!hasValue) {
+                condition1.await();
+            }
+            hasValue = false;
+            System.out.println("2");
+            condition1.signal();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }finally {
+            lock.unlock();;
         }
+    }
+}
+```
+
+实现两个线程分别执行这个服务的两个方法
+
+```
+
+
+
+public class MyThreadA extends Thread{
+    private MyService service;
+
+    public MyThreadA(MyService service) {
+        this.service = service;
+    }
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 10; i++) {
+            service.get();
+        }
+
     }
 }
 
 
+public class MyThreadB extends Thread{
+    private MyService service;
+
+    public MyThreadB(MyService service) {
+        this.service = service;
+    }
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 10; i++) {
+            service.set();
+        }
+
+    }
+}
+
 ```
+
+测试方法
+
+```
+package lock.ReetrantTest.Provider;
+
+public class Test03 {
+    public static void main(String[] args) {
+        final MyService service = new MyService();
+        new MyThreadA(service).start();
+        new MyThreadB(service).start();
+    }
+}
+
+```
+
+可以看到生产者消费者交替输出
+
+```
+1
+2
+1
+2
+1
+2
+1
+2
+1
+2
+1
+2
+1
+2
+1
+2
+1
+2
+1
+2
+
+Process finished with exit code 0
+```
+
+## 4、getHoldCount用法
+
+public int getHoldCount() 方法作用是查询“当前线程”保持次锁定的个数，即调用lock()的次数。注意是当前线程，实际的意思是重入锁的次数.
+
+执行lock()会使得可重入锁次数加1，执行unlock()会使可重入锁次数减1。
+
+
+
+测试代码
+
+```
+    public void testMethodA(){
+        lock.lock();
+        System.out.println("getHoldCount:" + lock.getHoldCount());
+        testMethodB();
+        System.out.println("getHoldCount:" + lock.getHoldCount());
+        lock.unlock();
+        System.out.println("getHoldCount:" + lock.getHoldCount());
+    }
+    private void testMethodB(){
+        try {
+            lock.lock();
+            System.out.println("getHoldCount:" + lock.getHoldCount());
+        }finally {
+            lock.unlock();
+        }
+    }
+```
+
+调用
+
+```
+        MyService service = new MyService();
+        new MyThread(service).start();
+        System.out.println(service.getHoldCount());
+```
+
+输出
+
+```
+getHoldCount:1
+getHoldCount:2
+getHoldCount:1
+getHoldCount:0
+```
+
+## 5、getQueueLength():获取正在等待获取此锁的线程估计数
+
+```
+    public void testMethodC(){
+        try {
+            lock.lock();
+            Thread.sleep(1000);
+            System.out.println("getQueueLength:" + lock.getQueueLength());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }finally {
+            lock.unlock();
+        }
+
+    }
+```
+
+开启四个线程测试
+
+```
+        MyService service = new MyService();
+        new MyThread(service).start();
+        new MyThread(service).start();
+        new MyThread(service).start();
+        new MyThread(service).start();
+```
+
+会发现
+
+```
+getQueueLength:3
+getQueueLength:2
+getQueueLength:1
+getQueueLength:0
+```
+
+开始会有3个线程在等待
+
+## 6、其他方法
+
+getWaitQueueLength(Condition condition):返回给定condition的线程计数，实际上是查看某个condition的await个数
+
+hasQueueThread(Thread thread)：查询指定的线程是否正在等待获取此锁，也就是判断参数中的线程是否在等待队列中。
+
+hasQueuedThreads()：查看是否有线程获取等待此锁
+
+hasWaiters(Condition condition)：查询是否有线程正在等待此锁有关的condition条件
+
+isHeldByCurrentThread()：查询当前线程是否保持此锁
+
+isLocked():次锁是否由任意线程保持
+
+tryLock()：嗅探拿锁
+
+lockInterruptibly()：当某个线程尝试获得锁并且堵塞在lockInterruptibly()方法时，该线程可以被中断。
+
+## 7、实现线程的顺序执行
+
+类似于3，只需要将 private boolean hasValue = false;变成一个实际的值，线程跟这个值对应起来即可。
+
+## 8、读写锁
+
+ReetrantLock是一个互斥锁，但是有些情况下两个线程都是读可以不用互斥，于是有了ReetrantReadWriteLock。
+
+基本情况就是
+
+读写互斥
+
+写写互斥
+
+读读共享
+
+定义方法
+
+```
+        ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        lock.readLock().lock();//加读锁
+        lock.writeLock().lock();//加写锁
+        lock.writeLock().unlock();//解锁
+        lock.readLock().unlock();
+```
+
 
