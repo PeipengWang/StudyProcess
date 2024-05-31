@@ -71,19 +71,11 @@ npm install -g vue-cli
 
 确保vue-cli安装成功后，将npm环境切换到配置二，因为vue-cli要下载webpack模板文件
 
-```
-cd /a/b  //先切换到需要放项目的文件夹vue init webpack vue-demo-project
-```
-
-此时会生成/a/b/vue-demo-project文件夹，这里面含有vue项目文件目录，以及package.json描述文件。在package.json中我们看到devdependence和dependence标签有许多node module需要下载。因此我们需要再次将npm配置切回配置一来下载node模块。
-切回配置一后，运行node模块安装命令：
-
-```
-npm install
+```shell
+vue create hello-world
 ```
 
-模块比较多，下载时间稍长。等所有的node modules下载安装完成后，我们的vue工程体系化的开发环境基本搭建完毕了。
-还有一个工具推荐大家安装，那就是vue-devtoo
+
 
 ## Idea直接安装
 
@@ -94,3 +86,24 @@ node.js
 idea插件：vue.js
 
 新建项目--》选择JavaScript--》选择vue.js--》确定
+
+## 运行
+
+```shell
+cd hello-world
+ npm run serve
+> hello-world@0.1.0 serve
+> vue-cli-service serve
+ INFO  Starting development server...
+ DONE  Compiled successfully in 5653ms                                                                                                                                                                       
+  App running at:
+  - Local:   http://localhost:8080/ 
+  - Network: http://ip:8080/
+
+  Note that the development build is not optimized.
+  To create a production build, run npm run build.
+
+
+```
+
+直接访问即可
