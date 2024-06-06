@@ -89,7 +89,7 @@ System.setProperty("sun.awt.fontconfig", "/path/to/fonts.conf");
 在Linux系统中，可以使用命令行工具fc-list查看系统中已安装的字体列表。如果系统中已经安装了fontconfig，那么该命令应该可以正常使用。如果该命令无法使用，则可能是系统中未安装fontconfig。
 
 
-在部分linux环境中，使用zxjdk绘图时（如验证码加载），报出空指针异常：
+在部分linux环境中，使用jdk绘图时（如验证码加载），报出空指针异常：
 
 Exception in thread "main" java.lang.NullPointerException
     at sun.awt.FontConfiguration.getVersion(FontConfiguration.java:1264)
@@ -100,13 +100,12 @@ X86可能存在两种情况：
 
 yum install -y fontconfig.i686
 
-2、在CGSLV6/RedHat8等glibc 2.28版本的linux系统上，zxjdk8u181/zxjdk8u252存在渲染故障，请先替换zxjdk8u212/zxjdk8u272的版本（该情况请跳过下述处理步骤），执行以下语句确认glibc版本号
 
 ldd --version
 
 ARM可能存在以下情况：
 
-1、操作系统使用了高版本的libpng（已知在CGSLV6.06.02P2B5-aarch64版本）。此情况可以libpng15.so.15.13.0 拷贝到/usr/lib64目录下，并执行以下操作：
+1、此情况可以libpng15.so.15.13.0 拷贝到/usr/lib64目录下，并执行以下操作：
 
 ln -s /usr/lib64/libpng15.so.15.13.0 /usr/lib64/libpng15.so.15
 
