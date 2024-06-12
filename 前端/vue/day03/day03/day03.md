@@ -525,6 +525,88 @@ Vue生命周期过程中，会**自动运行一些函数**，被称为【**生�
 ### 2.运行流程
 
 ![68209403287](assets/1682094032876.png)
+### 3. main.js解析
+```javascript
+// 文件核心作用：导入App.vue，基于App.vue创建结构渲染index.html
+// 1. 导入 Vue 核心包
+import Vue from 'vue'
+
+// 2. 导入 App.vue 根组件
+import App from './App.vue'
+
+// 提示：当前处于什么环境 (生产环境 / 开发环境)
+Vue.config.productionTip = false
+
+// 3. Vue实例化，提供render方法 → 基于App.vue创建结构渲染index.html
+new Vue({
+  // el: '#app', 作用：和$mount('选择器')作用一致，用于指定Vue所管理容器
+  // render: h => h(App),
+  render: (createElement) => {
+    // 基于App创建元素结构
+    return createElement(App)
+  }
+}).$mount('#app')
+
+```
+### 4. App.vue的结构
+```
+<template>
+  <div class="App">
+    <div class="box" @click="fn"></div>
+  </div>
+</template>
+
+<script>
+// 导出的是当前组件的配置项
+// 里面可以提供 data(特殊) methods computed watch 生命周期八大钩子
+export default {
+  created () {
+    console.log('我是created')
+  },
+  methods: {
+    fn () {
+      alert('你好')
+    }
+  }
+}
+</script>
+
+<style lang="less">
+/* 让style支持less
+   1. 给style加上 lang="less"
+   2. 安装依赖包 less less-loader
+      yarn add less less-loader -D (开发依赖)
+*/
+.App {
+  width: 400px;
+  height: 400px;
+  background-color: pink;
+  .box {
+    width: 100px;
+    height: 100px;
+    background-color: skyblue;
+  }
+}
+</style>
+```
+### 5. index.html的body元素
+```
+  <body>
+    <!-- 兼容：给不支持js的浏览器一个提示 -->
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+
+    <!-- Vue所管理的容器：将来创建结构动态渲染这个容器 -->
+    <div id="app">
+      <!-- 工程化开发模式中：这里不再直接编写模板语法，通过 App.vue 提供结构渲染 -->
+    </div>
+
+    <!-- built files will be auto injected -->
+  </body>
+```
+
+
 
 ## 八、组件化开发
 
