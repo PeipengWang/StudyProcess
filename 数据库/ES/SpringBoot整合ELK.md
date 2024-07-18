@@ -220,5 +220,240 @@ output：日志的输出目的地，我们将日志输出到elasticsearch中进�
 ```bash
 cd logstash-7.17.7/
 su elk
-bin/logstash
+nohup ./logstash > run.log 2>&1 &
 ```
+
+
+
+# 新建项目
+
+新建一个SpringBoot项目
+
+目录结构为
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/d32b424217cb4991bcaa8f2e628918a7.png#pic_center)
+
+## 引入依赖和配置
+
+```xml
+ <properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <spring-boot.version>2.6.13</spring-boot.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>7.3</version>
+        </dependency>
+
+    </dependencies>
+
+```
+
+Springboot配置
+
+```yaml
+server:
+  port: 8080
+
+log:
+  # logstash 地址和端口，注意修改
+  logstash-host: 152.136.246.11:4560
+
+```
+
+logback-spring.xml配置
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!-- 日志存放路径 -->
+    <property name="log.path" value="logs/test-log"/>
+    <!-- 日志输出格式 -->
+    <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n"/>
+    <!-- 读取SpringBoot配置文件获取logstash的地址和端口 -->
+    <springProperty scope="context" name="logstash-host" source="log.logstash-host"/>
+
+    <!-- 控制台输出 -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 系统日志输出 -->
+    <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/info.log</file>
+        <!-- 循环政策：基于时间创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${log.path}/info.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 日志最大的历史 7天 -->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 过滤的级别 -->
+            <level>INFO</level>
+            <!-- 匹配时的操作：接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 不匹配时的操作：拒绝（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/error.log</file>
+        <!-- 循环政策：基于时间创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${log.path}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 日志最大的历史 60天 -->
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 过滤的级别 -->
+            <level>ERROR</level>
+            <!-- 匹配时的操作：接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 不匹配时的操作：拒绝（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 将日志文件输出到Logstash -->
+    <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!-- 获取logstash地址作为输出的目的地 -->
+        <destination>${logstash-host}</destination>
+        <encoder chatset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <!-- 系统模块日志级别控制  -->
+    <logger name="com.greateme" level="info"/>
+    <!-- Spring日志级别控制  -->
+    <logger name="org.springframework" level="warn"/>
+
+    <root level="info">
+        <appender-ref ref="console"/>
+    </root>
+
+    <!--系统操作日志-->
+    <root level="info">
+        <appender-ref ref="file_info"/>
+        <appender-ref ref="file_error"/>
+        <appender-ref ref="logstash"/>
+    </root>
+</configuration>
+
+```
+
+## 测试代码
+
+建立Controller
+
+```java
+package com.example.elk.controller;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * <p>
+ * 测试日志的Controller
+ * </p>
+ *
+ * @author XiaoHH
+ * @version 1.0.0
+ * @date 2023-04-26 22:59:13
+ * @file TestLogController.java
+ */
+@RestController
+public class TestLogController {
+
+    /**
+     * 获取日志输出对象
+     */
+    private static final Logger log = LoggerFactory.getLogger(TestLogController.class);
+
+    /**
+     * 测试输出log的访问方法
+     */
+    @GetMapping("/testLog")
+    public String testLog() {
+        log.error("测试输出一个日志");
+        return "success";
+    }
+}
+
+```
+
+我们来启动项目，我们可以发现启动时就输出了八条日志：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/a784be59ddd14bc9902cfaec0b48027c.png#pic_center)
+
+我们来到kibana查询一下索引列表：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/8311f69eef1142d9895e18c2b1cc60e2.png#pic_center)
+
+然后再看看里面的数据，发现的确新增了8条内容：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2e1cc3e2714741faa4b1bf5964ab0241.png#pic_center)
+
+
+
+我们编写了一个Controller也会输出日志，我们访问试试：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/5d86c354bea9475484d4ca69edb9d2b2.png#pic_center)
+
+上面日志输出成功了，我们再来看看es里面的数据：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/833802aa9eee44f39793d453c4f52db6.png#pic_center)
+
+同时也可以看到日志的内容可以看到我们自定义输出的日志：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/7ae0f67774de4902b21bdc09fe678ebe.png#pic_center)
+
+代码仓库地址：
+https://gitcode.net/m0_51510236/test-log
+
+```
+GET test-log/_search
+{
+"sort": [
+		{  
+		"@timestamp": {
+		"order": "desc"
+		}
+		}
+	]
+}
+
+```
+
