@@ -133,7 +133,7 @@ mybatis-plus:
 
 例如，我们新建一个`UserMapper.xml`文件：
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722083212038-1.png)
+![img](./assets/1722083212038-1.png)
 
 然后在其中定义一个方法：
 
@@ -166,23 +166,23 @@ void testQuery() {
 
 除了新增以外，修改、删除、查询的SQL语句都需要指定where条件。因此BaseMapper中提供的相关方法除了以`id`作为`where`条件以外，还支持更加复杂的`where`条件。
 
-![image-20240727230436395](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/image-20240727230436395.png)
+![image-20240727230436395](./assets/image-20240727230436395.png)
 
 参数中的`Wrapper`就是条件构造的抽象类，其下有很多默认实现，继承关系如图：
 
-![image-20240727230457220](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/image-20240727230457220-1722092700475-60.png)
+![image-20240727230457220](./assets/image-20240727230457220-1722092700475-60.png)
 
 `Wrapper`的子类`AbstractWrapper`提供了where中包含的所有条件构造方法：
 
-![image-20240727230545498](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/image-20240727230545498-1722092747492-62.png)
+![image-20240727230545498](./assets/image-20240727230545498-1722092747492-62.png)
 
 而QueryWrapper在AbstractWrapper的基础上拓展了一个select方法，允许指定查询字段：
 
-![image-20240727230634784](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/image-20240727230634784-1722092796141-68.png)
+![image-20240727230634784](./assets/image-20240727230634784-1722092796141-68.png)
 
 而UpdateWrapper在AbstractWrapper的基础上拓展了一个set方法，允许指定SQL中的SET部分：
 
-![image-20240727230613258](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/image-20240727230613258-1722092774971-66.png)
+![image-20240727230613258](./assets/image-20240727230613258-1722092774971-66.png)
 
 接下来，我们就来看看如何利用`Wrapper`实现复杂查询。
 
@@ -274,7 +274,7 @@ void testLambdaQueryWrapper() {
 
 在演示UpdateWrapper的案例中，我们在代码中编写了更新的SQL语句：
 
-![image-20240727230656539](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/image-20240727230656539-1722092818047-70.png)
+![image-20240727230656539](./assets/image-20240727230656539-1722093036638-73.png)
 
 这种写法在某些企业也是不允许的，因为SQL语句最好都维护在持久层，而不是业务层。就当前案例来说，由于条件是in语句，只能将SQL写在Mapper.xml文件，利用foreach来生成动态SQL。 这实在是太麻烦了。假如查询条件更复杂，动态SQL的编写也会更加复杂。
 
@@ -384,7 +384,7 @@ MybatisPlus不仅提供了BaseMapper，还提供了通用的Service接口及默�
 
 我们先俩看下基本的CRUD接口。 **新增**：
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091201951-25.png)
+![img](./assets/1722091201951-25.png)
 
 - `save`是新增单个元素
 - `saveBatch`是批量新增
@@ -393,7 +393,7 @@ MybatisPlus不仅提供了BaseMapper，还提供了通用的Service接口及默�
 
 **删除：**
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091196887-22.png)
+![img](./assets/1722091196887-22.png)
 
 - `removeById`：根据id删除
 - `removeByIds`：根据id批量删除
@@ -403,7 +403,7 @@ MybatisPlus不仅提供了BaseMapper，还提供了通用的Service接口及默�
 
 **修改：**
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091193082-19.png)
+![img](./assets/1722091193082-19.png)
 
 - `updateById`：根据id修改
 - `update(Wrapper<T>)`：根据`UpdateWrapper`修改，`Wrapper`中包含`set`和`where`部分
@@ -412,7 +412,7 @@ MybatisPlus不仅提供了BaseMapper，还提供了通用的Service接口及默�
 
 **Get：**
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091188558-16.png)
+![img](./assets/1722091188558-16.png)
 
 - `getById`：根据id查询1条数据
 - `getOne(Wrapper<T>)`：根据`Wrapper`查询1条数据
@@ -420,7 +420,7 @@ MybatisPlus不仅提供了BaseMapper，还提供了通用的Service接口及默�
 
 **List：**
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091181434-13.png)
+![img](./assets/1722091181434-13.png)
 
 - `listByIds`：根据id批量查询
 - `list(Wrapper<T>)`：根据Wrapper条件查询多条数据
@@ -428,14 +428,14 @@ MybatisPlus不仅提供了BaseMapper，还提供了通用的Service接口及默�
 
 **Count**：
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091176882-10.png)
+![img](./assets/1722091176882-10.png)
 
 - `count()`：统计所有数量
 - `count(Wrapper<T>)`：统计符合`Wrapper`条件的数据数量
 
 **getBaseMapper**： 当我们在service中要调用Mapper中自定义SQL时，就必须获取service对应的Mapper，就可以通过这个方法：
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091173845-7.png)
+![img](./assets/1722091173845-7.png)
 
 ## **基本用法**
 
@@ -473,7 +473,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 项目结构如下：
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091167765-4.png)
+![img](./assets/1722091167765-4.png)
 
 接下来，我们快速实现下面4个接口：
 
@@ -885,7 +885,7 @@ private User buildUser(int i) {
 
 执行结果如下：
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091475665-43.png)
+![img](./assets/1722091475665-43.png)
 
 可以看到速度非常慢。
 
@@ -912,7 +912,7 @@ void testSaveBatch() {
 
 执行最终耗时如下：
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091480928-46.png)
+<img src="./assets/1722091480928-46.png" alt="img" />
 
 可以看到使用了批处理以后，比逐条新增效率提高了10倍左右，性能还是不错的。
 
@@ -985,10 +985,10 @@ spring:
 
 再次测试插入10万条数据，可以发现速度有非常明显的提升：
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091439416-40.png)
+![img](./assets/1722091439416-40.png)
 
 在`ClientPreparedStatement`的`executeBatchInternal`中，有判断`rewriteBatchedStatements`值是否为true并重写SQL的功能：
 
 最终，SQL被重写了：
 
-![img](E:/%E7%AC%94%E8%AE%B0/StudyProcess/%E6%A1%86%E6%9E%B6/MybatisPlus/assets/1722091490305-49.png)
+![img](./assets/1722091490305-49.png)
