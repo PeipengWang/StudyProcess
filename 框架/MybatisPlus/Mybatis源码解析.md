@@ -1,0 +1,1 @@
+MyBatis-Plus的BaseMapper实现原理https://juejin.cn/post/7002423698565103653
