@@ -40,7 +40,7 @@ JMS支持两种消息发送和接收模型：一种是P2P（Peer-to-Peer）点�
 
  P2P模型 ：P2P模型是基于队列的，消息生产者将数据发送到消息队列中，消息消费者从消息队列中接收消息。因为队列的存在，消息的异步传输成为可能。P2P模型的规定就是每一个消息数据，只有一个消费者，当发送者发送消息以后，不管接收者有没有运行都不影响消息发布到队列中。接收者在成功接收消息后会向发送者发送接收成功的消息
 
-** 发布 / 订阅模型 **：所谓得发布订阅模型就是事先将传输的数据进行分类，我们管这个数据的分类称之为主题（Topic）。也就是说，生产者发送消息时，会根据主题进行发送。比如咱们的消息中有一个分类是NBA，那么生产者在生产消息时，就可以将NBA篮球消息数据发送到NBA主题中，这样，对NBA消息主题感兴趣的消费者就可以申请订阅NBA主题，然后从该主题中获取消息。这样，也就是说一个消息，是允许被多个消费者同时消费的。这里生产者发送消息，我们称之为发布消息，而消费者从主题中获取消息，我们就称之为订阅消息。Kafka采用就是这种模型。
+发布 / 订阅模型 ：所谓得发布订阅模型就是事先将传输的数据进行分类，我们管这个数据的分类称之为主题（Topic）。也就是说，生产者发送消息时，会根据主题进行发送。比如咱们的消息中有一个分类是NBA，那么生产者在生产消息时，就可以将NBA篮球消息数据发送到NBA主题中，这样，对NBA消息主题感兴趣的消费者就可以申请订阅NBA主题，然后从该主题中获取消息。这样，也就是说一个消息，是允许被多个消费者同时消费的。这里生产者发送消息，我们称之为发布消息，而消费者从主题中获取消息，我们就称之为订阅消息。Kafka采用就是这种模型。
 
 ### **1.1.3** 生产者-消费者模式
 
@@ -165,10 +165,8 @@ $ bin/kafka-server-start.sh config/server.properties
 上面两个如果直接在窗口输入命令，在退出窗口时就关闭了，因此，可以在后台跑
 
 ```
-[root@node1 kafka_2.13-3.6.2]# nohup sh bin/zookeeper-server-start.sh config/zookeeper.properties > zoo.log 2>&1 &
-[1] 27107
-[root@node1 kafka_2.13-3.6.2]# nohup sh bin/kafka-server-start.sh config/server.properties > kafka.log 2>&1 &
-
+nohup sh bin/zookeeper-server-start.sh config/zookeeper.properties > zoo.log 2>&1 &
+nohup sh bin/kafka-server-start.sh config/server.properties > kafka.log 2>&1 &
 ```
 
 ### 1.1.2 消息主题
