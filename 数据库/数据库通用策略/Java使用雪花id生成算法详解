@@ -1,0 +1,222 @@
+## 什么是雪花算法
+
+雪花算法的本质为生成一个64位长度的具有自增性的分布式全局唯一id。在64bits中，会对不同段的位进行划分。可分为：
+
+- 符号段
+- 时间戳段
+- 机器码段(data center + worker)
+- 自增序列号段
+
+
+
+## 位段详解
+
+- 第一位 : 符号位，正数为0。
+- [2, 42] : 41位时间戳位，表明id的生成时间点(完整时间戳: 起始时间戳 + 41位时间戳)。41位最多能表示的时间为： (2^41-1) / (1000 * 60 * 60 * 24 * 365) 约等为69.73年。
+- [43, 47] : 5位data center id。data center id + worker id 共10位，最多能表示1024个机器。不同机器保证机器码段的位值不同即可。
+- [48, 52] : 5位worker id。data center id + worker id 共10位，最多能表示1024个机器。不同机器保证机器码段的位值不同即可。
+- [53, 64] : 12位自增序列号，用于区分同一毫秒内生成的id。序列号范围: [0, 2^12-1]，最多有2^12个，即4096个。
+
+
+
+## 优点
+
+- 算法简单，基于内存，生成效率高
+- 支持分布式环境下的多节点服务（机器码段），秒内可生成百万个唯一id
+- 基于时间戳 与 同时间戳下自增序列号，生成的id具有自增性
+- 具有业务定制性，根据业务的不同可以对不同段的位数进行变更。比如业务持续时长不会那么久，就可以将时间戳段减少位数，补充给自增序列段，使每一毫秒能生成更多的id。
+
+
+
+## 问题
+
+依赖服务器时间。若服务器时钟回拨，可能会导致生成的id重复。可在代码中新增lastTimeMillis字段，在获取nextId时根据系统当前时间进行判断解决。
+
+但若不进行持久化处理，服务重启后发生时钟回拨依旧会出现重复问题。
+
+
+
+## 实际应用
+
+- mybatis plus：使用雪花算法生成id：@TableId(value = “id”, type = IdType.ID_WORKER)。id字段若不指定类型，默认使用雪花算法生成id
+- Hutool工具包：IdUtil.createSnowflake(workerId, datacenterId);
+
+
+
+```java
+public class SnowflakeUtils {
+    // ============================== Basic field ==============================//
+    // Datacenter id
+    private long datacenterId;
+    // Worker id
+    private long workerId;
+    // Increment sequence
+    private long sequence;
+    // ============================== Bits ==============================//
+    // Bits of datacenter id
+    private long datacenterIdBits;
+    // Bits of worker id
+    private long workerIdBits;
+    // Bits of sequence
+    private long sequenceBits;
+    // ============================== Largest ==============================//
+    // Largest datacenter id
+    private long largestDatacenterId;
+    // Largest worker id
+    private long largestWorkerId;
+    // Largest sequence
+    private long largestSequence;
+    // ============================== Shift ==============================//
+    // Left shift num of worker id
+    private long workerIdShift;
+    // Left shift num of datacenter id
+    private long datacenterIdShift;
+    // Left shift num of timestamp
+    private long timestampShift;
+    // ============================== Other ==============================//
+    // Epoch
+    private long epoch;
+    // The timestamp that last get snowflake id
+    private long lastTimestamp;
+    // ============================== End ==============================//
+    public SnowflakeUtils(long dataCenterId, long workerId) {
+        // Default epoch: 2022-07-22 00:00:00
+        this(1658419200000L, -1L, dataCenterId, workerId, 5L, 5L, 5L);
+    }
+    public SnowflakeUtils(long epoch, long lastTimestamp, long datacenterId, long workerId,
+        long datacenterIdBits, long workerIdBits, long sequenceBits) {
+        this.epoch = epoch;
+        this.lastTimestamp = lastTimestamp;
+        this.datacenterId = datacenterId;
+        this.workerId = workerId;
+        this.sequence = 0L;
+        this.datacenterIdBits = datacenterIdBits;
+        this.workerIdBits = workerIdBits;
+        this.sequenceBits = sequenceBits;
+        this.largestDatacenterId = ~(-1L << datacenterIdBits);
+        this.largestWorkerId = ~(-1L << workerIdBits);
+        this.largestSequence = ~(-1L << sequenceBits);
+        if (datacenterId > largestDatacenterId || datacenterId < 0) {
+            throw new IllegalArgumentException(
+                String.format("The datacenter id param can't be greater than %s or less than 0",
+                    largestDatacenterId));
+        }
+        if (workerId > largestWorkerId || workerId < 0) {
+            throw new IllegalArgumentException(
+                String.format("The worker id param can't be greater than %s or less than 0",
+                    largestWorkerId));
+        }
+        this.workerIdShift = sequenceBits;
+        this.datacenterIdShift = workerIdShift + workerIdBits;
+        this.timestampShift = datacenterIdShift + datacenterIdBits;
+    }
+    /**
+     * Get snowflake id
+     * @return
+     */
+    public synchronized long nextId() {
+        long timestamp = System.currentTimeMillis();
+        // 若时钟回退
+        if (timestamp < lastTimestamp) {
+            throw new RuntimeException(
+                "System clock moved backward, cannot to generate snowflake id");
+        }
+        // 若当前毫秒内多次生成雪花id
+        if (timestamp == lastTimestamp) {
+            sequence = (sequence + 1) & largestSequence;
+            // 序列溢出
+            if (sequence == 0) {
+                timestamp = waitUntilNextMilli(timestamp);
+            }
+        }
+        // 若当前毫秒内首次生成雪花id
+        else {
+            sequence = 0L;
+        }
+        // 更新获取雪花id的时间戳
+        lastTimestamp = timestamp;
+        // 生成雪花id (通过位或运算符进行拼接)
+        return ((timestamp - epoch) << timestampShift) // 时间戳段
+            | (datacenterId << datacenterIdShift) // 机器码段
+            | (workerId << workerIdShift) // 机器码段
+            | sequence; // 自增序列段
+    }
+    /**
+     * Wait until next millisecond
+     * @param lastTimestamp
+     * @return
+     */
+    private long waitUntilNextMilli(long lastTimestamp) {
+        long currentTimeMillis;
+        do {
+            currentTimeMillis = System.currentTimeMillis();
+        }
+        while (currentTimeMillis <= lastTimestamp);
+        return currentTimeMillis;
+    }
+    /**
+     * Get util instance
+     * @param dataCenterId
+     * @param workerId
+     * @return
+     */
+    public static SnowflakeUtils getInstance(long dataCenterId, long workerId) {
+        return new SnowflakeUtils(dataCenterId, workerId);
+    }
+}
+```
+
+
+
+
+## java的雪花算法工具--snowflake4j
+
+Java中实现雪花算法通常使用开源库如`snowflake4j`。以下是使用`snowflake4j`的一个简单示例：
+
+首先，添加`snowflake4j`依赖到你的项目中。如果你使用的是Maven，可以在`pom.xml`中添加如下依赖：
+
+```xml
+<dependency>
+    <groupId>com.github.twitter</groupId>
+    <artifactId>snowflake4j-core</artifactId>
+    <version>2.0.1</version>
+</dependency>
+```
+
+然后，你可以使用以下代码生成雪花ID：
+
+```java
+import com.github.twitter.snowflake.Snowflake;
+import com.github.twitter.snowflake.ZkSnowflakeIdGenerator;
+ 
+public class SnowflakeIdGenerator {
+    public static void main(String[] args) {
+        // 初始化SnowflakeIdGenerator
+        SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
+ 
+        // 生成一个新的雪花ID
+        long snowflakeId = idGenerator.generateSnowflakeId();
+ 
+        System.out.println("Generated Snowflake ID: " + snowflakeId);
+    }
+ 
+    private Snowflake snowflake;
+ 
+    public SnowflakeIdGenerator() {
+        snowflake = new Snowflake(0, 0);
+    }
+ 
+    public long generateSnowflakeId() {
+        return snowflake.nextId();
+    }
+}
+```
+
+在这个例子中，我们创建了一个`SnowflakeIdGenerator`类，它有一个`snowflake`对象实例，并且提供了一个`generateSnowflakeId`方法来生成新的雪花ID。
+
+注意：`snowflake4j`依赖于ZooKeeper来管理集群中机器的状态，如果你不需要集群支持，可以直接使用`snowflake4j-core`，它不依赖ZooKeeper。如果你的应用场景不需要高可用和集群支持，可以直接使用`snowflake4j-core`。
+
+
+
+
+
