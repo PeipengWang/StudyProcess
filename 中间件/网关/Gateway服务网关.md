@@ -76,12 +76,11 @@ spring:
 我们在配置文件中写的断言规则只是字符串，这些字符串会被Predicate Factory读取并处理，转变为路由判断的条件
 例如Path=/user/**是按照路径匹配，这个规则是由
 org.springframework.cloud.gateway.handler.predicate.PathRoutePredicateFactory类来
-处理的，像这样的断言工厂在SpringCloudGateway还有十几个:
-![](_v_images/20211226184024146_822.png =1062x)
+处理的，像这样的断言工厂在SpringCloudGateway还有十几个
 
 ## 过滤器工厂（目前32个）
 GatewayFilter是网关中提供的一种过滤器，可以对进入网关的请求和微服务返回的响应做处理：
-![](_v_images/20211226183930950_27577.png =1016x)
+![](_v_images/20211226183930950_27577.png)
 下面我们以AddRequestHeader 为例来讲解。
 ### 服务过滤器
 只需要修改gateway服务的application.yml文件，添加路由过滤即可：
@@ -107,8 +106,6 @@ spring:
         return userService.queryById(id);
     }
 ```
-获得的数据如下：
-![](_v_images/20211226185509423_2190.png =1333x)
 ### 默认过滤器
 如果要对所有的路由都生效，则可以将过滤器工厂写到default下。格式如下：
 ```
