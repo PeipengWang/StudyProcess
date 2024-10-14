@@ -58,7 +58,8 @@
     <mirror>
         <id>local-mirror</id>
         <mirrorOf>central</mirrorOf>
-        <url>file:///C:/path/to/local/repo</url> <!-- 本地仓库的路径 -->
+       
+       <url>file:///C:/path/to/local/repo</url> <!-- 本地仓库的路径 -->
         <layout>default</layout>
     </mirror>
 </mirrors>
