@@ -432,3 +432,180 @@ Memory监控项：内存使用百分比
 ![img](file:///C:\Users\wangp\AppData\Local\Temp\ksohtml32028\wps17.jpg) 
 
  
+
+# 问题：缺少libevent-2.1.so.6
+
+系统需要安装libevent
+
+离线方式：
+
+提前下载
+
+[libevent-2.1.8-stable.tar.gz](https://github.com/libevent/libevent/releases/download/release-2.1.8-stable/libevent-2.1.8-stable.tar.gz) 
+
+官方网址：
+
+https://libevent.org/
+
+## 源码方式安装步骤
+
+一、解压缩源码包。
+
+```
+tar -xzvf libevent-2.1.8-stable.tar.gz
+```
+
+ 二、进入libevent-2.1.8-stable目录，执行 configure 配置脚本
+
+ 1、查看configure 脚本的使用帮助及其选项，可以执行命令：./configure --help 查看。
+
+如果直接执行：./configure，那么默认安装路径是/usr/local，对应的头文件、可执行文件和库文件分别对应的目录是：'/usr/local/include'、'/usr/local/bin'，'/usr/local/lib'。
+
+2、我本人设置了默认安装路径，执行命令如下：
+
+```
+./configure
+```
+
+ 3、第2步执行成功后，会生成Makefile文件，然后使用make命令进行源码编译。
+
+```
+make
+```
+
+ 4、编译成功后，执行安装命令。
+
+```
+make  install
+```
+
+5、进行软连接
+
+```
+ln -s /usr/local/lib/libevent-2.1.so.6 /usr/lib/libevent-2.1.so.6
+```
+
+或者将 /usr/local/lib目录加入环境变量
+
+编辑.bashrc文件，添加
+
+```
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+```
+
+已经有库了还是不行可以使用如下方法：
+
+1. 首先打开/etc/ld.so.conf文件
+2. 加入动态库文件所在的目录：执行vi /etc/ld.so.conf，在"include ld.so.conf.d/*.conf"下方增加"/usr/local/lib"。这里这个文件为只读文件，可以使用以下操作对其改写：
+
+```c
+sudo vim ld.so.conf
+1
+```
+
+修改完成后使用wq！退出即可。
+
+1. 保存后，在命令行终端执行：/sbin/ldconfig -v；其作用是将文件/etc/ld.so.conf列出的路径下的库文件缓存到/etc/ld.so.cache以供使用，因此当安装完一些库文件，或者修改/etc/ld.so.conf增加了库的新搜索路径，需要运行一下ldconfig，使所有的库文件都被缓存到文件/etc/ld.so.cache中，如果没做，可能会找不到刚安装的库。
+
+经过以上三个步骤，"error while loading shared libraries"的问题通常情况下就可以解决了
+
+## rpm包安装步骤
+
+------
+
+#### **1. 检查系统是否已安装 `libevent`**
+
+在终端运行以下命令，检查是否已经安装：
+
+```bash
+rpm -qa | grep libevent
+```
+
+如果结果中包含 `libevent` 的版本号，并且已满足需求，则无需重复安装。
+
+#### **2. 下载 `libevent` 的 RPM 包**
+
+根据操作系统版本（如 CentOS/RHEL 7 或 8）和架构（如 x86_64），从以下网站下载适合的 RPM 包：
+
+- **CentOS 官方仓库**（包含常用 RPM 包）：https://vault.centos.org/
+- **RPMFind 仓库**：https://rpmfind.net/
+
+搜索 `libevent`，选择版本 `2.1.x`，并下载相应的 RPM 包。例如：
+
+```bash
+wget http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/libevent-2.1.8-5.el8.x86_64.rpm
+```
+
+------
+
+#### **3. 手动安装 RPM 包**
+
+在终端中运行以下命令：
+
+```bash
+yum install -y ./libevent-2.1.8-5.el8.x86_64.rpm
+```
+
+------
+
+#### **4. 验证安装**
+
+安装完成后，验证 `libevent` 是否成功安装，并检查是否包含 `libevent-2.1.so.6`：
+
+```bash
+ls -l /usr/lib64/libevent-2.1.so.6
+```
+
+如果文件存在，说明安装成功。
+
+------
+
+#### **5. 处理依赖问题（如果有）**
+
+如果安装时提示依赖问题，可能需要下载其他依赖包（如 `libevent-devel` 或相关依赖）。可以运行以下命令解决：
+
+```bash
+yum deplist ./libevent-2.1.8-5.el8.x86_64.rpm
+```
+
+然后根据提示逐一下载依赖包，并安装。
+
+------
+
+#### **6. 确保链接库被加载**
+
+确保 `libevent-2.1.so.6` 被正确加载：
+
+1. 查看当前动态链接库路径：
+
+   ```bash
+   echo $LD_LIBRARY_PATH
+   ```
+
+2. 如果 
+
+   ```
+   /usr/lib64
+   ```
+
+    未包含在环境变量中，可通过以下命令添加：
+
+   ```bash
+   export LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH
+   ```
+
+3. 更新链接库缓存：
+
+   ```bash
+   ldconfig
+   ```
+
+------
+
+### **总结**
+
+1. 下载适配的 `libevent` RPM 包。
+2. 使用 `yum install` 安装。
+3. 确认文件安装路径和动态链接是否正确加载。
+
+若仍有问题，请提供详细的错误信息以进一步分析。
