@@ -1,6 +1,6 @@
 
 ## 准备
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210602170525394.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker998f43d20ccfc33ef11943c764f65e80.png)
 下载tomcat和jdk，其中将jdk解压
 
 ```shell

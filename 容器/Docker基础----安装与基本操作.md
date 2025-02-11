@@ -9,10 +9,6 @@
 # 一、Docker作用与的一些基本概念
 
 
-
-
-
-
 # 二、Docker环境准备
 ## 1.安装Linux
 可以购买阿里云或者腾讯云主机
@@ -67,7 +63,7 @@ systemctl start docker
 systemctl restart docker  # 重启docker服务
 ```
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2020112119523161.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker8ee6fd6b507c209fc00202e8664a3e9e.png)
 
 <font color=#999AAA >常见错误：</font>
 docker-ce conflicts with 2:docker-1.13.1-203.git0be3e21.el7.centos.x86_64
@@ -76,8 +72,9 @@ docker-ce conflicts with 2:docker-1.13.1-203.git0be3e21.el7.centos.x86_64
 ```shell
 yum list installed | grep docker
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201121195418820.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker53198a0cc805b5fac5f2867d2435b659.png)
 卸载
+
 ```shell
 yum remove -y containerd.io.x86_64 docker-ce.x86_64 docker-ce-cli.x86_64
 
@@ -112,8 +109,9 @@ docker pull 镜像名：镜像版本
 docker images
 ```
 显示内容如下格式
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201121200933355.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker20e4d5c914410aa9e2885bb9709303d9.png)
 删除镜像
+
 ```shell
 docker rmi IMAGE-ID 
 以上述的ID作为删除对象的标志
@@ -129,13 +127,13 @@ image-name：指定镜像模板
 eg:docker run --mytomcat -d tomcat:latest
 ```
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201122204331578.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/dockerd11bb801e058a70928c71fe1800cd0c2.png)
 
 查看运行中的镜像：
 ```shell
 docker ps
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201122204423283.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker932a3fa64ad7cbe9d5cedd5463f56a1d.png)
 查看所有的镜像
 
 ```c
@@ -148,13 +146,15 @@ docker ps -a
 docker stop ID
 ID是docker ps显示出来的ID
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201122204603917.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker00e88623d20b6939ef1785afc2520ec5.png)
 启动容器
+
 ```shell
 docker start 容器id
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201122204938424.png#pic_center)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker6c97f46d047456d4f22801276e1b993a.png)
 删除一个容器
+
 ```shell
 docker rm 容器id
 ```

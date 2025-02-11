@@ -5,7 +5,7 @@
 ip addr
 ```
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603103446871.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/dockerbf120610c902ef653fcac183a6c027a0.png)
 下载启动一个tomcat来测试
 
 ```shell
@@ -13,14 +13,14 @@ docker pull tomcat
 docker run  -d -P --name tomcat01 tomcat
 ```
 再次测试ip发现多了一个71: vethf1870a2@if70，如图所示
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603104450743.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker3556b2b86833d1307aadce717ea2090b.png)
 同时进一步的在容器内部查看网卡，发现
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603104722722.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker549d29b5fcefbc6120d6eafbd47ddfa0.png)
 正好与docker内的网卡想对应，由此可以看出，docker容器可以直接与tomcat进行联通，验证如下所示。其中172.17.0.2为tomcat的内部网卡。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603104925547.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker97aebe044bef7ea494fb412ca0db8672.png)
 同时在tomcat容器中ping docker也是可以的，如下图所示，其中172.17.0.1是docker容器内的docker0网卡
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603105139140.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker8d90bba2f12237c406fa300ea20faafb.png)
 **通过上述测试可以知道docker容器是可以与tomcat建立连接的**，那么两个tomcat是否可以进行网络连接呢？
 首先需要再次启动一个tomcat容器
 
@@ -32,19 +32,19 @@ docker run -d -P --name tomcat02 tomcat
 ```
 ip addr
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603105736851.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/dockerb1292421139e9f048c5e85ba9a0fdc6d.png)
 发现又多了一块。
 进一步测试新开的容器tomcat的网卡发现，正好与docker的网卡相对应。由此可知：**每当新开一个容器，docker总会生成一个相对应的一对网卡连接地址**，这是一种veth-pair技术，这种技术，一端连接协议，一端彼此相连。正因为这种技术，veth-pair充当桥梁使得容器可以彼此相连。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603105832880.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker5070a4c21b9758fec69fd7d1120d4965.png)
 测试：查看tomcat02是否能够ping通tomcat01
 
 ```shell
  docker exec -it tomcat02 ping 172.17.0.2
 ```
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603110422265.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker599f691dcce53e663650b6b6518424ad.png)
 由上可知，没生成一个容器会在docker0中生成一个地址分配给容器，每个容器能够与docker0相连，由此每个容器之间可以通过docker0进行间接通信。docker0也可以称作是容器之间相连的网桥。
-![!\[在这里插入图片描述\](https://img-blog.csdnimg.cn/20210603111448793.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size](https://img-blog.csdnimg.cn/20210603111546306.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+
 # link
 我们也可以直接利用名字进行容器之间的联通
 首先，如果直接执行名字互联，执行如下命令
@@ -65,13 +65,13 @@ ping: tomcat01: Name or service not known
 ```
 docker exec -it tomcat03 ping tomcat01
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603152030736.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/dockere3efa1aecd35195de32e080d1d96ff8f.png)
 发现tomcat03可以ping通tomcat01
 
 究其本质
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603152220328.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker8cd27faae24a767b2464de48e189be00.png)
 观察tomcat03的hosts文件可以发现tomcat01名字本质上是ip地址，因此tomcat03可以直接通过名字连接tomcat01的。相反tomcat01是无法直接通过名字连接tomcat03的，原因如下图所示。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603152444589.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker6b962e65a487e6627eca88db0e18ec03.png)
 可以发现tomcat01中没有关于tomcat03的名字记录的。
 
 # 自定义网络
@@ -81,7 +81,7 @@ docker exec -it tomcat03 ping tomcat01
 ```
 docker network ls
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603152735277.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/dockereee9c72de581d50a39d5aac67da2efbe.png)
 bridge：桥接模式
 host：和宿主机共享网络
 none: 不配置网络
@@ -95,7 +95,7 @@ docker network create --driver bridge --subnet 192.168.0.0/24 --gateway 192.168.
  mynet：自定义网络名称
 ```
 查看自己建立的网络
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603160416118.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/dockere927f68f55165049dfcaba8e0aa773ef.png)
 
 ```
 [root@VM-0-4-centos ~]# docker network inspect b6e6618b56af
@@ -150,7 +150,7 @@ PING tomcat01 (192.168.0.2) 56(84) bytes of data.
 
 ```
 发现tomcat01与tomcat02可以互相通过名字来ping通，进一步观察tomcat01的网卡
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603160945213.png)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker8d54c65f1480d48ef61bd3e6d48d2217.png)
 如果建立一个默认的tomcat03
 
 ```
@@ -161,7 +161,7 @@ PING tomcat01 (192.168.0.2) 56(84) bytes of data.
 ping: tomcat01: Name or service not known
 ```
 如上所示，tomcat03是无法打通tomcat01的，其原因如图所示，其中tomcat03与tomcat01不在一个网络内，因此要想实现tomcat03 ping通mynet子网内的容器，只能将tomcat03连接到mynet下。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2021060316241427.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker534263e4a5cbfc7e330213057f1251ee.png)
 
 ```
 [root@VM-0-4-centos ~]# docker network connect mynet tomcat03

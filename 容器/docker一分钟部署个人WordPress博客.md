@@ -53,7 +53,7 @@ volumes:
  docker-compose up -d
 ```
 访问自己ip地址的8000端口即可进行建立个人博客
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210607114138105.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FydGlzYW5fdw==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://raw.githubusercontent.com/PeipengWang/picture/master/docker0e3dd8423911d6883e29987a0a42fe39.png)
 
 扩展：
 在yml文件中包括三层
