@@ -113,3 +113,43 @@ ExecStart=/usr/bin/dockerd --registry-mirror=你的加速地址
  systemctl daemon-reload
 service docker restart
 ```
+
+
+
+
+
+```
+sudo mkdir -p /etc/systemd/system/docker.service.d
+
+
+sudo vim /etc/systemd/system/docker.service.d/http-proxy.conf
+
+[Service]
+Environment="HTTP_PROXY=http://127.0.0.1:8123"
+Environment="HTTPS_PROXY=http://127.0.0.1:8123"
+
+
+
+
+```
+
+```
+vim ~/.docker/config.json
+{
+ "proxies":
+ {
+   "default":
+   {
+     "httpProxy": "http://172.17.0.1:8123",
+     "httpsProxy": "http://172.17.0.1:8123",
+     "noProxy": "localhost,127.0.0.1,.daocloud.io"
+   }
+ }
+}
+
+
+
+
+
+```
+
