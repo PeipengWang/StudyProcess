@@ -1,0 +1,3 @@
+### 生成一个token，用于[picGo](https://zhida.zhihu.com/search?content_id=196850673&content_type=Article&match_order=1&q=picGo&zd_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ6aGlkYV9zZXJ2ZXIiLCJleHAiOjE3NTE3MjY0MDcsInEiOiJwaWNHbyIsInpoaWRhX3NvdXJjZSI6ImVudGl0eSIsImNvbnRlbnRfaWQiOjE5Njg1MDY3MywiY29udGVudF90eXBlIjoiQXJ0aWNsZSIsIm1hdGNoX29yZGVyIjoxLCJ6ZF90b2tlbiI6bnVsbH0.0ZgnH1TNZX3n1FNWbD0EIsuTF_GU7b5wH-dg-aTV80U&zhida_source=entity)访问github
+
+https://blog.csdn.net/zhebushibiaoshifu/article/details/129455228
