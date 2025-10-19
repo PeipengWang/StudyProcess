@@ -1,0 +1,1 @@
+[centos-7-isos-x86_64安装包下载_开源镜像站-阿里云](https://mirrors.aliyun.com/centos/7/isos/x86_64/)
