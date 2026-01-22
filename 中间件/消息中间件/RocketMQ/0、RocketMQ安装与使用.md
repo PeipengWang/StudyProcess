@@ -6,7 +6,8 @@
  安装：  
  unzip rocketmq-all-4.7.1-bin-release.zip  
  cd rocketmq-all-4.7.1-bin-release  
-可以修改一下参数，默认设置的队栈内存太大了  
+可以修改一下参数（ vim runserver.sh），默认设置的队栈内存太大了  
+
 ```
 server -Xms4g -Xmx4g -Xmn2g -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=320m
 ```
@@ -24,7 +25,7 @@ nohup sh bin/mqnamesrv &
 ```
 
 ## 启动Broker
-修改jvm参数  
+修改jvm参数  （runbroker.sh）
 
 ```
 JAVA_OPT="${JAVA_OPT} -server -Xms8g -Xmx8g -Xmn4g"
@@ -169,11 +170,4 @@ public class Consumer1 {
 }
 
 ```
-
-
-
-
-
-
-
 
